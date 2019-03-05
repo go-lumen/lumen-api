@@ -1,0 +1,12 @@
+server {
+    server_name     api.yourdomain.com www.api.yourdomain.com;
+
+    root /var/www/api-yourdomain;
+
+    location ~ /\.well-known/acme-challenge {
+            allow all;
+    }
+    # On interdit habituellement l'accès au dotfiles
+    #location ~ /\. { deny all; access_log off; log_not_found off; }
+
+}

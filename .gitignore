@@ -1,0 +1,13 @@
+things-api
+.idea/
+base.rsa
+base.rsa.pub
+.env
+.env.prod
+.env.prod.*
+.env.testing
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

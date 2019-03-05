@@ -1,0 +1,21 @@
+version: '2'
+services:
+  mongo-db:
+    image: mongo:latest
+  api:
+    container_name: iothings-api
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      IOTHINGS_ENV: prod
+    links:
+      - mongo-db:mongo
+
+  # FIXME(hoatle): $ docker-compose up test should work repeatedly
+  #test:
+    #build: .
+    #command: go run tests/main_test.go
+    #environment:
+    #  NODE_ENV: development
+

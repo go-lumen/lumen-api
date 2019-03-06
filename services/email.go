@@ -50,10 +50,6 @@ type EmailSenderParams struct {
 	apiUrl      string
 }
 
-/*func (f *FakeEmailSender) SendEmailFromTemplate(user *models.User, subject string, templateLink string) (error) {
-	return &rest.Response{StatusCode: http.StatusOK, Body: "Everything's fine Jean-Miche", Headers: nil}
-}*/
-
 func NewEmailSender(config *viper.Viper) EmailSender {
 	return &EmailSenderParams{
 		config.GetString("mail_sender_address"),

@@ -7,8 +7,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Setup Viper according to env var that selects related conf file
 func (a *API) SetupViper() error {
-
 	filename := ".env"
 	fmt.Println("Using env:" + os.Getenv("IOTHINGS_ENV"))
 	switch os.Getenv("IOTHINGS_ENV") {
@@ -23,12 +23,5 @@ func (a *API) SetupViper() error {
 	a.Config.SetEnvPrefix("iothings")
 	a.Config.AutomaticEnv()
 
-	a.SetupViperDefaults()
-
 	return nil
-}
-
-func (a *API) SetupViperDefaults() {
-	a.Config.SetDefault("rate_limit_requests_per_second", 5)
-	a.Config.SetDefault("rate_limit_activated", true)
 }

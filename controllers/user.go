@@ -18,6 +18,7 @@ func NewUserController() UserController {
 	return UserController{}
 }
 
+// Get user from id (in context)
 func (uc UserController) GetUser(c *gin.Context) {
 	user, err := store.FindUserById(c, c.Param("id"))
 
@@ -29,6 +30,7 @@ func (uc UserController) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Sanitize())
 }
 
+// Create a new user
 func (uc UserController) CreateUser(c *gin.Context) {
 	user := &models.User{}
 
@@ -59,6 +61,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user.Sanitize())
 }
 
+// Delete a user
 func (uc UserController) DeleteUser(c *gin.Context) {
 	err := store.DeleteUser(c, c.Param("id"))
 
@@ -71,6 +74,7 @@ func (uc UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// Change user language
 func (uc UserController) ChangeLanguage(c *gin.Context) {
 	if err := store.ChangeLanguage(c, c.Param("id"), c.Param("language")); err != nil {
 		c.Error(err)
@@ -80,6 +84,7 @@ func (uc UserController) ChangeLanguage(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// Activate user
 func (uc UserController) ActivateUser(c *gin.Context) {
 	if err := store.ActivateUser(c, c.Param("activationKey"), c.Param("id")); err != nil {
 		c.Error(err)
@@ -105,6 +110,7 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 	//c.Redirect(http.StatusMovedPermanently, "https://"+config.GetString(c, "front_url"))
 }
 
+// Get all users
 func (uc UserController) GetUsers(c *gin.Context) {
 	users, err := store.GetUsers(c)
 	if err != nil {

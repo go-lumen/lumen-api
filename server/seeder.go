@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/adrien3d/base-api/models"
 	"github.com/adrien3d/base-api/store/mongodb"
 )
@@ -19,7 +20,13 @@ func (a *API) SetupSeeds() error {
 		Admin:     true,
 	}
 
-	store.CreateUser(user)
-	store.ActivateUser(user.ActivationKey, user.Id)
+	if store.CreateUser(user) != nil {
+		fmt.Println(`Error when creating user`)
+	}
+
+	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
+		fmt.Println(`Error when activating user`)
+	}
+
 	return nil
 }

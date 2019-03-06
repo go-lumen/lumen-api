@@ -14,13 +14,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Creating a type
 type AuthController struct {
 }
 
+// Instantiation of the controller
 func NewAuthController() AuthController {
 	return AuthController{}
 }
 
+// Authenticating user
 func (ac AuthController) UserAuthentication(c *gin.Context) {
 	userInput := models.User{}
 	if err := c.Bind(&userInput); err != nil {

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/adrien3d/base-api/config"
@@ -12,13 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UserController holds all controller functions related to the user entity
 type UserController struct{}
 
 func NewUserController() UserController {
 	return UserController{}
 }
 
-// Get user from id (in context)
+// GetUser from id (in context)
 func (uc UserController) GetUser(c *gin.Context) {
 	user, err := store.FindUserById(c, c.Param("id"))
 
@@ -30,7 +32,7 @@ func (uc UserController) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Sanitize())
 }
 
-// Create a new user
+// CreateUser to create a new user
 func (uc UserController) CreateUser(c *gin.Context) {
 	user := &models.User{}
 
@@ -50,10 +52,11 @@ func (uc UserController) CreateUser(c *gin.Context) {
 	}
 
 	s := services.GetEmailSender(c)
-	data := models.EmailData{ReceiverMail: user.Email, ReceiverName: user.Firstname + " " + user.Lastname, User: user, Subject: subject, ApiUrl: config.GetString(c, "api_url"), AppName: config.GetString(c, "mail_sender_name")}
+	data := models.EmailData{ReceiverMail: user.Email, ReceiverName: user.FirstName + " " + user.LastName, User: user, Subject: subject, ApiUrl: config.GetString(c, "api_url"), AppName: config.GetString(c, "mail_sender_name")}
 
 	err := s.SendEmailFromTemplate(c, &data, templateLink)
 	if err != nil {
+		fmt.Println(err)
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("mail_credit_spent", "Your mail credit is spent", err))
 		return
 	}
@@ -61,7 +64,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user.Sanitize())
 }
 
-// Delete a user
+// DeleteUser to delete an existing user
 func (uc UserController) DeleteUser(c *gin.Context) {
 	err := store.DeleteUser(c, c.Param("id"))
 
@@ -84,7 +87,7 @@ func (uc UserController) ChangeLanguage(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Activate user
+// ActivateUser to activate a user (usually via mail)
 func (uc UserController) ActivateUser(c *gin.Context) {
 	if err := store.ActivateUser(c, c.Param("activationKey"), c.Param("id")); err != nil {
 		c.Error(err)
@@ -110,7 +113,7 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 	//c.Redirect(http.StatusMovedPermanently, "https://"+config.GetString(c, "front_url"))
 }
 
-// Get all users
+// GetUsers to get all users
 func (uc UserController) GetUsers(c *gin.Context) {
 	users, err := store.GetUsers(c)
 	if err != nil {

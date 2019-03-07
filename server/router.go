@@ -11,10 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Index is the default place
 func Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "You successfully reached the " + config.GetString(c, "mail_sender_name") + " API."})
 }
 
+// SetupRouter is the main routing point
 func (a *API) SetupRouter() {
 	router := a.Router
 
@@ -36,11 +38,6 @@ func (a *API) SetupRouter() {
 	router.Use(middlewares.EmailMiddleware(a.EmailSender))
 	router.Use(middlewares.TextMiddleware(a.TextSender))
 
-	if a.Config.GetBool("plan_check") == true {
-		router.Use(middlewares.PlanMiddleware())
-	}
-
-	//customerAuthMiddleware := middlewares.CustomerAuthMiddleware()
 	authMiddleware := middlewares.AuthMiddleware() //User
 	adminMiddleware := middlewares.AdminMiddleware()
 

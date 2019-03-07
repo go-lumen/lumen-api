@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Retrieving RSA private key
+// GetRSAPrivateKey retrieves the RSA private key
 func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 	//Decode base64 key
 	base64Text := make([]byte, base64.StdEncoding.DecodedLen(len(encodedKey)))
@@ -23,7 +23,7 @@ func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 	return privateKey, nil
 }
 
-// Generating an access token
+// GenerateAccessToken Generates an access token
 func GenerateAccessToken(encodedKey []byte, subject string) (*string, error) {
 	privateKey, err := GetRSAPrivateKey(encodedKey)
 	if err != nil {
@@ -45,7 +45,7 @@ func GenerateAccessToken(encodedKey []byte, subject string) (*string, error) {
 	return &accessString, nil
 }
 
-// Validating a JWT token
+// ValidateJwtToken Validates a JWT token
 func ValidateJwtToken(token string, encodedKey []byte, audience string) (jwt.MapClaims, error) {
 	privateKey, err := GetRSAPrivateKey(encodedKey)
 	if err != nil {

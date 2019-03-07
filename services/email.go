@@ -28,20 +28,23 @@ const (
 	emailSenderKey = "emailSender"
 )
 
+// GetEmailSender retrieves text sender
 func GetEmailSender(c context.Context) EmailSender {
 	return c.Value(emailSenderKey).(EmailSender)
 }
 
+// EmailSender creates a text sender interface
 type EmailSender interface {
-	GetEmailParams() *EmailSenderParams
 	//SendUserValidationEmail(user *models.User, subject string, templateLink string) error
 	//SendAlertEmail(user *models.User, device *models.Device, observation *models.Observation, subject string, templateLink string) error
 	SendEmailFromTemplate(ctx *gin.Context, data *models.EmailData, templateLink string) error
 	SendEmail(data *models.EmailData) error
 }
 
+// FakeEmailSender structure
 type FakeEmailSender struct{}
 
+// EmailSenderParams with various text sender params
 type EmailSenderParams struct {
 	senderEmail string
 	senderName  string
@@ -50,6 +53,7 @@ type EmailSenderParams struct {
 	apiUrl      string
 }
 
+// NewEmailSender instantiates of the sender
 func NewEmailSender(config *viper.Viper) EmailSender {
 	return &EmailSenderParams{
 		config.GetString("mail_sender_address"),
@@ -60,12 +64,9 @@ func NewEmailSender(config *viper.Viper) EmailSender {
 	}
 }
 
-func (s *EmailSenderParams) GetEmailParams() *EmailSenderParams {
-	return s
-}
-
+// SendAlertText sends a mail
 func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
-	file, err := ioutil.ReadFile("./templates/html/mail_squeletton.html")
+	file, err := ioutil.ReadFile("./templates/html/mail_skeleton.html")
 	if err != nil {
 		return err
 	}
@@ -130,8 +131,6 @@ func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
 				fmt.Println(aerr.Error())
 			}
 		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
 			fmt.Println(err.Error())
 		}
 
@@ -210,8 +209,6 @@ func (s *EmailSenderParams) SendEmailFromTemplate(ctx *gin.Context, data *models
 				fmt.Println(aerr.Error())
 			}
 		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
 			fmt.Println(err.Error())
 		}
 
@@ -219,8 +216,7 @@ func (s *EmailSenderParams) SendEmailFromTemplate(ctx *gin.Context, data *models
 		return err
 	}
 
-	//fmt.Println("SES Email Sent to " + data.ReceiverName + " at address: " + data.ReceiverMail)
-	//fmt.Println(result)
+	fmt.Println("SES Email Sent to " + data.ReceiverName + " at address: " + data.ReceiverMail)
 
 	return nil
 }

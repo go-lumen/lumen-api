@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Setup Viper according to env var that selects related conf file
+// SetupViper according to env var that selects related conf file
 func (a *API) SetupViper() error {
 	filename := ".env"
 	fmt.Println("Using env:" + os.Getenv("IOTHINGS_ENV"))

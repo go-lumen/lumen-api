@@ -9,10 +9,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// User type holds all required informations
 type User struct {
 	Id            string `json:"id" bson:"_id,omitempty" valid:"-"`
-	Firstname     string `json:"first_name" bson:"first_name"`
-	Lastname      string `json:"last_name" bson:"last_name"`
+	FirstName     string `json:"first_name" bson:"first_name"`
+	LastName      string `json:"last_name" bson:"last_name"`
 	Password      string `json:"password" bson:"password" valid:"required"`
 	Email         string `json:"email" bson:"email" valid:"email,required"`
 	Phone         string `json:"phone" bson:"phone"`
@@ -24,18 +25,21 @@ type User struct {
 	LastAccess    int64  `json:"last_access" bson:"last_access" valid:"-"`
 }
 
+// SanitizedUser allows to expose only few characteristics
 type SanitizedUser struct {
 	Id        string `json:"id" bson:"_id,omitempty"`
-	Firstname string `json:"first_name" bson:"first_name"`
-	Lastname  string `json:"last_name" bson:"last_name"`
+	FirstName string `json:"first_name" bson:"first_name"`
+	LastName  string `json:"last_name" bson:"last_name"`
 	Email     string `json:"email" bson:"email"`
 	Admin     bool   `json:"admin" bson:"admin"`
 }
 
+// Sanitize allows to create a lightweight user
 func (user *User) Sanitize() SanitizedUser {
-	return SanitizedUser{user.Id, user.Firstname, user.Lastname, user.Email, user.Admin}
+	return SanitizedUser{user.Id, user.FirstName, user.LastName, user.Email, user.Admin}
 }
 
+// BeforeCreate is here to check inputs and generating an encrypted password
 func (user *User) BeforeCreate() error {
 	user.Active = false
 	user.ActivationKey = helpers.RandomString(20)
@@ -55,4 +59,5 @@ func (user *User) BeforeCreate() error {
 	return nil
 }
 
+// UsersCollection represents a specific MongoDB collection
 const UsersCollection = "users"

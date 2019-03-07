@@ -16,21 +16,21 @@ const (
 	textSenderKey = "textSender"
 )
 
-// Retrieving text sender
+// GetTextSender retrieves text sender
 func GetTextSender(c context.Context) TextSender {
 	return c.Value(textSenderKey).(TextSender)
 }
 
-// Creating text sender interface
+// TextSender creates a text sender interface
 type TextSender interface {
 	SendAlertText(c *gin.Context, user *models.User, message string, templateLink string) error
 	SendText(ctx *gin.Context, data models.TextData) error
 }
 
-// Fake sender type
+// FakeTextSender structure
 type FakeTextSender struct{}
 
-// Various text sender params
+// TextSenderParams with various text sender params
 type TextSenderParams struct {
 	senderEmail string
 	senderName  string
@@ -39,7 +39,7 @@ type TextSenderParams struct {
 	apiUrl      string
 }
 
-// Instantiation of the sender
+// NewTextSender instantiates of the sender
 func NewTextSender(config *viper.Viper) TextSender {
 	return &TextSenderParams{
 		config.GetString("mail_sender_address"),
@@ -50,7 +50,7 @@ func NewTextSender(config *viper.Viper) TextSender {
 	}
 }
 
-// Sending a simple alert
+// SendAlertText sends a simple alert
 func (s *TextSenderParams) SendAlertText(c *gin.Context, user *models.User, message string, templateLink string) error {
 	data := models.TextData{PhoneNumber: user.Phone, Message: message}
 	if s.SendText(c, data) != nil {
@@ -60,7 +60,7 @@ func (s *TextSenderParams) SendAlertText(c *gin.Context, user *models.User, mess
 	return nil
 }
 
-// Sending any type of text
+// SendText sends any type of text
 func (s *TextSenderParams) SendText(ctx *gin.Context, data models.TextData) error {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("eu-west-1")},
@@ -69,12 +69,10 @@ func (s *TextSenderParams) SendText(ctx *gin.Context, data models.TextData) erro
 	fmt.Println("Amazon Creds: " + s.apiID + s.apiKey)
 	creds := credentials.NewStaticCredentials(s.apiID, s.apiKey, "")
 
-	// Create an SES session.
+	// Creates an SES session.
 	svc := sns.New(sess, &aws.Config{Credentials: creds})
 
-	// Assemble the text.
-
-	// Attempt to send the email.
+	// Assembling the text and attempting to send the email.
 	params := &sns.PublishInput{
 		Subject:     aws.String(data.Subject),
 		Message:     aws.String(data.Message),

@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// AdminMiddleware allows to filter admin only users
 func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := store.Current(c)

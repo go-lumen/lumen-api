@@ -1,5 +1,6 @@
 package models
 
+// EmailData holds informations required to send an email
 type EmailData struct {
 	ReceiverMail string
 	ReceiverName string
@@ -10,6 +11,7 @@ type EmailData struct {
 	AppName      string
 }
 
+// TextData holds informations required to send a text
 type TextData struct {
 	PhoneNumber string
 	Subject     string

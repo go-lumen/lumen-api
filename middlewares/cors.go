@@ -19,32 +19,38 @@ A Default Config for example is below:
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (
-	AllowOriginKey      string = "Access-Control-Allow-Origin"
-	AllowCredentialsKey        = "Access-Control-Allow-Credentials"
-	AllowHeadersKey            = "Access-Control-Allow-Headers"
-	AllowMethodsKey            = "Access-Control-Allow-Methods"
-	MaxAgeKey                  = "Access-Control-Max-Age"
+	// AllowOriginKey string key
+	AllowOriginKey string = "Access-Control-Allow-Origin"
+	// AllowCredentialsKey string key
+	AllowCredentialsKey = "Access-Control-Allow-Credentials"
+	// AllowHeadersKey string key
+	AllowHeadersKey = "Access-Control-Allow-Headers"
+	// AllowMethodsKey string key
+	AllowMethodsKey = "Access-Control-Allow-Methods"
+	// MaxAgeKey string key
+	MaxAgeKey = "Access-Control-Max-Age"
 
-	OriginKey         = "Origin"
-	RequestMethodKey  = "Access-Control-Request-Method"
+	// OriginKey string key
+	OriginKey = "Origin"
+	// RequestMethodKey string key
+	RequestMethodKey = "Access-Control-Request-Method"
+	// RequestHeadersKey string key
 	RequestHeadersKey = "Access-Control-Request-Headers"
-	ExposeHeadersKey  = "Access-Control-Expose-Headers"
+	// ExposeHeadersKey string key
+	ExposeHeadersKey = "Access-Control-Expose-Headers"
 )
 
 const (
 	optionsMethod = "OPTIONS"
 )
 
-/*
-Config defines the configuration options available to control how the CORS middleware should function.
-*/
+// Config defines the configuration options available to control how the CORS middleware should function.
 type Config struct {
 	// Enabling this causes us to compare Request-Method and Request-Headers to confirm they contain a subset of the Allowed Methods and Allowed Headers
 	// The spec however allows for the server to always match, and simply return the allowed methods and headers. Either is supported in this middleware.
@@ -100,10 +106,7 @@ func (config *Config) prepare() {
 	}
 }
 
-/*
-Middleware generates a middleware handler function that works inside of a Gin request
-to set the correct CORS headers.  It accepts a cors.Options struct for configuration.
-*/
+// CorsMiddleware generates a middleware handler function that works inside of a Gin request to set the correct CORS headers.  It accepts a cors.Options struct for configuration.
 func CorsMiddleware(config Config) gin.HandlerFunc {
 	forceOriginMatch := false
 

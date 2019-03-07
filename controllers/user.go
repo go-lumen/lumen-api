@@ -14,6 +14,7 @@ import (
 // UserController holds all controller functions related to the user entity
 type UserController struct{}
 
+// NewUserController instantiates of the controller
 func NewUserController() UserController {
 	return UserController{}
 }
@@ -75,7 +76,7 @@ func (uc UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Change user language
+// ChangeLanguage changes user language
 func (uc UserController) ChangeLanguage(c *gin.Context) {
 	if err := store.ChangeLanguage(c, c.Param("id"), c.Param("language")); err != nil {
 		c.Error(err)

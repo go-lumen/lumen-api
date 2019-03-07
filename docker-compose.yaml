@@ -11,11 +11,3 @@ services:
       IOTHINGS_ENV: prod
     links:
       - mongo-db:mongo
-
-  # FIXME(hoatle): $ docker-compose up test should work repeatedly
-  #test:
-    #build: .
-    #command: go run tests/main_test.go
-    #environment:
-    #  NODE_ENV: development
-

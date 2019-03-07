@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// AuthMiddleware allows to analyze the token and check that it is valid
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenReader := c.Request.Header.Get("Authorization")

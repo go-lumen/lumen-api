@@ -9,6 +9,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
+// CreateUser checks if user already exists, and if not, creates it
 func (db *mongo) CreateUser(user *models.User) error {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -32,6 +33,7 @@ func (db *mongo) CreateUser(user *models.User) error {
 	return nil
 }
 
+// FindUserById allows to retrieve a user by its id
 func (db *mongo) FindUserById(id string) (*models.User, error) {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -46,6 +48,7 @@ func (db *mongo) FindUserById(id string) (*models.User, error) {
 	return user, err
 }
 
+// FindUser allows to retrieve a user by its characteristics
 func (db *mongo) FindUser(params params.M) (*models.User, error) {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -61,6 +64,7 @@ func (db *mongo) FindUser(params params.M) (*models.User, error) {
 	return user, err
 }
 
+// DeleteUser allows to delete a user by its id
 func (db *mongo) DeleteUser(user *models.User, userId string) error {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -74,6 +78,7 @@ func (db *mongo) DeleteUser(user *models.User, userId string) error {
 	return nil
 }
 
+// ActivateUser allows to activate a user by its id
 func (db *mongo) ActivateUser(activationKey string, id string) error {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -86,6 +91,7 @@ func (db *mongo) ActivateUser(activationKey string, id string) error {
 	return nil
 }
 
+// ChangeLanguage allows to change a user language by its id
 func (db *mongo) ChangeLanguage(id string, language string) error {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -98,6 +104,7 @@ func (db *mongo) ChangeLanguage(id string, language string) error {
 	return nil
 }
 
+// UpdateUser allows to update one or more user characteristics
 func (db *mongo) UpdateUser(user *models.User, params params.M) error {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -111,6 +118,7 @@ func (db *mongo) UpdateUser(user *models.User, params params.M) error {
 	return nil
 }
 
+// GetUsers allows to get all users
 func (db *mongo) GetUsers() ([]*models.User, error) {
 	session := db.Session.Copy()
 	defer session.Close()
@@ -126,6 +134,7 @@ func (db *mongo) GetUsers() ([]*models.User, error) {
 	return list, nil
 }
 
+// CountUsers allows to count all users
 func (db *mongo) CountUsers() (int, error) {
 	session := db.Session.Copy()
 	defer session.Close()

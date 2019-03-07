@@ -58,7 +58,7 @@ func NewEmailSender(config *viper.Viper) EmailSender {
 	}
 }
 
-// SendAlertText sends a mail
+// SendEmail sends a mail
 func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
 	file, err := ioutil.ReadFile("./templates/html/mail_skeleton.html")
 	if err != nil {
@@ -135,6 +135,7 @@ func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
 	return nil
 }
 
+// SendEmailFromTemplate sends an email from template
 func (s *EmailSenderParams) SendEmailFromTemplate(ctx *gin.Context, data *models.EmailData, templateLink string) error {
 	file, err := ioutil.ReadFile(templateLink)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// API structure that holds various necessary services
 type API struct {
 	Router      *gin.Engine
 	Config      *viper.Viper

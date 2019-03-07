@@ -5,6 +5,7 @@ import (
 	"github.com/adrien3d/base-api/models"
 )
 
+// Store interface
 type Store interface {
 	CreateUser(*models.User) error
 	DeleteUser(*models.User, string) error

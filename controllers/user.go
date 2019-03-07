@@ -1,16 +1,14 @@
 package controllers
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/adrien3d/base-api/config"
 	"github.com/adrien3d/base-api/helpers"
 	"github.com/adrien3d/base-api/models"
-	"github.com/adrien3d/base-api/store"
-
 	"github.com/adrien3d/base-api/services"
+	"github.com/adrien3d/base-api/store"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"net/http"
 )
 
 // UserController holds all controller functions related to the user entity
@@ -56,7 +54,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 
 	err := s.SendEmailFromTemplate(c, &data, templateLink)
 	if err != nil {
-		fmt.Println(err)
+		logrus.Infoln(err)
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("mail_credit_spent", "Your mail credit is spent", err))
 		return
 	}
@@ -96,7 +94,7 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 	}
 	//c.JSON(http.StatusOK, nil)
 
-	user, err := store.FindUserById(c, c.Param("id"))
+	/*user, err := store.FindUserById(c, c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
 		return
@@ -108,9 +106,9 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 		"AppUrl":  config.GetString(c, "front_url"),
 	}
 
-	c.HTML(http.StatusOK, "./templates/html/page_account_activated.html", vars)
+	c.HTML(http.StatusOK, "./templates/html/page_account_activated.html", vars)*/
 
-	//c.Redirect(http.StatusMovedPermanently, "https://"+config.GetString(c, "front_url"))
+	c.Redirect(http.StatusMovedPermanently, "https://"+config.GetString(c, "front_url"))
 }
 
 // GetUsers to get all users

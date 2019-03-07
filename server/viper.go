@@ -1,16 +1,16 @@
 package server
 
 import (
+	"github.com/sirupsen/logrus"
 	"os"
 
-	"fmt"
 	"github.com/joho/godotenv"
 )
 
 // SetupViper according to env var that selects related conf file
 func (a *API) SetupViper() error {
 	filename := ".env"
-	fmt.Println("Using env:" + os.Getenv("IOTHINGS_ENV"))
+	logrus.Infoln("Using env:" + os.Getenv("IOTHINGS_ENV"))
 	switch os.Getenv("IOTHINGS_ENV") {
 	case "testing":
 		filename = "../.env.testing"

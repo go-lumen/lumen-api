@@ -1,9 +1,9 @@
 package server
 
 import (
-	"fmt"
 	"github.com/adrien3d/base-api/models"
 	"github.com/adrien3d/base-api/store/mongodb"
+	"github.com/sirupsen/logrus"
 )
 
 // SetupSeeds creates the first user
@@ -22,11 +22,11 @@ func (a *API) SetupSeeds() error {
 	}
 
 	if store.CreateUser(user) != nil {
-		fmt.Println(`Error when creating user`)
+		logrus.Warnln(`Error when creating user`)
 	}
 
 	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
-		fmt.Println(`Error when activating user`)
+		logrus.Warnln(`Error when activating user`)
 	}
 
 	return nil

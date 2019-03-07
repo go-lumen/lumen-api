@@ -2,18 +2,12 @@ package services
 
 import (
 	"bytes"
+	"github.com/sirupsen/logrus"
 	"html/template"
 	"io/ioutil"
 
-	//"net/http"
-
 	"github.com/adrien3d/base-api/models"
 
-	/*"github.com/sendgrid/rest"
-	"github.com/sendgrid/sendgrid-go
-	"github.com/sendgrid/sendgrid-go/helpers/mail"*/
-
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -76,7 +70,7 @@ func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
 	buffer := new(bytes.Buffer)
 	err = htmlTemplate.Execute(buffer, data)
 	if err != nil {
-		fmt.Println(err)
+		logrus.Warnln(err)
 		return err
 	}
 
@@ -110,8 +104,6 @@ func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
 			},
 		},
 		Source: aws.String(s.senderEmail),
-		// Uncomment to use a configuration set
-		// ConfigurationSetName: aws.String(ConfigurationSet),
 	}
 
 	// Attempt to send the email.
@@ -122,23 +114,23 @@ func (s *EmailSenderParams) SendEmail(data *models.EmailData) error {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case ses.ErrCodeMessageRejected:
-				fmt.Println(ses.ErrCodeMessageRejected, aerr.Error())
+				logrus.Warnln(ses.ErrCodeMessageRejected, aerr.Error())
 			case ses.ErrCodeMailFromDomainNotVerifiedException:
-				fmt.Println(ses.ErrCodeMailFromDomainNotVerifiedException, aerr.Error())
+				logrus.Warnln(ses.ErrCodeMailFromDomainNotVerifiedException, aerr.Error())
 			case ses.ErrCodeConfigurationSetDoesNotExistException:
-				fmt.Println(ses.ErrCodeConfigurationSetDoesNotExistException, aerr.Error())
+				logrus.Warnln(ses.ErrCodeConfigurationSetDoesNotExistException, aerr.Error())
 			default:
-				fmt.Println(aerr.Error())
+				logrus.Warnln(aerr.Error())
 			}
 		} else {
-			fmt.Println(err.Error())
+			logrus.Warnln(err.Error())
 		}
 
-		fmt.Println(err)
+		logrus.Warnln(err)
 		return err
 	}
 
-	fmt.Println("SES Email Sent to " + data.ReceiverName + " at address: " + data.ReceiverMail)
+	logrus.Infoln("SES Email Sent to " + data.ReceiverName + " at address: " + data.ReceiverMail)
 
 	return nil
 }
@@ -154,7 +146,7 @@ func (s *EmailSenderParams) SendEmailFromTemplate(ctx *gin.Context, data *models
 	buffer := new(bytes.Buffer)
 	err = htmlTemplate.Execute(buffer, data)
 	if err != nil {
-		fmt.Println(err)
+		logrus.Warnln(err)
 		return err
 	}
 
@@ -188,8 +180,6 @@ func (s *EmailSenderParams) SendEmailFromTemplate(ctx *gin.Context, data *models
 			},
 		},
 		Source: aws.String(s.senderEmail),
-		// Uncomment to use a configuration set
-		// ConfigurationSetName: aws.String(ConfigurationSet),
 	}
 
 	// Attempt to send the email.
@@ -200,23 +190,23 @@ func (s *EmailSenderParams) SendEmailFromTemplate(ctx *gin.Context, data *models
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case ses.ErrCodeMessageRejected:
-				fmt.Println(ses.ErrCodeMessageRejected, aerr.Error())
+				logrus.Warnln(ses.ErrCodeMessageRejected, aerr.Error())
 			case ses.ErrCodeMailFromDomainNotVerifiedException:
-				fmt.Println(ses.ErrCodeMailFromDomainNotVerifiedException, aerr.Error())
+				logrus.Warnln(ses.ErrCodeMailFromDomainNotVerifiedException, aerr.Error())
 			case ses.ErrCodeConfigurationSetDoesNotExistException:
-				fmt.Println(ses.ErrCodeConfigurationSetDoesNotExistException, aerr.Error())
+				logrus.Warnln(ses.ErrCodeConfigurationSetDoesNotExistException, aerr.Error())
 			default:
-				fmt.Println(aerr.Error())
+				logrus.Warnln(aerr.Error())
 			}
 		} else {
-			fmt.Println(err.Error())
+			logrus.Warnln(err.Error())
 		}
 
-		fmt.Println(err)
+		logrus.Warnln(err)
 		return err
 	}
 
-	fmt.Println("SES Email Sent to " + data.ReceiverName + " at address: " + data.ReceiverMail)
+	logrus.Infoln("SES Email Sent to " + data.ReceiverName + " at address: " + data.ReceiverMail)
 
 	return nil
 }

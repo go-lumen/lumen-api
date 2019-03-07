@@ -1,13 +1,13 @@
 package services
 
 import (
-	"fmt"
 	"github.com/adrien3d/base-api/models"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 )
@@ -54,7 +54,7 @@ func NewTextSender(config *viper.Viper) TextSender {
 func (s *TextSenderParams) SendAlertText(c *gin.Context, user *models.User, message string, templateLink string) error {
 	data := models.TextData{PhoneNumber: user.Phone, Message: message}
 	if s.SendText(c, data) != nil {
-		fmt.Println(`Send text error`)
+		logrus.Warnln(`Send text error`)
 	}
 
 	return nil
@@ -66,7 +66,7 @@ func (s *TextSenderParams) SendText(ctx *gin.Context, data models.TextData) erro
 		Region: aws.String("eu-west-1")},
 	)
 
-	fmt.Println("Amazon Creds: " + s.apiID + s.apiKey)
+	// logrus.Infoln("Amazon Creds: " + s.apiID + s.apiKey)
 	creds := credentials.NewStaticCredentials(s.apiID, s.apiKey, "")
 
 	// Creates an SES session.
@@ -78,15 +78,15 @@ func (s *TextSenderParams) SendText(ctx *gin.Context, data models.TextData) erro
 		Message:     aws.String(data.Message),
 		PhoneNumber: aws.String(data.PhoneNumber),
 	}
-	resp, err := svc.Publish(params)
+	_, err = svc.Publish(params)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		logrus.Warnln(err.Error())
 		return err
 	}
 
-	fmt.Println("SNS Text Sent to " + data.PhoneNumber)
-	fmt.Println(resp)
+	// logrus.Infoln("SNS Text Sent to " + data.PhoneNumber)
+	// logrus.Infoln(resp)
 
 	return nil
 }

@@ -26,9 +26,7 @@ func GetEmailSender(c context.Context) EmailSender {
 
 // EmailSender creates a text sender interface
 type EmailSender interface {
-	//SendUserValidationEmail(user *models.User, subject string, templateLink string) error
-	//SendAlertEmail(user *models.User, device *models.Device, observation *models.Observation, subject string, templateLink string) error
-	SendEmail( /*buffer *bytes.Buffer*/ content string, data *models.EmailData) error
+	SendEmail(content string, data *models.EmailData) error
 	SendActivationEmail(user *models.User, apiUrl string, appName string, frontUrl string) error
 }
 
@@ -55,8 +53,18 @@ func NewEmailSender(config *viper.Viper) EmailSender {
 	}
 }
 
+// SendEmail is used for test purposes
+func (f *FakeEmailSender) SendEmail(content string, data *models.EmailData) error {
+	return nil
+}
+
+// SendActivationEmail is used for test purposes
+func (f *FakeEmailSender) SendActivationEmail(user *models.User, apiUrl string, appName string, frontUrl string) error {
+	return nil
+}
+
 // SendEmail sends an mail
-func (s *EmailSenderParams) SendEmail( /*buffer *bytes.Buffer*/ content string, data *models.EmailData) error {
+func (s *EmailSenderParams) SendEmail(content string, data *models.EmailData) error {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("eu-west-1")},
 	)
@@ -139,8 +147,10 @@ func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiUrl string
 				`Welcome to ` + appName + `! We're very excited to have you on board.`,
 			},
 			Dictionary: []hermes.Entry{
-				{Key: "Firstname", Value: user.FirstName},
-				{Key: "Lastname", Value: user.LastName},
+				{Key: "Email", Value: user.Email},
+				{Key: "FirstName", Value: user.FirstName},
+				{Key: "LastName", Value: user.LastName},
+				{Key: "Phone", Value: user.Phone},
 			},
 			Actions: []hermes.Action{
 				{

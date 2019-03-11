@@ -38,8 +38,8 @@ func ChangeLanguage(c context.Context, id string, language string) error {
 }
 
 // UpdateUser allows to update one or more user characteristics
-func UpdateUser(c context.Context, params params.M) error {
-	return FromContext(c).UpdateUser(Current(c), params)
+func UpdateUser(c context.Context, userId string, params params.M) error {
+	return FromContext(c).UpdateUser(userId, params)
 }
 
 // GetUsers allows to get all users

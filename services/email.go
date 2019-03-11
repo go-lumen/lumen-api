@@ -28,6 +28,7 @@ func GetEmailSender(c context.Context) EmailSender {
 type EmailSender interface {
 	SendEmail(content string, data *models.EmailData) error
 	SendActivationEmail(user *models.User, apiUrl string, appName string, frontUrl string) error
+	SendResetEmail(user *models.User, apiUrl string, appName string, frontUrl string) error
 }
 
 // FakeEmailSender structure
@@ -39,7 +40,7 @@ type EmailSenderParams struct {
 	senderName  string
 	apiID       string
 	apiKey      string
-	apiUrl      string
+	//apiUrl      string
 }
 
 // NewEmailSender instantiates of the sender
@@ -49,7 +50,7 @@ func NewEmailSender(config *viper.Viper) EmailSender {
 		config.GetString("mail_sender_name"),
 		config.GetString("aws_api_id"),
 		config.GetString("aws_api_key"),
-		config.GetString("api_url"),
+		//config.GetString("api_url"),
 	}
 }
 
@@ -156,10 +157,10 @@ func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiUrl string
 				{
 					Instructions: `To get started with ` + appName + `, please click here:`,
 					Button: hermes.Button{
-						/*Color: ``,
-						TextColor: ``,*/
-						Text: "Confirm your account",
-						Link: apiUrl,
+						Color:     `#22BC66`,
+						TextColor: `#FFFFFF`,
+						Text:      "Confirm your account",
+						Link:      apiUrl,
 					},
 				},
 			},
@@ -175,7 +176,62 @@ func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiUrl string
 		panic(err)
 	}
 
-	data := models.EmailData{ReceiverMail: user.Email, ReceiverName: user.FirstName + " " + user.LastName, User: user, Subject: `Welcome to ` + appName + `! We're very excited to have you on board.`, ApiUrl: apiUrl, AppName: appName}
+	data := models.EmailData{ReceiverMail: user.Email, ReceiverName: user.FirstName + " " + user.LastName, User: user, Subject: `Welcome to ` + appName + `! We're very excited to have you on board.`, AppName: appName}
+
+	return s.SendEmail(emailBody, &data)
+}
+
+// SendResetEmail allows to send an email to user to reset his password
+func (s *EmailSenderParams) SendResetEmail(user *models.User, apiUrl string, appName string, frontUrl string) error {
+	currentYear := string(int(time.Now().Year()))
+
+	h := hermes.Hermes{
+		Theme: new(hermes.Flat),
+		Product: hermes.Product{ // Appears in header & footer of e-mails
+			Name: appName,
+			Link: frontUrl,
+			//Logo: ``,
+			Copyright: `Copyright © ` + currentYear + ` ` + appName + `. All rights reserved.`,
+		},
+	}
+
+	email := hermes.Email{
+		Body: hermes.Body{
+			Name: user.FirstName + ` ` + user.LastName,
+			Intros: []string{
+				`We received a request to reset your` + appName + `password.`,
+				`We have found an account with the following details`,
+			},
+			Dictionary: []hermes.Entry{
+				{Key: "Email", Value: user.Email},
+				{Key: "FirstName", Value: user.FirstName},
+				{Key: "LastName", Value: user.LastName},
+				{Key: "Phone", Value: user.Phone},
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: `If you want to reset your ` + appName + ` password, please click here:`,
+					Button: hermes.Button{
+						Color:     `#DC4D2F`,
+						TextColor: `#FFFFFF`,
+						Text:      "Reset your password",
+						Link:      apiUrl,
+					},
+				},
+			},
+			Outros: []string{
+				`If you received this mail and it was not intended to you, please ignore it.`,
+			},
+		},
+	}
+
+	emailBody, err := h.GenerateHTML(email)
+	if err != nil {
+		logrus.Warnln(err)
+		panic(err)
+	}
+
+	data := models.EmailData{ReceiverMail: user.Email, ReceiverName: user.FirstName + " " + user.LastName, User: user, Subject: appName + ` password reset request.`, AppName: appName}
 
 	return s.SendEmail(emailBody, &data)
 }

@@ -97,21 +97,19 @@ func (db *mongo) ChangeLanguage(id string, language string) error {
 	defer session.Close()
 	users := db.C(models.UsersCollection).With(session)
 
-	err := users.Update(bson.M{"_id": id}, bson.M{"$set": bson.M{"language": language}})
-	if err != nil {
+	if err := users.UpdateId(id, bson.M{"$set": bson.M{"language": language}}); err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_activation_failed", "Couldn't find the user to change language", err)
 	}
 	return nil
 }
 
 // UpdateUser allows to update one or more user characteristics
-func (db *mongo) UpdateUser(user *models.User, params params.M) error {
+func (db *mongo) UpdateUser(userId string, params params.M) error {
 	session := db.Session.Copy()
 	defer session.Close()
 	users := db.C(models.UsersCollection).With(session)
 
-	err := users.UpdateId(user.Id, params)
-	if err != nil {
+	if err := users.UpdateId(userId, params); err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_update_failed", "Failed to update the user", err)
 	}
 
@@ -126,8 +124,7 @@ func (db *mongo) GetUsers() ([]*models.User, error) {
 	users := db.C(models.UsersCollection).With(session)
 
 	list := []*models.User{}
-	err := users.Find(params.M{}).All(&list)
-	if err != nil {
+	if err := users.Find(params.M{}).All(&list); err != nil {
 		return nil, helpers.NewError(http.StatusNotFound, "users_not_found", "Users not found", err)
 	}
 

@@ -33,9 +33,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		user, _ := store.FindUserById(c, claims["sub"].(string))
 		c.Set(store.CurrentKey, user)
 
-		user.LastAccess = time.Now().Unix()
-
-		store.UpdateUser(c, params.M{"$set": params.M{"last_access": user.LastAccess}})
+		if err := store.UpdateUser(c, user.Id, params.M{"$set": params.M{"last_access": time.Now().Unix()}}); err != nil {
+			println(err)
+		}
 
 		c.Next()
 	}

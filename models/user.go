@@ -42,7 +42,7 @@ func (user *User) Sanitize() SanitizedUser {
 // BeforeCreate is here to check inputs and generating an encrypted password
 func (user *User) BeforeCreate() error {
 	user.Active = false
-	user.ActivationKey = helpers.RandomString(20)
+	user.ActivationKey = helpers.RandomString(40)
 	user.Email = strings.ToLower(user.Email)
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)

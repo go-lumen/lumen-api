@@ -12,7 +12,7 @@ type Store interface {
 	FindUserById(string) (*models.User, error)
 	ActivateUser(string, string) error
 	FindUser(params.M) (*models.User, error)
-	UpdateUser(*models.User, params.M) error
+	UpdateUser(string, params.M) error
 	ChangeLanguage(string, string) error
 	GetUsers() ([]*models.User, error)
 	CountUsers() (int, error)

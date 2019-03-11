@@ -54,7 +54,8 @@ func (a *API) SetupRouter() {
 		users := v1.Group("/users")
 		{
 			userController := controllers.NewUserController()
-			//v1.POST("/reset_password", userController.ResetPasswordRequest)
+			users.POST("/reset/:email", userController.ResetPasswordRequest)
+			users.POST("/reset_password/:id/:resetKey", userController.ResetPasswordResponse)
 			users.GET("/:id/activate/:activationKey", userController.ActivateUser)
 			users.Use(authMiddleware)
 			users.GET("/:id", userController.GetUser)

@@ -130,3 +130,41 @@ func (uc UserController) GetUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, users)
 }
+
+// ResetPasswordRequest allows to send the user an email to reset his password
+func (uc UserController) ResetPasswordRequest(c *gin.Context) {
+	databaseUser, err := store.FindUser(c, params.M{"email": c.Param("email")})
+	if err != nil {
+		c.Error(err)
+		c.Abort()
+		return
+	}
+
+	resetKey := helpers.RandomString(40)
+
+	if err = store.UpdateUser(c, databaseUser.Id, params.M{"resetKey": resetKey}); err != nil {
+		c.Error(err)
+		c.Abort()
+		return
+	}
+
+	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/reset_password/` + databaseUser.Id + `/` + resetKey
+	frontUrl := config.GetString(c, "front_url")
+	appName := config.GetString(c, "mail_sender_name")
+
+	s := services.GetEmailSender(c)
+
+	err = s.SendResetEmail(databaseUser, apiUrl, appName, frontUrl)
+	if err != nil {
+		logrus.Infoln(err)
+		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("mail_sending_error", "Error when sending mail", err))
+		return
+	}
+
+	c.JSON(http.StatusCreated, databaseUser.Sanitize())
+}
+
+// ResetPasswordResponse allows the user to change his password
+func (uc UserController) ResetPasswordResponse(C *gin.Context) {
+
+}

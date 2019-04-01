@@ -11,3 +11,5 @@ base.rsa.pub
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+vendor/

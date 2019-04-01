@@ -1,27 +1,20 @@
-module github.com/adrien3d/base-api
+module github.com/adrien3d/lumen-api
 
 go 1.12
 
 require (
+	github.com/adrien3d/base-api v0.0.0-20190329150044-b255b543b773
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
-	github.com/aws/aws-sdk-go v1.17.14
+	github.com/aws/aws-sdk-go v1.19.6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3 // indirect
 	github.com/gin-gonic/gin v1.3.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
-	github.com/golang/protobuf v1.3.0 // indirect
 	github.com/joho/godotenv v1.3.0
-	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/matcornic/hermes/v2 v2.0.2
-	github.com/mattn/go-isatty v0.0.6 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/sendgrid/rest v2.4.1+incompatible // indirect
-	github.com/sirupsen/logrus v1.3.0
-	github.com/spf13/viper v1.3.1
+	github.com/sirupsen/logrus v1.4.0
+	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.3.0
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-	golang.org/x/net v0.0.0-20190301231341-16b79f2e4e95
-	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
+	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
+	golang.org/x/net v0.0.0-20190328230028-74de082e2cca
 )

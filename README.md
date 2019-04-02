@@ -7,11 +7,14 @@
 <h1 align="center">Lumen Api</h1>
 
 <p align="center">
+    <a href="https://github.com/adrien3d/lumen-api/blob/master/LICENSE.md">
+        <img alt="Go Report Card" src="https://img.shields.io/github/license/adrien3d/lumen-api.svg">
+    </a>
     <a href="https://goreportcard.com/report/github.com/adrien3d/lumen-api">
         <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/adrien3d/lumen-api">
     </a>
     <a href="https://godoc.org/github.com/adrien3d/lumen-api">
-        <img alt="latest release" src="https://godoc.org/github.com/adrien3d/lumen-api?status.svg">
+        <img alt="GoDoc" src="https://godoc.org/github.com/adrien3d/lumen-api?status.svg">
     </a>
     <a href="https://hub.docker.com/r/adrien3d/lumen-api">
         <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/adrien3d/lumen-api.svg">
@@ -59,3 +62,20 @@ Some features would be nice to have, such as user roles management, Stripe billi
 
 ## Miscellaneous
 If you want something you consider relevant to be implemented, feel free to fork the repo, and create a PR.
+
+## Built With
+
+* [gin-gonic/gin](github.com/gin-gonic/gin) - Gin is a HTTP web framework written in Go (Golang).
+* [mgo](github.com/globalsign/mgo) - The MongoDB driver for Go.
+* [hermes](github.com/matcornic/hermes) - Golang package that generates clean, responsive HTML e-mails for sending transactional mail.
+* [viper](github.com/spf13/viper) - Go configuration with fangs.
+* [logrus](github.com/sirupsen/logrus) - Structured, pluggable logging for Go.
+* [aws/aws-sdk-go](github.com/aws/aws-sdk-go) - AWS SDK for the Go programming language.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+* **Romain Braems** - *Initial work* - [IoThings](https://github.com/rb62680)
+* **Adrien Chapelet** - *Initial work & Updates* - [IoThings](https://github.com/adrien3d)
+* **Maxence Henneron** - *Initial work* - [IoThings](https://github.com/maxencehenneron)
+

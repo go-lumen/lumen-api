@@ -3,10 +3,10 @@
 FROM golang
 
 # Copy the local package files to the container's workspace.
-ADD . /go/src/github.com/adrien3d/base-api
+ADD . /go/src/github.com/adrien3d/lumen-api
 
 # Change workdir
-WORKDIR /go/src/github.com/adrien3d/base-api
+WORKDIR /go/src/github.com/adrien3d/lumen-api
 
 # Install the dependencies
 RUN go get -t -v ./...
@@ -14,7 +14,7 @@ RUN go get -t -v ./...
 # Build the outyet command inside the container.
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
-RUN go install github.com/adrien3d/base-api
+RUN go install github.com/adrien3d/lumen-api
 
 ENV GIN_MODE release
 ENV IOTHINGS_ENV prod

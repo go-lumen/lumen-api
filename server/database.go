@@ -9,7 +9,7 @@ func (a *API) SetupDatabase() (*mgo.Session, error) {
 		return nil, err
 	}
 
-	a.Database = session.DB(a.Config.GetString("db_name"))
+	a.MongoDatabase = session.DB(a.Config.GetString("db_name"))
 
 	return session, nil
 }

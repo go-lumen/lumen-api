@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/adrien3d/base-api/models"
+	"github.com/adrien3d/lumen-api/models"
 	"github.com/globalsign/mgo/bson"
 	"github.com/stretchr/testify/assert"
 )

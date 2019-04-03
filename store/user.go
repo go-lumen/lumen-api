@@ -3,8 +3,8 @@ package store
 import (
 	"context"
 
-	"github.com/adrien3d/base-api/helpers/params"
-	"github.com/adrien3d/base-api/models"
+	"github.com/adrien3d/lumen-api/helpers/params"
+	"github.com/adrien3d/lumen-api/models"
 )
 
 // CreateUser checks if user already exists, and if not, creates it

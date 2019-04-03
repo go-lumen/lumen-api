@@ -1,14 +1,14 @@
 package server
 
 import (
-	"github.com/adrien3d/base-api/models"
-	"github.com/adrien3d/base-api/store/mongodb"
+	"github.com/adrien3d/lumen-api/models"
+	"github.com/adrien3d/lumen-api/store/mongodb"
 	"github.com/sirupsen/logrus"
 )
 
 // SetupSeeds creates the first user
 func (a *API) SetupSeeds() error {
-	store := mongodb.New(a.Database)
+	store := mongodb.New(a.MongoDatabase)
 
 	//Mails: 0.10$/1000         Texts: 0.05-0.10$/1       WiFi: 5$/1000
 

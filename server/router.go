@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/adrien3d/base-api/config"
+	"github.com/adrien3d/lumen-api/config"
 	"net/http"
 	"time"
 
-	"github.com/adrien3d/base-api/controllers"
-	"github.com/adrien3d/base-api/middlewares"
+	"github.com/adrien3d/lumen-api/controllers"
+	"github.com/adrien3d/lumen-api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +32,7 @@ func (a *API) SetupRouter() {
 		ValidateHeaders: false,
 	}))
 
-	router.Use(middlewares.StoreMiddleware(a.Database))
+	router.Use(middlewares.StoreMiddleware(a.MongoDatabase))
 	router.Use(middlewares.ConfigMiddleware(a.Config))
 
 	router.Use(middlewares.EmailMiddleware(a.EmailSender))

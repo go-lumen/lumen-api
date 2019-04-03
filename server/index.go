@@ -1,14 +1,14 @@
 package server
 
 import (
-	"github.com/adrien3d/base-api/models"
+	"github.com/adrien3d/lumen-api/models"
 
 	"github.com/globalsign/mgo"
 )
 
 // SetupIndexes allows to setup MongoDB index
 func (a *API) SetupIndexes() error {
-	database := a.Database
+	database := a.MongoDatabase
 
 	// Creates a list of indexes to ensure
 	collectionIndexes := make(map[*mgo.Collection][]mgo.Index)

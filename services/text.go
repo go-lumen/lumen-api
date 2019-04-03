@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/adrien3d/base-api/models"
+	"github.com/adrien3d/lumen-api/models"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"

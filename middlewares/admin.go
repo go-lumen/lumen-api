@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/adrien3d/base-api/helpers"
-	"github.com/adrien3d/base-api/store"
+	"github.com/adrien3d/lumen-api/helpers"
+	"github.com/adrien3d/lumen-api/store"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )

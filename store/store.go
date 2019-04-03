@@ -1,8 +1,8 @@
 package store
 
 import (
-	"github.com/adrien3d/base-api/helpers/params"
-	"github.com/adrien3d/base-api/models"
+	"github.com/adrien3d/lumen-api/helpers/params"
+	"github.com/adrien3d/lumen-api/models"
 )
 
 // Store interface

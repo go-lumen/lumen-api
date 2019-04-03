@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/adrien3d/base-api/server"
-	"github.com/adrien3d/base-api/services"
+	"github.com/adrien3d/lumen-api/server"
+	"github.com/adrien3d/lumen-api/services"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )

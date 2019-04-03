@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/adrien3d/base-api/models"
+	"github.com/adrien3d/lumen-api/models"
 	"github.com/matcornic/hermes/v2"
 	"github.com/sirupsen/logrus"
 	"time"

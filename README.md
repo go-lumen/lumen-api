@@ -65,12 +65,12 @@ If you want something you consider relevant to be implemented, feel free to fork
 
 ## Built With
 
-* [gin-gonic/gin](github.com/gin-gonic/gin) - Gin is a HTTP web framework written in Go (Golang).
-* [mgo](github.com/globalsign/mgo) - The MongoDB driver for Go.
-* [hermes](github.com/matcornic/hermes) - Golang package that generates clean, responsive HTML e-mails for sending transactional mail.
-* [viper](github.com/spf13/viper) - Go configuration with fangs.
-* [logrus](github.com/sirupsen/logrus) - Structured, pluggable logging for Go.
-* [aws/aws-sdk-go](github.com/aws/aws-sdk-go) - AWS SDK for the Go programming language.
+* [gin-gonic/gin](https://github.com/gin-gonic/gin) - Gin is a HTTP web framework written in Go (Golang).
+* [mgo](https://github.com/globalsign/mgo) - The MongoDB driver for Go.
+* [hermes](https://github.com/matcornic/hermes) - Golang package that generates clean, responsive HTML e-mails for sending transactional mail.
+* [viper](https://github.com/spf13/viper) - Go configuration with fangs.
+* [logrus](https://github.com/sirupsen/logrus) - Structured, pluggable logging for Go.
+* [aws/aws-sdk-go](https://github.com/aws/aws-sdk-go) - AWS SDK for the Go programming language.
 
 ## License
 

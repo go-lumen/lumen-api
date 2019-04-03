@@ -21,7 +21,7 @@ func main() {
 	api.TextSender = services.NewTextSender(api.Config)
 
 	// Database setup
-	session, err := api.SetupDatabase()
+	session, err := api.SetupMongoDatabase()
 	if err != nil {
 		panic(err)
 	}

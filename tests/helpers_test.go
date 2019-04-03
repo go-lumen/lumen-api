@@ -36,7 +36,7 @@ func SendRequestWithToken(parameters []byte, method string, url string, authToke
 }
 
 func CreateUserAndGenerateToken() (*models.User, string) {
-	users := api.Database.C(models.UsersCollection)
+	users := api.SetupMongoDatabase.C(models.UsersCollection)
 
 	user := models.User{
 		Id:        bson.NewObjectId().Hex(),
@@ -72,7 +72,7 @@ func CreateUserAndGenerateToken() (*models.User, string) {
 }
 
 func ResetDatabase() {
-	api.Database.DropDatabase()
+	api.MongoDatabase.DropDatabase()
 	user, authToken = CreateUserAndGenerateToken()
 }
 
@@ -84,12 +84,12 @@ func SetupApi() *server.API {
 		panic(err)
 	}
 
-	_, err = api.SetupDatabase()
+	_, err = api.SetupMongoDatabase()
 	if err != nil {
 		panic(err)
 	}
 
-	api.Database.DropDatabase()
+	api.MongoDatabase.DropDatabase()
 
 	err = api.SetupIndexes()
 	if err != nil {

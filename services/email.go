@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/adrien3d/lumen-api/models"
+	"github.com/adrien3d/lumen-api/utils"
 	"github.com/matcornic/hermes/v2"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -226,10 +227,7 @@ func (s *EmailSenderParams) SendResetEmail(user *models.User, apiUrl string, app
 	}
 
 	emailBody, err := h.GenerateHTML(email)
-	if err != nil {
-		logrus.Warnln(err)
-		panic(err)
-	}
+	utils.CheckErr(err)
 
 	data := models.EmailData{ReceiverMail: user.Email, ReceiverName: user.FirstName + " " + user.LastName, User: user, Subject: appName + ` password reset request.`, AppName: appName}
 

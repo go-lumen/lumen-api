@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/adrien3d/lumen-api/server"
 	"github.com/adrien3d/lumen-api/services"
+	"github.com/adrien3d/lumen-api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -12,9 +13,7 @@ func main() {
 
 	// Configuration setup
 	err := api.SetupViper()
-	if err != nil {
-		panic(err)
-	}
+	utils.CheckErr(err)
 
 	// Email sender setup
 	api.EmailSender = services.NewEmailSender(api.Config)
@@ -22,15 +21,11 @@ func main() {
 
 	// Database setup
 	session, err := api.SetupMongoDatabase()
-	if err != nil {
-		panic(err)
-	}
+	utils.CheckErr(err)
 	defer session.Close()
 
 	err = api.SetupIndexes()
-	if err != nil {
-		panic(err)
-	}
+	utils.CheckErr(err)
 
 	// Seeds setup
 	api.SetupSeeds()

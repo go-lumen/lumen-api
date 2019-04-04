@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/adrien3d/lumen-api/models"
+	"github.com/adrien3d/lumen-api/utils"
 
 	"github.com/globalsign/mgo"
 )
@@ -26,9 +27,7 @@ func (a *API) SetupIndexes() error {
 		for _, index := range indexes {
 			err := collection.EnsureIndex(index)
 
-			if err != nil {
-				return err
-			}
+			utils.CheckErr(err)
 		}
 	}
 	return nil

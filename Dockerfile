@@ -20,7 +20,7 @@ ENV GIN_MODE release
 ENV IOTHINGS_ENV prod
 
 # Run the outyet command by default when the container starts.
-ENTRYPOINT /go/bin/iothings-api
+ENTRYPOINT /go/bin/lumen-api
 
 # Document that the service listens on port 4000.
 EXPOSE 4000

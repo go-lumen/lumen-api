@@ -10,8 +10,8 @@ import (
 // SetupViper according to env var that selects related conf file
 func (a *API) SetupViper() error {
 	filename := ".env"
-	logrus.Infoln("Using env:" + os.Getenv("IOTHINGS_ENV"))
-	switch os.Getenv("IOTHINGS_ENV") {
+	logrus.Infoln("Using env:" + os.Getenv("LUMEN_ENV"))
+	switch os.Getenv("LUMEN_ENV") {
 	case "testing":
 		filename = "../.env.testing"
 	case "prod":
@@ -20,7 +20,7 @@ func (a *API) SetupViper() error {
 
 	godotenv.Overload(filename)
 
-	a.Config.SetEnvPrefix("iothings")
+	a.Config.SetEnvPrefix("lumen")
 	a.Config.AutomaticEnv()
 
 	return nil

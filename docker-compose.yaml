@@ -3,11 +3,11 @@ services:
   mongo-db:
     image: mongo:latest
   api:
-    container_name: iothings-api
+    container_name: lumen-api
     build: .
     ports:
       - "4000:4000"
     environment:
-      IOTHINGS_ENV: prod
+      LUMEN_ENV: prod
     links:
       - mongo-db:mongo

@@ -51,3 +51,7 @@ func GetUsers(c context.Context) ([]*models.User, error) {
 func CountUsers(c context.Context) (int, error) {
 	return FromContext(c).CountUsers()
 }
+
+func UserExists(c context.Context, userEmail string) (bool, error) {
+	return FromContext(c).UserExists(userEmail)
+}

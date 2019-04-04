@@ -144,3 +144,19 @@ func (db *mongo) CountUsers() (int, error) {
 	}
 	return nbr, nil
 }
+
+// UserExists allows to know if a user exists through his mail
+func (db *mongo) UserExists(userEmail string) (bool, error) {
+	session := db.Session.Copy()
+	defer session.Close()
+	users := db.C(models.UsersCollection).With(session)
+
+	user := &models.User{}
+
+	err := users.Find(params.M{"email": userEmail}).One(user)
+	if err != nil {
+		return false, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
+	}
+
+	return true, err
+}

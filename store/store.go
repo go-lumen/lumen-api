@@ -16,4 +16,5 @@ type Store interface {
 	ChangeLanguage(string, string) error
 	GetUsers() ([]*models.User, error)
 	CountUsers() (int, error)
+	UserExists(string) (bool, error)
 }

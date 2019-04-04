@@ -21,6 +21,12 @@ func (a *API) SetupSeeds() error {
 		Admin:     true,
 	}
 
+	userExists, _ := store.UserExists(user.Email)
+	if userExists {
+		logrus.Infoln(`Seed user already exists`)
+		return nil
+	}
+
 	if store.CreateUser(user) != nil {
 		logrus.Warnln(`Error when creating user`)
 	}

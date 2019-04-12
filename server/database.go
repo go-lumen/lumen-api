@@ -3,7 +3,7 @@ package server
 import (
 	"database/sql"
 	"github.com/globalsign/mgo"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" //to support PQ connection
 	"github.com/sirupsen/logrus"
 )
 

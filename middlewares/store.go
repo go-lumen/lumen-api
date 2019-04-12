@@ -17,7 +17,7 @@ func StoreMongoMiddleware(db *mgo.Database) gin.HandlerFunc {
 	}
 }
 
-// StoreMongoMiddleware allows to setup PostgreSQLdatabase
+// StorePostgreMiddleware allows to setup PostgreSQL database
 func StorePostgreMiddleware(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		store.ToContext(c, postgresql.New(db))

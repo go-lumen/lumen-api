@@ -52,6 +52,7 @@ func CountUsers(c context.Context) (int, error) {
 	return FromContext(c).CountUsers()
 }
 
+// UserExists checks if user exists
 func UserExists(c context.Context, userEmail string) (bool, error) {
 	return FromContext(c).UserExists(userEmail)
 }

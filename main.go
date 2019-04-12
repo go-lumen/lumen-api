@@ -19,10 +19,14 @@ func main() {
 	api.EmailSender = services.NewEmailSender(api.Config)
 	api.TextSender = services.NewTextSender(api.Config)
 
-	// Database setup
+	// Databases setup
 	session, err := api.SetupMongoDatabase()
 	utils.CheckErr(err)
 	defer session.Close()
+
+	db, err := api.SetupPostgreDatabase()
+	utils.CheckErr(err)
+	defer db.Close()
 
 	err = api.SetupIndexes()
 	utils.CheckErr(err)

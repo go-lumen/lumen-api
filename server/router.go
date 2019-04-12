@@ -32,7 +32,7 @@ func (a *API) SetupRouter() {
 		ValidateHeaders: false,
 	}))
 
-	router.Use(middlewares.StoreMiddleware(a.MongoDatabase))
+	router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
 	router.Use(middlewares.ConfigMiddleware(a.Config))
 
 	router.Use(middlewares.EmailMiddleware(a.EmailSender))

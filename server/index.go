@@ -7,8 +7,8 @@ import (
 	"github.com/globalsign/mgo"
 )
 
-// SetupIndexes allows to setup MongoDB index
-func (a *API) SetupIndexes() error {
+// SetupMongoIndexes allows to setup MongoDB index
+func (a *API) SetupMongoIndexes() error {
 	database := a.MongoDatabase
 
 	// Creates a list of indexes to ensure

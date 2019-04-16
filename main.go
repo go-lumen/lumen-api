@@ -24,17 +24,22 @@ func main() {
 	utils.CheckErr(err)
 	defer session.Close()
 
-	db, err := api.SetupPostgreDatabase()
-	utils.CheckErr(err)
-	defer db.Close()
-
-	err = api.SetupIndexes()
+	err = api.SetupMongoIndexes()
 	utils.CheckErr(err)
 
 	// Seeds setup
-	api.SetupSeeds()
+	err = api.SetupMongoSeeds()
+	utils.CheckErr(err)
+
+	/*db, err := api.SetupPostgreDatabase()
+	utils.CheckErr(err)
+	defer db.Close()
+
+	err = api.SetupPostgreSeeds()
+	utils.CheckErr(err)*/
 
 	// Router setup
 	api.SetupRouter()
-	api.Router.Run(api.Config.GetString("host_address"))
+	err = api.Router.Run(api.Config.GetString("host_address"))
+	utils.CheckErr(err)
 }

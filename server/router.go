@@ -33,6 +33,7 @@ func (a *API) SetupRouter() {
 	}))
 
 	router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
+	//router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))
 	router.Use(middlewares.ConfigMiddleware(a.Config))
 
 	router.Use(middlewares.EmailMiddleware(a.EmailSender))

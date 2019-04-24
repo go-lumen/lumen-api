@@ -1,9 +1,8 @@
 package server
 
 import (
-	"database/sql"
 	"github.com/globalsign/mgo"
-	_ "github.com/lib/pq" //to support PQ connection
+	"github.com/go-pg/pg"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,14 +20,13 @@ func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
 }
 
 // SetupPostgreDatabase establishes the connexion with the postgre database
-func (a *API) SetupPostgreDatabase() (*sql.DB, error) {
-	connStr := "user=" + a.Config.GetString("postgre_db_user") + " dbname=" + a.Config.GetString("postgre_db_dbname") + " sslmode=verify-full"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		logrus.Errorln(err)
-		return nil, err
+func (a *API) SetupPostgreDatabase() (*pg.DB, error) {
+	pgOptions := &pg.Options{
+		//Addr:     a.Config.GetString("postgre_db_addr"),
+		Database: a.Config.GetString("postgre_db_dbname"),
+		User:     a.Config.GetString("postgre_db_user"),
 	}
-
+	db := pg.Connect(pgOptions)
 	a.PostgreDatabase = db
 
 	return db, nil

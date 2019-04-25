@@ -3,11 +3,11 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/adrien3d/lumen-api/config"
-	"github.com/adrien3d/lumen-api/helpers"
-	"github.com/adrien3d/lumen-api/helpers/params"
-	"github.com/adrien3d/lumen-api/models"
-	"github.com/adrien3d/lumen-api/store"
+	"github.com/go-lumen/lumen-api/config"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/store"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/adrien3d/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/asaskevich/govalidator"
 	"golang.org/x/crypto/bcrypt"
 )

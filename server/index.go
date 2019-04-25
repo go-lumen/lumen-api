@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/adrien3d/lumen-api/models"
-	"github.com/adrien3d/lumen-api/utils"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/utils"
 
 	"github.com/globalsign/mgo"
 )

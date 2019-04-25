@@ -9,9 +9,9 @@ import (
 
 	"time"
 
-	"github.com/adrien3d/lumen-api/models"
-	"github.com/adrien3d/lumen-api/server"
-	"github.com/adrien3d/lumen-api/services"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/services"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/globalsign/mgo/bson"
 	"github.com/spf13/viper"

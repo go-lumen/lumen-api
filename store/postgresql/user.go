@@ -1,8 +1,8 @@
 package postgresql
 
 import (
-	"github.com/adrien3d/lumen-api/helpers/params"
-	"github.com/adrien3d/lumen-api/models"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
 )
 
 // CreateUser checks if user already exists, and if not, creates it

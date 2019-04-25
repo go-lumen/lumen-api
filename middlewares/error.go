@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/adrien3d/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/gin-gonic/gin"
 )
 

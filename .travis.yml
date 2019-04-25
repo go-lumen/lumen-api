@@ -8,7 +8,7 @@ services:
 
 script: BASEAPI_ENV=testing go test ./...
 
-go_import_path: github.com/adrien3d/lumen-api
+go_import_path: github.com/go-lumen/lumen-api
   
 notifications:
   email: false

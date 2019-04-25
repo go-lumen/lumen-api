@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/adrien3d/lumen-api/config"
+	"github.com/go-lumen/lumen-api/config"
 	"net/http"
 	"time"
 
-	"github.com/adrien3d/lumen-api/controllers"
-	"github.com/adrien3d/lumen-api/middlewares"
+	"github.com/go-lumen/lumen-api/controllers"
+	"github.com/go-lumen/lumen-api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

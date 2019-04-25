@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/adrien3d/lumen-api/services"
+	"github.com/go-lumen/lumen-api/services"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
 	"github.com/go-pg/pg"

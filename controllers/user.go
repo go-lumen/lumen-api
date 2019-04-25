@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"github.com/adrien3d/lumen-api/config"
-	"github.com/adrien3d/lumen-api/helpers"
-	"github.com/adrien3d/lumen-api/helpers/params"
-	"github.com/adrien3d/lumen-api/models"
-	"github.com/adrien3d/lumen-api/services"
-	"github.com/adrien3d/lumen-api/store"
+	"github.com/go-lumen/lumen-api/config"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/services"
+	"github.com/go-lumen/lumen-api/store"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"

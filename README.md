@@ -1,23 +1,23 @@
 <p align="center">
-    <a href="https://github.com/adrien3d/lumen-api">
-        <img width="500px" src="https://raw.githubusercontent.com/adrien3d/lumen-api/master/lumen-logo.png" />
+    <a href="https://github.com/go-lumen/lumen-api">
+        <img width="500px" src="https://raw.githubusercontent.com/go-lumen/lumen-api/master/lumen-logo.png" />
     </a>
 </p>
 
 <h1 align="center">Lumen Api</h1>
 
 <p align="center">
-    <a href="https://github.com/adrien3d/lumen-api/blob/master/LICENSE.md">
-        <img alt="Go Report Card" src="https://img.shields.io/github/license/adrien3d/lumen-api.svg">
+    <a href="https://github.com/go-lumen/lumen-api/blob/master/LICENSE.md">
+        <img alt="Go Report Card" src="https://img.shields.io/github/license/go-lumen/lumen-api.svg">
     </a>
-    <a href="https://goreportcard.com/report/github.com/adrien3d/lumen-api">
-        <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/adrien3d/lumen-api">
+    <a href="https://goreportcard.com/report/github.com/go-lumen/lumen-api">
+        <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/go-lumen/lumen-api">
     </a>
-    <a href="https://godoc.org/github.com/adrien3d/lumen-api">
-        <img alt="GoDoc" src="https://godoc.org/github.com/adrien3d/lumen-api?status.svg">
+    <a href="https://godoc.org/github.com/go-lumen/lumen-api">
+        <img alt="GoDoc" src="https://godoc.org/github.com/go-lumen/lumen-api?status.svg">
     </a>
-    <a href="https://hub.docker.com/r/adrien3d/lumen-api">
-        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/adrien3d/lumen-api.svg">
+    <a href="https://hub.docker.com/r/go-lumen/lumen-api">
+        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/go-lumen/lumen-api.svg">
     </a>
 </p>
 
@@ -42,11 +42,11 @@ Congratulations, you are all set !
 
 ## NGinx configuration
 ### With HTTPS using certbot
-You can copy paste and customize the [nginx/conf-https-step-1](https://github.com/adrien3d/lumen-api/tree/master/nginx/conf-https-step-1) to your etc/nginx/sites-enabled/yourdomain
+You can copy paste and customize the [nginx/conf-https-step-1](https://github.com/go-lumen/lumen-api/tree/master/nginx/conf-https-step-1) to your etc/nginx/sites-enabled/yourdomain
 sudo service nginx reload
 Run certbot ....
 
-Copy paste and customize the [nginx/conf-https-step-2](https://github.com/adrien3d/lumen-api/tree/master/nginx/conf-https-step-2)
+Copy paste and customize the [nginx/conf-https-step-2](https://github.com/go-lumen/lumen-api/tree/master/nginx/conf-https-step-2)
 to your `etc/nginx/sites-enabled/yourdomain`
 `sudo service nginx reload`
 

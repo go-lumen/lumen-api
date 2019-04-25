@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/adrien3d/lumen-api/server"
-	"github.com/adrien3d/lumen-api/services"
-	"github.com/adrien3d/lumen-api/utils"
+	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/services"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )

@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/adrien3d/lumen-api/models"
-	"github.com/adrien3d/lumen-api/store/mongodb"
-	"github.com/adrien3d/lumen-api/store/postgresql"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/store/mongodb"
+	"github.com/go-lumen/lumen-api/store/postgresql"
 	"github.com/sirupsen/logrus"
 )
 

@@ -13,7 +13,8 @@ import (
 func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 	//Decode base64 key
 	base64Text := make([]byte, base64.StdEncoding.DecodedLen(len(encodedKey)))
-	base64.StdEncoding.Decode(base64Text, []byte(encodedKey))
+	_, err := base64.StdEncoding.Decode(base64Text, []byte(encodedKey))
+	utils.CheckErr(err)
 
 	//Parse RSA key
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(base64Text)

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/go-lumen/lumen-api/models"
 	"github.com/globalsign/mgo/bson"
+	"github.com/go-lumen/lumen-api/models"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/go-lumen/lumen-api/utils"
 	"net/http"
 
 	"github.com/go-lumen/lumen-api/config"
@@ -51,6 +52,7 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 	encodedKey := []byte(config.GetString(c, "rsa_private"))
 	accessToken, err := helpers.GenerateAccessToken(encodedKey, user.Id)
 	if err != nil {
+		utils.CheckErr(err)
 		c.AbortWithError(http.StatusInternalServerError, helpers.ErrorWithCode("token_generation_failed", "Could not generate the access token", err))
 		return
 	}

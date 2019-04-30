@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-lumen/lumen-api/utils"
 	"time"
 )
 
@@ -17,6 +18,7 @@ func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 	//Parse RSA key
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(base64Text)
 	if err != nil {
+		utils.CheckErr(err)
 		return nil, err
 	}
 
@@ -27,6 +29,7 @@ func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 func GenerateAccessToken(encodedKey []byte, subject string) (*string, error) {
 	privateKey, err := GetRSAPrivateKey(encodedKey)
 	if err != nil {
+		utils.CheckErr(err)
 		return nil, err
 	}
 
@@ -39,6 +42,7 @@ func GenerateAccessToken(encodedKey []byte, subject string) (*string, error) {
 
 	accessString, err := access.SignedString(privateKey)
 	if err != nil {
+		utils.CheckErr(err)
 		return nil, err
 	}
 
@@ -49,6 +53,7 @@ func GenerateAccessToken(encodedKey []byte, subject string) (*string, error) {
 func ValidateJwtToken(token string, encodedKey []byte, audience string) (jwt.MapClaims, error) {
 	privateKey, err := GetRSAPrivateKey(encodedKey)
 	if err != nil {
+		utils.CheckErr(err)
 		return nil, err
 	}
 	publicKey := privateKey.PublicKey
@@ -57,6 +62,7 @@ func ValidateJwtToken(token string, encodedKey []byte, audience string) (jwt.Map
 		return &publicKey, nil
 	})
 	if err != nil {
+		utils.CheckErr(err)
 		return nil, err
 	}
 

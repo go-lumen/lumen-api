@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/go-lumen/lumen-api/config"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/config"
 	"github.com/spf13/viper"
 )
 

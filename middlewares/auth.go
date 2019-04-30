@@ -2,11 +2,11 @@ package middlewares
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/config"
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 	"time"

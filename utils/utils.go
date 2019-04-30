@@ -1,13 +1,13 @@
 package utils
 
 import (
-	"github.com/sirupsen/logrus"
+	"github.com/snwfdhmp/errlog"
 )
 
 // CheckErr checks error and print it if it exists
 func CheckErr(e error) {
 	if e != nil {
-		logrus.Errorln(e)
+		errlog.Debug(e)
 		panic(e)
 	}
 }

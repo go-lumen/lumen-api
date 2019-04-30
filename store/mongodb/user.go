@@ -3,10 +3,10 @@ package mongodb
 import (
 	"net/http"
 
+	"github.com/globalsign/mgo/bson"
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
-	"github.com/globalsign/mgo/bson"
 )
 
 // CreateUser checks if user already exists, and if not, creates it

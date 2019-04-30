@@ -1,11 +1,11 @@
 package middlewares
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/globalsign/mgo"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/store/mongodb"
 	"github.com/go-lumen/lumen-api/store/postgresql"
-	"github.com/gin-gonic/gin"
-	"github.com/globalsign/mgo"
 	"github.com/go-pg/pg"
 )
 

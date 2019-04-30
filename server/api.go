@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/go-lumen/lumen-api/services"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
+	"github.com/go-lumen/lumen-api/services"
 	"github.com/go-pg/pg"
 	"github.com/spf13/viper"
 )

@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/go-lumen/lumen-api/services"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/services"
 )
 
 // TextMiddleware allows to retrieve the TextSender

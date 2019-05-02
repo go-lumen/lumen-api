@@ -11,11 +11,12 @@ require (
 	github.com/gin-gonic/gin v1.3.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/go-pg/pg v8.0.4+incompatible
+	github.com/go-sql-driver/mysql v1.4.1
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.6 // indirect
-	github.com/lib/pq v1.0.0
+	github.com/lib/pq v1.1.0
 	github.com/matcornic/hermes/v2 v2.0.2
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect

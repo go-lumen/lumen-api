@@ -43,8 +43,6 @@ func (a *API) SetupMongoSeeds() error {
 func (a *API) SetupPostgreSeeds() error {
 	store := postgresql.New(a.PostgreDatabase)
 
-	//Mails: 0.10$/1000         Texts: 0.05-0.10$/1       WiFi: 5$/1000
-
 	user := &models.User{
 		FirstName: "Adrien",
 		LastName:  "Chapelet",

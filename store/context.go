@@ -8,7 +8,7 @@ import (
 const (
 	// CurrentKey for user
 	CurrentKey = "currentUser"
-	// StoreKey for storign
+	// StoreKey for storing
 	StoreKey = "store"
 )
 

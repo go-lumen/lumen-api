@@ -20,23 +20,28 @@ func main() {
 	api.TextSender = services.NewTextSender(api.Config)
 
 	// Database setup
-	session, err := api.SetupMongoDatabase()
-	utils.CheckErr(err)
-	defer session.Close()
+	dbType := api.Config.GetString("db_type")
+	switch (dbType) {
+	case "mongo":
+		session, err := api.SetupMongoDatabase()
+		utils.CheckErr(err)
+		defer session.Close()
 
-	err = api.SetupMongoIndexes()
-	utils.CheckErr(err)
+		err = api.SetupMongoIndexes()
+		utils.CheckErr(err)
 
-	// Seeds setup
-	err = api.SetupMongoSeeds()
-	utils.CheckErr(err)
+		// Seeds setup
+		err = api.SetupMongoSeeds()
+		utils.CheckErr(err)
 
-	/*db, err := api.SetupPostgreDatabase()
-	utils.CheckErr(err)
-	defer db.Close()
+	case "postgre":
+		db, err := api.SetupPostgreDatabase()
+		utils.CheckErr(err)
+		defer db.Close()
 
-	err = api.SetupPostgreSeeds()
-	utils.CheckErr(err)*/
+		err = api.SetupPostgreSeeds()
+		utils.CheckErr(err)
+	}
 
 	// Router setup
 	api.SetupRouter()

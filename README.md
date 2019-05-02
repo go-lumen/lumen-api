@@ -60,6 +60,16 @@ to your `etc/nginx/sites-enabled/yourdomain`
 ## Roadmap
 Some features would be nice to have, such as user roles management, Stripe billing management, Twilio SMS alerts.... And may be implemented in the future.
 
+### Databases
+For instance, MongoDB is used as the default DB system.
+https://github.com/mattn/go-sqlite3
+https://github.com/go-sql-driver/mysql
+https://github.com/lib/pq
+
+https://golang.org/src/database/sql/example_test.go
+http://go-database-sql.org/accessing.html
+https://flaviocopes.com/golang-sql-database/
+
 ## Miscellaneous
 If you want something you consider relevant to be implemented, feel free to fork the repo, and create a PR.
 

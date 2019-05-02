@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"fmt"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
 )
@@ -17,6 +18,9 @@ func (db *postgre) FindUserById(id string) (*models.User, error) {
 
 // FindUser allows to retrieve a user by its characteristics
 func (db *postgre) FindUser(params params.M) (*models.User, error) {
+	fmt.Println("finding user:", params)
+	//rows, err := db.Query("SELECT * FROM users WHERE email = $1", params)
+
 	return nil, nil
 }
 

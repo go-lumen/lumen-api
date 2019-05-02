@@ -48,7 +48,7 @@ func TestCreateAccount(t *testing.T) {
 
 	// Test activation
 	user := models.User{}
-	err := api.Database.C(models.UsersCollection).Find(bson.M{"email": "adrien@plugblocks.com"}).One(&user)
+	err := api.MongoDatabase.C(models.UsersCollection).Find(bson.M{"email": "adrien@plugblocks.com"}).One(&user)
 	if err != nil {
 		t.Fail()
 		return
@@ -58,7 +58,7 @@ func TestCreateAccount(t *testing.T) {
 	resp = SendRequest(nil, "GET", "/v1/users/"+user.Id+"/activate/"+user.ActivationKey)
 
 	//Update user information
-	err = api.Database.C(models.UsersCollection).Find(bson.M{"email": "adrien@plugblocks.com"}).One(&user)
+	err = api.MongoDatabase.C(models.UsersCollection).Find(bson.M{"email": "adrien@plugblocks.com"}).One(&user)
 	if err != nil {
 		t.Fail()
 		return

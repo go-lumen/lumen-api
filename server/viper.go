@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 	"os"
 
@@ -18,7 +19,8 @@ func (a *API) SetupViper() error {
 		filename = ".env.prod"
 	}
 
-	godotenv.Overload(filename)
+	err := godotenv.Overload(filename)
+	utils.CheckErr(err)
 
 	a.Config.SetEnvPrefix("lumen")
 	a.Config.AutomaticEnv()

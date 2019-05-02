@@ -32,8 +32,14 @@ func (a *API) SetupRouter() {
 		ValidateHeaders: false,
 	}))
 
-	router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
-	//router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))
+	dbType := a.Config.GetString("db_type")
+	switch (dbType) {
+	case "mongo":
+		router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
+	case "postgre":
+		router.Use(middlewares.StoreSQLMiddleware(a.PostgreDatabase))
+	}
+
 	router.Use(middlewares.ConfigMiddleware(a.Config))
 
 	router.Use(middlewares.EmailMiddleware(a.EmailSender))

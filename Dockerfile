@@ -17,7 +17,7 @@ RUN go get -t -v ./...
 RUN go install github.com/go-lumen/lumen-api
 
 ENV GIN_MODE release
-ENV IOTHINGS_ENV prod
+ENV LUMEN_ENV prod
 
 # Run the outyet command by default when the container starts.
 ENTRYPOINT /go/bin/lumen-api

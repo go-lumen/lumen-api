@@ -6,6 +6,7 @@ import (
 	"github.com/globalsign/mgo"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/store/mongodb"
+	"github.com/go-lumen/lumen-api/store/mysql"
 	"github.com/go-lumen/lumen-api/store/postgresql"
 )
 
@@ -17,10 +18,18 @@ func StoreMongoMiddleware(db *mgo.Database) gin.HandlerFunc {
 	}
 }
 
-// StoreSQLMiddleware allows to setup SQL database
-func StoreSQLMiddleware(db *sql.DB) gin.HandlerFunc {
+// StorePostgreMiddleware allows to setup SQL database
+func StorePostgreMiddleware(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		store.ToContext(c, postgresql.New(db))
+		c.Next()
+	}
+}
+
+// StoreMySQLMiddleware allows to setup SQL database
+func StoreMySQLMiddleware(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		store.ToContext(c, mysql.New(db))
 		c.Next()
 	}
 }

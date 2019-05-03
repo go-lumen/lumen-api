@@ -21,7 +21,7 @@ func main() {
 
 	// Database setup
 	dbType := api.Config.GetString("db_type")
-	switch (dbType) {
+	switch dbType {
 	case "mongo":
 		session, err := api.SetupMongoDatabase()
 		utils.CheckErr(err)
@@ -40,6 +40,14 @@ func main() {
 		defer db.Close()
 
 		err = api.SetupPostgreSeeds()
+		utils.CheckErr(err)
+
+	case "mysql":
+		db, err := api.SetupMySQLDatabase()
+		utils.CheckErr(err)
+		defer db.Close()
+
+		err = api.SetupMySQLSeeds()
 		utils.CheckErr(err)
 	}
 

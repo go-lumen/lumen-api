@@ -33,11 +33,14 @@ func (a *API) SetupRouter() {
 	}))
 
 	dbType := a.Config.GetString("db_type")
-	switch (dbType) {
+	switch dbType {
 	case "mongo":
 		router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
 	case "postgre":
-		router.Use(middlewares.StoreSQLMiddleware(a.PostgreDatabase))
+		router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))
+	case "mysql":
+		router.Use(middlewares.StoreMySQLMiddleware(a.MySQLDatabase))
+
 	}
 
 	router.Use(middlewares.ConfigMiddleware(a.Config))

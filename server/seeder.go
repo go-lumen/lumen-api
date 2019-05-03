@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store/mongodb"
+	"github.com/go-lumen/lumen-api/store/mysql"
 	"github.com/go-lumen/lumen-api/store/postgresql"
 	"github.com/sirupsen/logrus"
 )
@@ -42,6 +43,36 @@ func (a *API) SetupMongoSeeds() error {
 // SetupPostgreSeeds creates the first user
 func (a *API) SetupPostgreSeeds() error {
 	store := postgresql.New(a.PostgreDatabase)
+
+	user := &models.User{
+		FirstName: "Adrien",
+		LastName:  "Chapelet",
+		Password:  "adminpwd",
+		Email:     "adrien@plugblocks.com",
+		Phone:     "+33671174203",
+		Admin:     true,
+	}
+
+	userExists, _ := store.UserExists(user.Email)
+	if userExists {
+		logrus.Infoln(`Seed user already exists`)
+		return nil
+	}
+
+	if store.CreateUser(user) != nil {
+		logrus.Warnln(`Error when creating user`)
+	}
+
+	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
+		logrus.Warnln(`Error when activating user`)
+	}
+
+	return nil
+}
+
+// SetupMySQLSeeds creates the first user
+func (a *API) SetupMySQLSeeds() error {
+	store := mysql.New(a.MySQLDatabase)
 
 	user := &models.User{
 		FirstName: "Adrien",

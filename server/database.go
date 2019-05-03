@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"github.com/globalsign/mgo"
 	"github.com/go-lumen/lumen-api/utils"
-	_ "github.com/lib/pq"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // For MySQL
+	_ "github.com/lib/pq"              // For PostgreSQL
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +22,7 @@ func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
 	return session, nil
 }
 
-// SetupPostgreDatabase establishes the connexion with the postgre database
+// SetupPostgreDatabase establishes the connexion with the PostgreSQL database
 func (a *API) SetupPostgreDatabase() (*sql.DB, error) {
 	/*pgOptions := &pg.Options{
 		//Addr:     a.Config.GetString("postgre_db_addr"),
@@ -40,9 +40,10 @@ func (a *API) SetupPostgreDatabase() (*sql.DB, error) {
 	return db, nil
 }
 
+// SetupMySQLDatabase establishes the connexion with the MySQL database
 func (a *API) SetupMySQLDatabase() (*sql.DB, error) {
-	db, err := sql.Open("mysql", a.Config.GetString("mysql_db_user") + ":" + a.Config.GetString("mysql_db_password") +
-		"@/" + a.Config.GetString("mysql_db_dbname"))
+	db, err := sql.Open("mysql", a.Config.GetString("mysql_db_user")+":"+a.Config.GetString("mysql_db_password")+
+		"@/"+a.Config.GetString("mysql_db_dbname"))
 	utils.CheckErr(err)
 
 	a.MySQLDatabase = db

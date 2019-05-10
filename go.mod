@@ -23,6 +23,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/sirupsen/logrus v1.4.0
 	github.com/snwfdhmp/errlog v0.0.0-20190419112242-156d20a3e777
 	github.com/spf13/viper v1.3.2
@@ -32,3 +33,5 @@ require (
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	mellium.im/sasl v0.2.1 // indirect
 )
+
+replace gopkg.in/russross/blackfriday.v2 => github.com/russross/blackfriday/v2 v2.0.1

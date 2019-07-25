@@ -4,10 +4,20 @@ import (
 	"database/sql"
 	"github.com/globalsign/mgo"
 	"github.com/go-lumen/lumen-api/utils"
+	"github.com/go-pg/pg"
 	_ "github.com/go-sql-driver/mysql" // For MySQL
 	_ "github.com/lib/pq"              // For PostgreSQL
 	"github.com/sirupsen/logrus"
 )
+
+type dbLogger struct{}
+
+func (d dbLogger) BeforeQuery(q *pg.QueryEvent) {}
+
+func (d dbLogger) AfterQuery(q *pg.QueryEvent) {
+	sql, _ := q.FormattedQuery()
+	logrus.Debugf("SQL query: %s", sql)
+}
 
 // SetupMongoDatabase establishes the connexion with the mongo database
 func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
@@ -23,17 +33,18 @@ func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
 }
 
 // SetupPostgreDatabase establishes the connexion with the PostgreSQL database
-func (a *API) SetupPostgreDatabase() (*sql.DB, error) {
-	/*pgOptions := &pg.Options{
-		//Addr:     a.Config.GetString("postgre_db_addr"),
+func (a *API) SetupPostgreDatabase() (*pg.DB, error) {
+	pgOptions := &pg.Options{
+		Addr:     a.Config.GetString("postgre_db_addr"),
 		Database: a.Config.GetString("postgre_db_dbname"),
 		User:     a.Config.GetString("postgre_db_user"),
 	}
-	db := pg.Connect(pgOptions)*/
+	db := pg.Connect(pgOptions)
 
-	db, err := sql.Open("postgres", "user="+a.Config.GetString("postgre_db_user")+
+	db.AddQueryHook(dbLogger{})
+	/*db, err := sql.Open("postgres", "user="+a.Config.GetString("postgre_db_user")+
 		" dbName="+a.Config.GetString("postgre_db_dbname")+" sslmode=verify-full")
-	utils.CheckErr(err)
+	utils.CheckErr(err)*/
 
 	a.PostgreDatabase = db
 

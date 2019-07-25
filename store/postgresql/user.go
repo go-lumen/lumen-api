@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/utils"
 )
 
 // CreateUser checks if user already exists, and if not, creates it
@@ -13,12 +14,16 @@ func (db *postgre) CreateUser(user *models.User) error {
 
 // FindUserById allows to retrieve a user by its id
 func (db *postgre) FindUserById(id string) (*models.User, error) {
-	return nil, nil
+	fmt.Println("finding user:", id)
+	user := &models.User{}
+	err := db.Model(models.User{}).Where("id=?", id).Select(user) //.Order("id")
+	utils.CheckErr(err)
+
+	return user, err
 }
 
 // FindUser allows to retrieve a user by its characteristics
 func (db *postgre) FindUser(params params.M) (*models.User, error) {
-	fmt.Println("finding user:", params)
 	//rows, err := db.Query("SELECT * FROM users WHERE email = $1", params)
 
 	return nil, nil
@@ -46,7 +51,11 @@ func (db *postgre) UpdateUser(userId string, params params.M) error {
 
 // GetUsers allows to get all users
 func (db *postgre) GetUsers() ([]*models.User, error) {
-	return nil, nil
+	users := make([]*models.User, 0)
+	err := db.Model(models.User{}).Order("id").Select(users)
+	utils.CheckErr(err)
+
+	return users, err
 }
 
 // CountUsers allows to count all users

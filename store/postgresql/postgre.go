@@ -1,14 +1,14 @@
 package postgresql
 
 import (
-	"database/sql"
+	"github.com/go-pg/pg"
 )
 
 type postgre struct {
-	*sql.DB
+	*pg.DB
 }
 
 // New creates a database connexion
-func New(database *sql.DB) *postgre {
+func New(database *pg.DB) *postgre {
 	return &postgre{database}
 }

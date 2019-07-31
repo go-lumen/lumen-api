@@ -17,10 +17,10 @@ type User struct {
 	Password      string `json:"password" bson:"password" valid:"required"`
 	Email         string `json:"email" bson:"email" valid:"email,required"`
 	Phone         string `json:"phone" bson:"phone"`
-	Active        bool   `json:"active" bson:"active"`
 	Language      string `json:"language" bson:"language"`
-	ActivationKey string `json:"activationKey" bson:"activationKey"`
-	ResetKey      string `json:"resetKey" bson:"resetKey"`
+	ActivationKey string `json:"activation_key" bson:"activation_key"`
+	ResetKey      string `json:"reset_key" bson:"reset_key"`
+	Active        bool   `json:"active" bson:"active"`
 	Admin         bool   `json:"admin" bson:"admin"`
 	LastAccess    int64  `json:"last_access" bson:"last_access" valid:"-"`
 }

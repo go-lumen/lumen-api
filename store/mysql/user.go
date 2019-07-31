@@ -4,10 +4,20 @@ import (
 	"fmt"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/utils"
 )
 
 // CreateUser checks if user already exists, and if not, creates it
 func (db *mysql) CreateUser(user *models.User) error {
+	/*
+	   CREATE TABLE `userinfo` (
+	       `uid` INT(10) NOT NULL AUTO_INCREMENT,
+	       `username` VARCHAR(64) NULL DEFAULT NULL,
+	       `departname` VARCHAR(64) NULL DEFAULT NULL,
+	       `created` DATE NULL DEFAULT NULL,
+	       PRIMARY KEY (`uid`)
+	   );
+	*/
 	return nil
 }
 
@@ -18,8 +28,11 @@ func (db *mysql) FindUserById(id string) (*models.User, error) {
 
 // FindUser allows to retrieve a user by its characteristics
 func (db *mysql) FindUser(params params.M) (*models.User, error) {
+	var first_name string
 	fmt.Println("finding user:", params)
-	//rows, err := db.Query("SELECT * FROM users WHERE email = $1", params)
+	var rows, err = db.Query("SELECT * FROM users WHERE email = $1", params)
+	utils.CheckErr(err)
+	utils.CheckErr(rows.Scan(&first_name))
 
 	return nil, nil
 }

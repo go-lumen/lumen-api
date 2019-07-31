@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/config"
 	"github.com/go-lumen/lumen-api/helpers"
@@ -60,6 +61,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 
 	s := services.GetEmailSender(c)
 
+	fmt.Println("DB User:", databaseUser)
 	err = s.SendActivationEmail(databaseUser, apiUrl, appName, frontUrl)
 	if err != nil {
 		logrus.Infoln(err)

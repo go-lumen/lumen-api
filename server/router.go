@@ -36,11 +36,10 @@ func (a *API) SetupRouter() {
 	switch dbType {
 	case "mongo":
 		router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
-	case "postgre":
+	case "postgres":
 		router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))
 	case "mysql":
 		router.Use(middlewares.StoreMySQLMiddleware(a.MySQLDatabase))
-
 	}
 
 	router.Use(middlewares.ConfigMiddleware(a.Config))
@@ -67,10 +66,10 @@ func (a *API) SetupRouter() {
 			users.POST("/reset/:email", userController.ResetPasswordRequest)
 			users.POST("/reset_password/:id/:resetKey", userController.ResetPasswordResponse)
 			users.GET("/:id/activate/:activationKey", userController.ActivateUser)
+			users.POST("/", userController.CreateUser)
 			users.Use(authMiddleware)
 			users.GET("/:id", userController.GetUser)
 			users.Use(adminMiddleware)
-			users.POST("/", userController.CreateUser)
 			users.DELETE("/:id", userController.DeleteUser)
 			users.GET("/", userController.GetUsers)
 		}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/globalsign/mgo/bson"
 	"net/http"
 	"strings"
 
@@ -41,6 +42,7 @@ func (user *User) Sanitize() SanitizedUser {
 
 // BeforeCreate is here to check inputs and generating an encrypted password
 func (user *User) BeforeCreate() error {
+	user.Id = bson.NewObjectId().Hex()
 	user.Active = false
 	user.ActivationKey = helpers.RandomString(40)
 	user.Email = strings.ToLower(user.Email)

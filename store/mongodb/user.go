@@ -15,7 +15,6 @@ func (db *mongo) CreateUser(user *models.User) error {
 	defer session.Close()
 	users := db.C(models.UsersCollection).With(session)
 
-	user.Id = bson.NewObjectId().Hex()
 	err := user.BeforeCreate()
 	if err != nil {
 		return err

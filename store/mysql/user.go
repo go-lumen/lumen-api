@@ -28,11 +28,11 @@ func (db *mysql) FindUserById(id string) (*models.User, error) {
 
 // FindUser allows to retrieve a user by its characteristics
 func (db *mysql) FindUser(params params.M) (*models.User, error) {
-	var first_name string
+	var firstName string
 	fmt.Println("finding user:", params)
 	var rows, err = db.Query("SELECT * FROM users WHERE email = $1", params)
 	utils.CheckErr(err)
-	utils.CheckErr(rows.Scan(&first_name))
+	utils.CheckErr(rows.Scan(&firstName))
 
 	return nil, nil
 }

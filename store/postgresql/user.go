@@ -25,10 +25,34 @@ func (db *postgres) FindUserById(id string) (*models.User, error) {
 }
 
 // FindUser allows to retrieve a user by its characteristics
-func (db *postgres) FindUser(params params.M) (*models.User, error) {
+func (db *postgres) FindUser(params params.M) (res *models.User, err error) {
 	//rows, err := db.Query("SELECT * FROM users WHERE email = $1", params)
 
-	return nil, nil
+	reqStr := ""
+	availableParams := []string{"first_name", "last_name", "email", "phone", "activation_key", "reset_key"}
+	reqParams := []string{}
+	i := 0
+	for key, value := range params {
+		//fmt.Println(key, ":", value)
+		for _, availParam := range availableParams {
+			if key == availParam {
+				reqParams = append(reqParams, fmt.Sprintf("%v", value))
+				if i != 0 {
+					reqStr += "&"
+				}
+				reqStr += key + "=?"
+				i++
+			}
+		}
+	}
+	fmt.Println(reqStr, reqParams)
+	//err = db.Model(models.User{}).Where(reqStr, reqParams).Select(user) //.Order("id")
+	err = db.Model(res).Where(reqStr, reqParams[0]).Select() //.Order("id")
+	fmt.Println("err", err)
+	//utils.CheckErr(err)
+	fmt.Println(res)
+
+	return res, err
 }
 
 // DeleteUser allows to delete a user by its id
@@ -53,8 +77,8 @@ func (db *postgres) UpdateUser(userId string, params params.M) error {
 
 // GetUsers allows to get all users
 func (db *postgres) GetUsers() ([]*models.User, error) {
-	users := make([]*models.User, 0)
-	err := db.Model(models.User{}).Order("id").Select(users)
+	var users []*models.User
+	err := db.Model(&users).Select()
 	utils.CheckErr(err)
 
 	return users, err

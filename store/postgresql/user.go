@@ -91,5 +91,17 @@ func (db *postgres) CountUsers() (int, error) {
 
 // UserExists allows to know if a user exists through his mail
 func (db *postgres) UserExists(userEmail string) (bool, error) {
+	fmt.Println("finding user:", userEmail)
+	user := &models.User{Email:userEmail}
+	//res, _ := db.FindUser(params.M{"email":userEmail})
+	//err := db.Model(user).Where("email=?", userEmail).Select(user) //.Order("id")
+	//utils.CheckErr(err)
+
+	_, err := db.QueryOne(&user, `SELECT * FROM users WHERE email = ?`, userEmail)
+	utils.CheckErr(err)
+
+	fmt.Println("User:", user)
+	//fmt.Println("Res:", res)
+
 	return false, nil
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store/mongodb"
 	"github.com/go-lumen/lumen-api/store/mysql"
@@ -80,6 +81,7 @@ func (a *API) SetupPostgreSeeds() error {
 	}
 	utils.CheckErr(user.BeforeCreate())
 
+	fmt.Println("Checking")
 	userExists, _ := store.UserExists(user.Email)
 	if userExists {
 		logrus.Infoln(`Seed user already exists`)
@@ -93,6 +95,7 @@ func (a *API) SetupPostgreSeeds() error {
 	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
 		logrus.Warnln(`Error when activating user`)
 	}
+	fmt.Println("Checked")
 
 	return nil
 }

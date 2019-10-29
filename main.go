@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/migrations"
 	"github.com/go-lumen/lumen-api/server"
 	"github.com/go-lumen/lumen-api/services"
 	"github.com/go-lumen/lumen-api/utils"
@@ -40,6 +41,10 @@ func main() {
 		defer db.Close()
 
 		err = api.SetupPostgreSeeds()
+		utils.CheckErr(err)
+
+		migrator := migrations.New(api)
+		err = migrator.Migrate()
 		utils.CheckErr(err)
 
 	case "mysql":

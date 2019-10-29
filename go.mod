@@ -10,7 +10,6 @@ require (
 	github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3 // indirect
 	github.com/gin-gonic/gin v1.3.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
-	github.com/go-pg/pg v8.0.4+incompatible
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/jinzhu/gorm v1.9.11
 	github.com/joho/godotenv v1.3.0
@@ -27,8 +26,9 @@ require (
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/net v0.0.0-20190328230028-74de082e2cca
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
-	mellium.im/sasl v0.2.1 // indirect
+	gopkg.in/gormigrate.v1 v1.6.0
 )
 
 replace gopkg.in/russross/blackfriday.v2 => github.com/russross/blackfriday/v2 v2.0.1

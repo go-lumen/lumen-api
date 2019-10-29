@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type dbLogger struct{}
@@ -27,16 +28,29 @@ func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
 
 // SetupPostgreDatabase establishes the connexion with the PostgreSQL database
 func (a *API) SetupPostgreDatabase() (*gorm.DB, error) {
-	/*connStr := string("host=" + a.Config.GetString("postgres_db_addr") + " port=" + a.Config.GetString("postgres_db_port") +
-		" user=" + a.Config.GetString("postgres_db_user") + " dbname=" + a.Config.GetString("postgres_db_name") +
-		" password=" + a.Config.GetString("postgres_db_password"))*/
-	db, err := gorm.Open("postgres", "host=localhost port=5432 sslmode=disable user=adrien password=litfsoh:PQ dbname=lumen")
-	fmt.Println("error:", err)
-	//utils.CheckErr(err)
-	defer db.Close()
+	connectionURI := fmt.Sprintf(
+		"sslmode=disable dbname=%s host=%s port=%s user=%s password=%s",
+		a.Config.GetString("db"),
+		a.Config.GetString("db_host"),
+		a.Config.GetString("db_port"),
+		a.Config.GetString("db_user"),
+		a.Config.GetString("db_password"),
+	)
+
+	db, err := gorm.Open("postgres", connectionURI)
+	if err != nil {
+		return nil, err
+	}
+
+	// Debug database logs
+	debugDatabase := a.Config.GetBool("debug_database")
+	db.LogMode(debugDatabase)
+
+	db.DB().SetConnMaxLifetime(time.Minute * 5)
+	db.DB().SetMaxIdleConns(5)
+	db.DB().SetMaxOpenConns(5)
 
 	a.PostgreDatabase = db
-
 	return db, nil
 }
 

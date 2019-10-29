@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"errors"
 	"fmt"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
@@ -9,21 +8,21 @@ import (
 
 // CreateUser checks if user already exists, and if not, creates it
 func (db *postgres) CreateUser(user *models.User) error {
-	res1 := db.NewRecord(user)
-	db.Create(&user)
-	res2 := db.NewRecord(user)
-	if res1 == true && res2 == false {
-		return nil
-	} else {
-		return errors.New("user not created, perhaps it already exists")
+	if err := db.Create(&user).Error; err != nil {
+		// handle err
 	}
+
+	return nil
 }
 
 // FindUserById allows to retrieve a user by its id
 func (db *postgres) FindUserById(id string) (*models.User, error) {
 	fmt.Println("finding user:", id)
 	user := &models.User{}
-	db.Where("id = ?", id).First(&user)
+
+	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+		//handle error
+	}
 
 	return user, nil
 }

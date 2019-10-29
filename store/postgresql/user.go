@@ -1,27 +1,31 @@
 package postgresql
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/utils"
 )
 
 // CreateUser checks if user already exists, and if not, creates it
 func (db *postgres) CreateUser(user *models.User) error {
-	err := db.Insert(user)
-	utils.CheckErr(err)
-	return err
+	res1 := db.NewRecord(user)
+	db.Create(&user)
+	res2 := db.NewRecord(user)
+	if res1 == true && res2 == false {
+		return nil
+	} else {
+		return errors.New("user not created, perhaps it already exists")
+	}
 }
 
 // FindUserById allows to retrieve a user by its id
 func (db *postgres) FindUserById(id string) (*models.User, error) {
 	fmt.Println("finding user:", id)
 	user := &models.User{}
-	err := db.Model(models.User{}).Where("id=?", id).Select(user) //.Order("id")
-	utils.CheckErr(err)
+	db.Where("id = ?", id).First(&user)
 
-	return user, err
+	return user, nil
 }
 
 // FindUser allows to retrieve a user by its characteristics
@@ -46,10 +50,8 @@ func (db *postgres) FindUser(params params.M) (res *models.User, err error) {
 		}
 	}
 	fmt.Println(reqStr, reqParams)
-	//err = db.Model(models.User{}).Where(reqStr, reqParams).Select(user) //.Order("id")
-	err = db.Model(res).Where(reqStr, reqParams[0]).Select() //.Order("id")
+	db.Where(reqStr, reqParams).Find(&res)
 	fmt.Println("err", err)
-	//utils.CheckErr(err)
 	fmt.Println(res)
 
 	return res, err
@@ -78,10 +80,9 @@ func (db *postgres) UpdateUser(userId string, params params.M) error {
 // GetUsers allows to get all users
 func (db *postgres) GetUsers() ([]*models.User, error) {
 	var users []*models.User
-	err := db.Model(&users).Select()
-	utils.CheckErr(err)
+	db.Find(&users)
 
-	return users, err
+	return users, nil
 }
 
 // CountUsers allows to count all users
@@ -92,16 +93,11 @@ func (db *postgres) CountUsers() (int, error) {
 // UserExists allows to know if a user exists through his mail
 func (db *postgres) UserExists(userEmail string) (bool, error) {
 	fmt.Println("finding user:", userEmail)
-	user := &models.User{Email:userEmail}
-	//res, _ := db.FindUser(params.M{"email":userEmail})
-	//err := db.Model(user).Where("email=?", userEmail).Select(user) //.Order("id")
-	//utils.CheckErr(err)
+	user := &models.User{Email: userEmail}
 
-	_, err := db.QueryOne(&user, `SELECT * FROM users WHERE email = ?`, userEmail)
-	utils.CheckErr(err)
+	db.Where("email = ?", userEmail).Find(&user)
 
 	fmt.Println("User:", user)
-	//fmt.Println("Res:", res)
 
 	return false, nil
 }

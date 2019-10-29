@@ -7,8 +7,6 @@ import (
 	"github.com/go-lumen/lumen-api/store/mysql"
 	"github.com/go-lumen/lumen-api/store/postgresql"
 	"github.com/go-lumen/lumen-api/utils"
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,32 +42,10 @@ func (a *API) SetupMongoSeeds() error {
 	return nil
 }
 
-func setupPostgreTables(db *pg.DB, models []interface{}) error {
-	for _, model := range models {
-		err := db.DropTable(model, &orm.DropTableOptions{
-			IfExists: true,
-			Cascade:  true,
-		})
-		if err != nil {
-			return err
-		}
-
-		err = db.CreateTable(model, nil)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // SetupPostgreSeeds creates the first user
 func (a *API) SetupPostgreSeeds() error {
+	fmt.Println("Setup postgre seeds")
 	store := postgresql.New(a.PostgreDatabase)
-
-	mods := []interface{}{
-		(*models.User)(nil),
-	}
-	utils.CheckErr(setupPostgreTables(store.DB, mods))
 
 	user := &models.User{
 		FirstName: "Adrien",

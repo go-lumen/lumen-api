@@ -34,7 +34,7 @@ func main() {
 		err = api.SetupMongoSeeds()
 		utils.CheckErr(err)
 
-	case "postgres":
+	case "postgresql":
 		db, err := api.SetupPostgreDatabase()
 		utils.CheckErr(err)
 		defer db.Close()

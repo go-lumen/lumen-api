@@ -30,11 +30,11 @@ func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
 func (a *API) SetupPostgreDatabase() (*gorm.DB, error) {
 	connectionURI := fmt.Sprintf(
 		"sslmode=disable dbname=%s host=%s port=%s user=%s password=%s",
-		a.Config.GetString("db"),
-		a.Config.GetString("db_host"),
-		a.Config.GetString("db_port"),
-		a.Config.GetString("db_user"),
-		a.Config.GetString("db_password"),
+		a.Config.GetString("postgres_db_name"),
+		a.Config.GetString("postgres_db_addr"),
+		a.Config.GetString("postgres_db_port"),
+		a.Config.GetString("postgres_db_user"),
+		a.Config.GetString("postgres_db_password"),
 	)
 
 	db, err := gorm.Open("postgres", connectionURI)

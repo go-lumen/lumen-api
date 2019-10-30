@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/migrations"
 	"github.com/go-lumen/lumen-api/server"
@@ -45,7 +46,10 @@ func main() {
 
 		migrator := migrations.New(api)
 		err = migrator.Migrate()
-		utils.CheckErr(err)
+		if err != nil {
+			fmt.Println("migration error", err)
+		}
+		//utils.CheckErr(err)
 
 	case "mysql":
 		db, err := api.SetupMySQLDatabase()

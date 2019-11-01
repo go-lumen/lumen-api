@@ -1,8 +1,8 @@
 package store
 
 import (
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/models"
 )
 
 // Store interface

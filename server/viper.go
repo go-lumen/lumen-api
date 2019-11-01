@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 	"os"
 

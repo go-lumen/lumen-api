@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/utils"
 	"time"
 )
 

@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/utils"
 	"net/http"
 
-	"github.com/go-lumen/lumen-api/config"
-	"github.com/go-lumen/lumen-api/helpers"
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/store"
+	"go-lumen/lumen-api/config"
+	"go-lumen/lumen-api/helpers"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/store"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"

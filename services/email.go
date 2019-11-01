@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/utils"
 	"github.com/matcornic/hermes/v2"
 	"github.com/sirupsen/logrus"
 	"time"

@@ -2,11 +2,11 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/store/mongodb"
-	"github.com/go-lumen/lumen-api/store/mysql"
-	"github.com/go-lumen/lumen-api/store/postgresql"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/store/mongodb"
+	"go-lumen/lumen-api/store/mysql"
+	"go-lumen/lumen-api/store/postgresql"
+	"go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -51,7 +51,7 @@ func (a *API) SetupPostgreSeeds() error {
 		FirstName: "Adrien",
 		LastName:  "Chapelet",
 		Password:  "adminpwd",
-		Email:     "adrien@plugblocks.com",
+		Email:     "adrien@fline.io",
 		Phone:     "+33671174203",
 		Admin:     true,
 	}

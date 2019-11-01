@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-lumen/lumen-api/config"
+	"go-lumen/lumen-api/config"
 	"github.com/spf13/viper"
 )
 

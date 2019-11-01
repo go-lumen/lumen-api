@@ -2,9 +2,9 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/utils"
 )
 
 // CreateUser checks if user already exists, and if not, creates it

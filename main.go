@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-lumen/lumen-api/migrations"
-	"github.com/go-lumen/lumen-api/server"
-	"github.com/go-lumen/lumen-api/services"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/migrations"
+	"go-lumen/lumen-api/server"
+	"go-lumen/lumen-api/services"
+	"go-lumen/lumen-api/utils"
 	"github.com/spf13/viper"
 )
 

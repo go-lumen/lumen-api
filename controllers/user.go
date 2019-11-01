@@ -3,12 +3,12 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-lumen/lumen-api/config"
-	"github.com/go-lumen/lumen-api/helpers"
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/services"
-	"github.com/go-lumen/lumen-api/store"
+	"go-lumen/lumen-api/config"
+	"go-lumen/lumen-api/helpers"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/services"
+	"go-lumen/lumen-api/store"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )

@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
-	"github.com/go-lumen/lumen-api/store"
-	"github.com/go-lumen/lumen-api/store/mongodb"
-	"github.com/go-lumen/lumen-api/store/mysql"
-	"github.com/go-lumen/lumen-api/store/postgresql"
+	"go-lumen/lumen-api/store"
+	"go-lumen/lumen-api/store/mongodb"
+	"go-lumen/lumen-api/store/mysql"
+	"go-lumen/lumen-api/store/postgresql"
 	"github.com/jinzhu/gorm"
 )
 

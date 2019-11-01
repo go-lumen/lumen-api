@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/globalsign/mgo/bson"
-	"github.com/go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/models"
 	"github.com/stretchr/testify/assert"
 )
 

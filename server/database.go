@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/globalsign/mgo"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"

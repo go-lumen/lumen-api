@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
-	"github.com/go-lumen/lumen-api/services"
+	"go-lumen/lumen-api/services"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 )

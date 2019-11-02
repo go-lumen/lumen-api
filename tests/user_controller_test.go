@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/globalsign/mgo/bson"
-	"go-lumen/lumen-api/models"
 	"github.com/stretchr/testify/assert"
+	"go-lumen/lumen-api/models"
 )
 
 func TestCreateAccount(t *testing.T) {

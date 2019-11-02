@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
+	"github.com/jinzhu/gorm"
 	"go-lumen/lumen-api/store"
 	"go-lumen/lumen-api/store/mongodb"
 	"go-lumen/lumen-api/store/mysql"
 	"go-lumen/lumen-api/store/postgresql"
-	"github.com/jinzhu/gorm"
 )
 
 // StoreMongoMiddleware allows to setup MongoDB database

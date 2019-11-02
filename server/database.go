@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/globalsign/mgo"
-	"go-lumen/lumen-api/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
+	"go-lumen/lumen-api/utils"
 	"time"
 )
 

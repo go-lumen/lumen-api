@@ -1,10 +1,10 @@
 package services
 
 import (
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/utils"
 	"github.com/matcornic/hermes/v2"
 	"github.com/sirupsen/logrus"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/utils"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"

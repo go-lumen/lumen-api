@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"go-lumen/lumen-api/models"
 	"go-lumen/lumen-api/store/mongodb"
 	"go-lumen/lumen-api/store/mysql"
 	"go-lumen/lumen-api/store/postgresql"
 	"go-lumen/lumen-api/utils"
-	"github.com/sirupsen/logrus"
 )
 
 // SetupMongoSeeds creates the first user

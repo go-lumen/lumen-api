@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
-	"go-lumen/lumen-api/services"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"go-lumen/lumen-api/services"
 )
 
 // API structure that holds various necessary services

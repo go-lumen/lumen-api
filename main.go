@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"go-lumen/lumen-api/migrations"
 	"go-lumen/lumen-api/server"
 	"go-lumen/lumen-api/services"
 	"go-lumen/lumen-api/utils"
-	"github.com/spf13/viper"
 )
 
 func main() {

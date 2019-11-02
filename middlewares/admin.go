@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"go-lumen/lumen-api/helpers"
 	"go-lumen/lumen-api/store"
-	"github.com/pkg/errors"
 )
 
 // AdminMiddleware allows to filter admin only users

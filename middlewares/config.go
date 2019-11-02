@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-lumen/lumen-api/config"
 	"github.com/spf13/viper"
+	"go-lumen/lumen-api/config"
 )
 
 // ConfigMiddleware allows to use viper configuration parameters set in .env files

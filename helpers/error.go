@@ -26,6 +26,6 @@ func ErrorWithCode(code string, message string, trace error) Error {
 }
 
 // NewError is creating an error with code and HTTP code
-func NewError(httpCode int, code string, message string, trace error) Error {
-	return Error{Code: code, Message: message, HttpCode: httpCode, Trace: trace}
+func NewError(httpCode int, code string, message string) Error {
+	return Error{Code: code, Message: message, HttpCode: httpCode}
 }

@@ -37,6 +37,10 @@ func AuthMiddleware() gin.HandlerFunc {
 			println(err)
 		}
 
+		if user.LastPasswordUpdate > claims["iat"].(int64) {
+			c.AbortWithError(http.StatusBadRequest, helpers.ErrorWithCode("invalid_token_new_password", "the given token is invalid due to new password", err))
+		}
+
 		c.Next()
 	}
 }

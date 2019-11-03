@@ -1,0 +1,23 @@
+package migrations
+
+import (
+	"github.com/jinzhu/gorm"
+	"gopkg.in/gormigrate.v1"
+)
+
+func init() {
+	migrations = append(migrations, &gormigrate.Migration{
+		ID: "{{ $.MigrationId }}",
+		Migrate: func(tx *gorm.DB) error {
+			type {{ singularize $.ModelName }} struct {
+				gorm.Model
+				Id       string `json:"id" gorm:"type:text;not null;unique;primary_key:true"`
+				Name     string `json:"name" gorm:"type:text"`
+			}
+			return tx.AutoMigrate(&{{ singularize $.ModelName }}{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("{{ toLower $.ModelName }}").Error
+		},
+	})
+}

@@ -50,7 +50,7 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 
 	//Read base64 private key
 	encodedKey := []byte(config.GetString(c, "rsa_private"))
-	accessToken, err := helpers.GenerateAccessToken(encodedKey, user.Id)
+	accessToken, err := helpers.GenerateAccessToken(encodedKey, user.Id, user.LastPasswordUpdate)
 	if err != nil {
 		utils.CheckErr(err)
 		c.AbortWithError(http.StatusInternalServerError, helpers.ErrorWithCode("token_generation_failed", "Could not generate the access token", err))

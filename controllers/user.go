@@ -55,7 +55,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/` + user.Id + `/activate/` + user.ActivationKey
+	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/` + string(user.Id) + `/activate/` + user.ActivationKey
 	frontUrl := config.GetString(c, "front_url")
 	appName := config.GetString(c, "mail_sender_name")
 
@@ -144,13 +144,13 @@ func (uc UserController) ResetPasswordRequest(c *gin.Context) {
 
 	resetKey := helpers.RandomString(40)
 
-	if err = store.UpdateUser(c, databaseUser.Id, params.M{"resetKey": resetKey}); err != nil {
+	if err = store.UpdateUser(c, string(databaseUser.Id), params.M{"resetKey": resetKey}); err != nil {
 		c.Error(err)
 		c.Abort()
 		return
 	}
 
-	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/reset_password/` + databaseUser.Id + `/` + resetKey
+	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/reset_password/` + string(databaseUser.Id) + `/` + resetKey
 	frontUrl := config.GetString(c, "front_url")
 	appName := config.GetString(c, "mail_sender_name")
 

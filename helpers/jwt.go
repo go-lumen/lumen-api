@@ -35,11 +35,11 @@ func GenerateAccessToken(encodedKey []byte, userId string, passwordUpdate int64)
 	}
 
 	access := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub": userId,
-		"aud": "access",
+		"sub":        userId,
+		"aud":        "access",
 		"updated_at": passwordUpdate,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Minute * time.Duration(8760)).Unix(),
+		"iat":        time.Now().Unix(),
+		"exp":        time.Now().Add(time.Minute * time.Duration(8760)).Unix(),
 	})
 
 	accessString, err := access.SignedString(privateKey)

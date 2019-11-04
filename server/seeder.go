@@ -17,11 +17,11 @@ func (a *API) SetupMongoSeeds() error {
 	//Mails: 0.10$/1000         Texts: 0.05-0.10$/1       WiFi: 5$/1000
 
 	user := &models.User{
-		FirstName: "Adrien",
-		LastName:  "Chapelet",
-		Password:  "adminpwd",
-		Email:     "adrien@plugblocks.com",
-		Phone:     "+33671174203",
+		FirstName: a.Config.GetString("admin_firstname"),
+		LastName:  a.Config.GetString("admin_lastname"),
+		Password:  a.Config.GetString("admin_password"),
+		Email:     a.Config.GetString("admin_email"),
+		Phone:     a.Config.GetString("admin_phone"),
 		Admin:     true,
 	}
 
@@ -35,7 +35,7 @@ func (a *API) SetupMongoSeeds() error {
 		logrus.Warnln(`Error when creating user`)
 	}
 
-	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
+	if store.ActivateUser(user.ActivationKey, string(user.Id)) != nil {
 		logrus.Warnln(`Error when activating user`)
 	}
 
@@ -48,27 +48,27 @@ func (a *API) SetupPostgreSeeds() error {
 	store := postgresql.New(a.PostgreDatabase)
 
 	user := &models.User{
-		FirstName: "Adrien",
-		LastName:  "Chapelet",
-		Password:  "adminpwd",
-		Email:     "adrien@fline.io",
-		Phone:     "+33671174203",
+		FirstName: a.Config.GetString("admin_firstname"),
+		LastName:  a.Config.GetString("admin_lastname"),
+		Password:  a.Config.GetString("admin_password"),
+		Email:     a.Config.GetString("admin_email"),
+		Phone:     a.Config.GetString("admin_phone"),
 		Admin:     true,
 	}
 	utils.CheckErr(user.BeforeCreate())
 
 	fmt.Println("Checking")
-	userExists, _ := store.UserExists(user.Email)
+	/*userExists, _ := store.UserExists(user.Email)
 	if userExists {
 		logrus.Infoln(`Seed user already exists`)
 		return nil
-	}
+	}*/
 
 	if store.CreateUser(user) != nil {
 		logrus.Warnln(`Error when creating user`)
 	}
 
-	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
+	if store.ActivateUser(user.ActivationKey, string(user.Id)) != nil {
 		logrus.Warnln(`Error when activating user`)
 	}
 	fmt.Println("Checked")
@@ -81,11 +81,11 @@ func (a *API) SetupMySQLSeeds() error {
 	store := mysql.New(a.MySQLDatabase)
 
 	user := &models.User{
-		FirstName: "Adrien",
-		LastName:  "Chapelet",
-		Password:  "adminpwd",
-		Email:     "adrien@plugblocks.com",
-		Phone:     "+33671174203",
+		FirstName: a.Config.GetString("admin_firstname"),
+		LastName:  a.Config.GetString("admin_lastname"),
+		Password:  a.Config.GetString("admin_password"),
+		Email:     a.Config.GetString("admin_email"),
+		Phone:     a.Config.GetString("admin_phone"),
 		Admin:     true,
 	}
 
@@ -99,7 +99,7 @@ func (a *API) SetupMySQLSeeds() error {
 		logrus.Warnln(`Error when creating user`)
 	}
 
-	if store.ActivateUser(user.ActivationKey, user.Id) != nil {
+	if store.ActivateUser(user.ActivationKey, string(user.Id)) != nil {
 		logrus.Warnln(`Error when activating user`)
 	}
 

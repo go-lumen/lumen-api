@@ -24,7 +24,7 @@ type User struct {
 	Active             bool   `json:"active" bson:"active"`
 	Admin              bool   `json:"admin" bson:"admin"`
 	LastAccess         int64  `json:"last_access" bson:"last_access" valid:"-"`
-	LastPasswordUpdate int64 `json:"last_password_update" bson:"last_password_update"`
+	LastPasswordUpdate int64  `json:"last_password_update" bson:"last_password_update"`
 }
 
 // SanitizedUser allows to expose only few characteristics
@@ -50,13 +50,13 @@ func (user *User) BeforeCreate() error {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return helpers.NewError(http.StatusInternalServerError, "encryption_failed", "Failed to generate the crypted password")
+		return helpers.NewError(http.StatusInternalServerError, "encryption_failed", "Failed to generate the crypted password", err)
 	}
 	user.Password = string(hashedPassword)
 
 	_, err = govalidator.ValidateStruct(user)
 	if err != nil {
-		return helpers.NewError(http.StatusBadRequest, "input_not_valid", err.Error())
+		return helpers.NewError(http.StatusBadRequest, "input_not_valid", err.Error(), err)
 	}
 
 	return nil

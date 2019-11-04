@@ -13,13 +13,15 @@ func (db *postgres) CreateUser(user *models.User) error {
 	var count int
 	if err := db.Model(user).Where("email = ?", user.Email).Count(&count).Error; err != nil || count > 0 {
 		fmt.Println("user_exists", user)
-		return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists")
+		//return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists")
 	}
+	fmt.Println("User exists Passed")
 
 	if err := db.Create(user).Error; err != nil {
 		fmt.Println("user_creation_failed")
-		return helpers.NewError(http.StatusInternalServerError, "user_creation_failed", "could not create the user")
+		return helpers.NewError(http.StatusInternalServerError, "user_creation_failed", "could not create the user", err)
 	}
+	fmt.Println("Users creation Passed")
 
 	return nil
 }
@@ -28,7 +30,7 @@ func (db *postgres) CreateUser(user *models.User) error {
 func (db *postgres) FindUserById(id string) (*models.User, error) {
 	var user models.User
 	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user")
+		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user", err)
 	}
 	return &user, nil
 }
@@ -70,7 +72,7 @@ func (db *postgres) FindUser(params params.M) (*models.User, error) {
 	}
 
 	if err := session.First(&user).Error; err != nil {
-		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user")
+		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user", err)
 	}
 
 	return &user, nil
@@ -85,15 +87,15 @@ func (db *postgres) DeleteUser(user *models.User, userId string) error {
 func (db *postgres) ActivateUser(activationKey string, id string) error {
 	var user models.User
 	if err := db.Where("id = ?", id).First(&user); err != nil {
-		return helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user")
+		return helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user", err.Error)
 	}
 
 	if user.ActivationKey != activationKey {
-		return helpers.NewError(http.StatusBadRequest, "invalid_validation_code", "the provided activation code is invalid")
+		return helpers.NewError(http.StatusBadRequest, "invalid_validation_code", "the provided activation code is invalid", nil)
 	}
 
 	if err := db.Model(&user).Update("active = ?", true).Error; err != nil {
-		return helpers.NewError(http.StatusInternalServerError, "update_user_failed", "could not update the user")
+		return helpers.NewError(http.StatusInternalServerError, "update_user_failed", "could not update the user", err)
 	}
 
 	return nil
@@ -126,7 +128,7 @@ func (db *postgres) CountUsers() (int, error) {
 func (db *postgres) UserExists(userEmail string) (bool, error) {
 	var user models.User
 	if err := db.Where("email = ?", userEmail).First(&user).Error; err != nil {
-		return true, helpers.NewError(http.StatusNotFound, "user_exists", "found the user")
+		return true, helpers.NewError(http.StatusNotFound, "user_exists", "found the user", err)
 	}
 	fmt.Println("User:", user)
 	return false, nil

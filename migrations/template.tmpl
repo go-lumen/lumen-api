@@ -11,7 +11,6 @@ func init() {
 		Migrate: func(tx *gorm.DB) error {
 			type {{ singularize $.ModelName }} struct {
 				gorm.Model
-				Id       string `json:"id" gorm:"type:text;not null;unique;primary_key:true"`
 				Name     string `json:"name" gorm:"type:text"`
 			}
 			return tx.AutoMigrate(&{{ singularize $.ModelName }}{}).Error

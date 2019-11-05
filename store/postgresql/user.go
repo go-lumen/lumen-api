@@ -12,15 +12,14 @@ import (
 func (db *postgres) CreateUser(user *models.User) error {
 	var count int
 	if err := db.Model(user).Where("email = ?", user.Email).Count(&count).Error; err != nil || count > 0 {
-		//return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists")
+		fmt.Println("user_exists", err)
+		return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists", err)
 	}
-	fmt.Println("User exists Passed")
 
 	if err := db.Create(user).Error; err != nil {
 		fmt.Println("user_creation_failed", err)
 		return helpers.NewError(http.StatusInternalServerError, "user_creation_failed", "could not create the user", err)
 	}
-	fmt.Println("Users creation Passed")
 
 	return nil
 }

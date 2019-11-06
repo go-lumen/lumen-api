@@ -41,15 +41,14 @@ func main() {
 		utils.CheckErr(err)
 		defer db.Close()
 
-		err = api.SetupPostgreSeeds()
-		utils.CheckErr(err)
-
 		migrator := migrations.New(api)
 		err = migrator.Migrate()
 		if err != nil {
 			fmt.Println("migration error", err)
 		}
-		//utils.CheckErr(err)
+
+		err = api.SetupPostgreSeeds()
+		utils.CheckErr(err)
 
 	case "mysql":
 		db, err := api.SetupMySQLDatabase()

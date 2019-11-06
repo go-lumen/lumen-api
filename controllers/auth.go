@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"go-lumen/lumen-api/utils"
 	"net/http"
 
@@ -37,9 +38,11 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("Comparing", string([]byte(user.Password)), "and", string([]byte(userInput.Password)))
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userInput.Password))
 	if err != nil {
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("incorrect_password", "Password is not correct", err))
+		fmt.Println("CompareHashAndPassword err:", err)
 		return
 	}
 

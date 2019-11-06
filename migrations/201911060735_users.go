@@ -7,7 +7,7 @@ import (
 
 func init() {
 	migrations = append(migrations, &gormigrate.Migration{
-		ID: "201911050741",
+		ID: "201911060735",
 		Migrate: func(tx *gorm.DB) error {
 			type User struct {
 				gorm.Model

@@ -7,7 +7,6 @@ import (
 	"go-lumen/lumen-api/store/mongodb"
 	"go-lumen/lumen-api/store/mysql"
 	"go-lumen/lumen-api/store/postgresql"
-	"go-lumen/lumen-api/utils"
 )
 
 // SetupMongoSeeds creates the first user
@@ -55,9 +54,6 @@ func (a *API) SetupPostgreSeeds() error {
 		Phone:     a.Config.GetString("admin_phone"),
 		Admin:     true,
 	}
-	utils.CheckErr(user.BeforeCreate())
-
-	fmt.Println("Checking")
 	/*userExists, _ := store.UserExists(user.Email)
 	if userExists {
 		logrus.Infoln(`Seed user already exists`)

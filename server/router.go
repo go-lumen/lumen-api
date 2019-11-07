@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/go-lumen/lumen-api/config"
+	"go-lumen/lumen-api/config"
 	"net/http"
 	"time"
 
-	"github.com/go-lumen/lumen-api/controllers"
-	"github.com/go-lumen/lumen-api/middlewares"
+	"go-lumen/lumen-api/controllers"
+	"go-lumen/lumen-api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +36,7 @@ func (a *API) SetupRouter() {
 	switch dbType {
 	case "mongo":
 		router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
-	case "postgres":
+	case "postgresql":
 		router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))
 	case "mysql":
 		router.Use(middlewares.StoreMySQLMiddleware(a.MySQLDatabase))

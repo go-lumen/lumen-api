@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/globalsign/mgo"
-	"github.com/go-lumen/lumen-api/services"
-	"github.com/go-pg/pg"
+	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"go-lumen/lumen-api/services"
 )
 
 // API structure that holds various necessary services
@@ -14,7 +14,7 @@ type API struct {
 	Router          *gin.Engine
 	Config          *viper.Viper
 	MongoDatabase   *mgo.Database
-	PostgreDatabase *pg.DB
+	PostgreDatabase *gorm.DB
 	MySQLDatabase   *sql.DB
 	EmailSender     services.EmailSender
 	TextSender      services.TextSender

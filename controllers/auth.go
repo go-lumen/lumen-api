@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"github.com/go-lumen/lumen-api/utils"
+	"fmt"
+	"go-lumen/lumen-api/utils"
 	"net/http"
 
-	"github.com/go-lumen/lumen-api/config"
-	"github.com/go-lumen/lumen-api/helpers"
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/store"
+	"go-lumen/lumen-api/config"
+	"go-lumen/lumen-api/helpers"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/store"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
@@ -37,9 +38,11 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("Comparing", string([]byte(user.Password)), "and", string([]byte(userInput.Password)))
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userInput.Password))
 	if err != nil {
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("incorrect_password", "Password is not correct", err))
+		fmt.Println("CompareHashAndPassword err:", err)
 		return
 	}
 
@@ -50,7 +53,7 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 
 	//Read base64 private key
 	encodedKey := []byte(config.GetString(c, "rsa_private"))
-	accessToken, err := helpers.GenerateAccessToken(encodedKey, user.Id)
+	accessToken, err := helpers.GenerateAccessToken(encodedKey, string(user.Id), user.LastPasswordUpdate)
 	if err != nil {
 		utils.CheckErr(err)
 		c.AbortWithError(http.StatusInternalServerError, helpers.ErrorWithCode("token_generation_failed", "Could not generate the access token", err))

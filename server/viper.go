@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
+	"go-lumen/lumen-api/utils"
 	"os"
 
 	"github.com/joho/godotenv"

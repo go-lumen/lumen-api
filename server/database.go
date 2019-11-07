@@ -2,24 +2,16 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/globalsign/mgo"
-	"github.com/go-lumen/lumen-api/utils"
-	"github.com/go-pg/pg"
-	_ "github.com/go-sql-driver/mysql" // For MySQL
-	//_ "github.com/lib/pq"              // For PostgreSQL
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/sirupsen/logrus"
-	//https://github.com/jinzhu/gorm
-	//https://github.com/go-xorm/xorm
+	"go-lumen/lumen-api/utils"
+	"time"
 )
 
 type dbLogger struct{}
-
-func (d dbLogger) BeforeQuery(q *pg.QueryEvent) {}
-
-func (d dbLogger) AfterQuery(q *pg.QueryEvent) {
-	sql, _ := q.FormattedQuery()
-	logrus.Debugf("SQL query: %s", sql)
-}
 
 // SetupMongoDatabase establishes the connexion with the mongo database
 func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
@@ -35,21 +27,30 @@ func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
 }
 
 // SetupPostgreDatabase establishes the connexion with the PostgreSQL database
-func (a *API) SetupPostgreDatabase() (*pg.DB, error) {
-	pgOptions := &pg.Options{
-		Addr:     a.Config.GetString("postgres_db_addr"),
-		Database: a.Config.GetString("postgres_db_name"),
-		User:     a.Config.GetString("postgres_db_user"),
-	}
-	db := pg.Connect(pgOptions)
+func (a *API) SetupPostgreDatabase() (*gorm.DB, error) {
+	connectionURI := fmt.Sprintf(
+		"sslmode=disable dbname=%s host=%s port=%s user=%s password=%s",
+		a.Config.GetString("postgres_db_name"),
+		a.Config.GetString("postgres_db_addr"),
+		a.Config.GetString("postgres_db_port"),
+		a.Config.GetString("postgres_db_user"),
+		a.Config.GetString("postgres_db_password"),
+	)
 
-	db.AddQueryHook(dbLogger{})
-	/*db, err := sql.Open("postgres", "user="+a.Config.GetString("postgres_db_user")+
-		" dbName="+a.Config.GetString("postgres_db_dbname")+" sslmode=verify-full")
-	utils.CheckErr(err)*/
+	db, err := gorm.Open("postgres", connectionURI)
+	if err != nil {
+		return nil, err
+	}
+
+	// Debug database logs
+	debugDatabase := a.Config.GetBool("debug_database")
+	db.LogMode(debugDatabase)
+
+	db.DB().SetConnMaxLifetime(time.Minute * 5)
+	db.DB().SetMaxIdleConns(5)
+	db.DB().SetMaxOpenConns(5)
 
 	a.PostgreDatabase = db
-
 	return db, nil
 }
 

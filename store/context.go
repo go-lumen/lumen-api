@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/models"
 	"golang.org/x/net/context"
 )
 

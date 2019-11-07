@@ -3,10 +3,10 @@ package middlewares
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/go-lumen/lumen-api/config"
-	"github.com/go-lumen/lumen-api/helpers"
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/store"
+	"go-lumen/lumen-api/config"
+	"go-lumen/lumen-api/helpers"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/store"
 	"net/http"
 	"strings"
 	"time"
@@ -33,8 +33,12 @@ func AuthMiddleware() gin.HandlerFunc {
 		user, _ := store.FindUserById(c, claims["sub"].(string))
 		c.Set(store.CurrentKey, user)
 
-		if err := store.UpdateUser(c, user.Id, params.M{"$set": params.M{"last_access": time.Now().Unix()}}); err != nil {
+		if err := store.UpdateUser(c, string(user.Id), params.M{"$set": params.M{"last_access": time.Now().Unix()}}); err != nil {
 			println(err)
+		}
+
+		if user.LastPasswordUpdate > claims["iat"].(int64) {
+			c.AbortWithError(http.StatusBadRequest, helpers.ErrorWithCode("invalid_token_new_password", "the given token is invalid due to new password", err))
 		}
 
 		c.Next()

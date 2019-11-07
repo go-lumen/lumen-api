@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/go-lumen/lumen-api/models"
-	"github.com/go-lumen/lumen-api/utils"
+	"go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/utils"
 
 	"github.com/globalsign/mgo"
 )

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-lumen/lumen-api/server"
-	"github.com/go-lumen/lumen-api/services"
-	"github.com/go-lumen/lumen-api/utils"
 	"github.com/spf13/viper"
+	"go-lumen/lumen-api/migrations"
+	"go-lumen/lumen-api/server"
+	"go-lumen/lumen-api/services"
+	"go-lumen/lumen-api/utils"
 )
 
 func main() {
@@ -34,10 +36,16 @@ func main() {
 		err = api.SetupMongoSeeds()
 		utils.CheckErr(err)
 
-	case "postgres":
+	case "postgresql":
 		db, err := api.SetupPostgreDatabase()
 		utils.CheckErr(err)
 		defer db.Close()
+
+		migrator := migrations.New(api)
+		err = migrator.Migrate()
+		if err != nil {
+			fmt.Println("migration error", err)
+		}
 
 		err = api.SetupPostgreSeeds()
 		utils.CheckErr(err)

@@ -3,8 +3,8 @@ package store
 import (
 	"context"
 
-	"github.com/go-lumen/lumen-api/helpers/params"
-	"github.com/go-lumen/lumen-api/models"
+	"go-lumen/lumen-api/helpers/params"
+	"go-lumen/lumen-api/models"
 )
 
 // CreateUser checks if user already exists, and if not, creates it

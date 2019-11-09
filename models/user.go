@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/globalsign/mgo/bson"
 	"net/http"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 
 // User type holds all required informations
 type User struct {
-	Id                 int    `json:"id" bson:"_id,omitempty" valid:"-"`
+	Id                 string    `json:"id" bson:"_id,omitempty" valid:"-"`
 	FirstName          string `json:"first_name" bson:"first_name"`
 	LastName           string `json:"last_name" bson:"last_name"`
 	Password           string `json:"password" bson:"password" valid:"required"`
@@ -28,7 +29,7 @@ type User struct {
 
 // SanitizedUser allows to expose only few characteristics
 type SanitizedUser struct {
-	Id        int    `json:"id" bson:"_id,omitempty"`
+	Id        string    `json:"id" bson:"_id,omitempty"`
 	FirstName string `json:"first_name" bson:"first_name"`
 	LastName  string `json:"last_name" bson:"last_name"`
 	Email     string `json:"email" bson:"email"`
@@ -42,7 +43,7 @@ func (user *User) Sanitize() SanitizedUser {
 
 // BeforeCreate is here to check inputs and generating an encrypted password
 func (user *User) BeforeCreate() error {
-	//user.Id = bson.NewObjectId().Hex()
+	user.Id = bson.NewObjectId().Hex()
 	user.Active = false
 	user.ActivationKey = helpers.RandomString(40)
 	user.Email = strings.ToLower(user.Email)

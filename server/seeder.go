@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"go-lumen/lumen-api/helpers/params"
 	"go-lumen/lumen-api/models"
 	"go-lumen/lumen-api/store/mongodb"
 	"go-lumen/lumen-api/store/mysql"
@@ -24,18 +25,18 @@ func (a *API) SetupMongoSeeds() error {
 		Admin:     true,
 	}
 
-	userExists, _ := store.UserExists(user.Email)
+	userExists, err := store.UserExists(user.Email)
 	if userExists {
-		logrus.Infoln(`Seed user already exists`)
+		logrus.Infoln(`Seed user already exists`, err)
 		return nil
 	}
 
-	if store.CreateUser(user) != nil {
-		logrus.Warnln(`Error when creating user`)
+	if err := store.CreateUser(user); err != nil {
+		logrus.Warnln(`Error when creating user:`, err)
 	}
 
-	if store.ActivateUser(user.ActivationKey, string(user.Id)) != nil {
-		logrus.Warnln(`Error when activating user`)
+	if err := store.ActivateUser(user.ActivationKey, string(user.Id)); err != nil {
+		logrus.Warnln(`Error when activating user`, err)
 	}
 
 	return nil
@@ -54,18 +55,23 @@ func (a *API) SetupPostgreSeeds() error {
 		Phone:     a.Config.GetString("admin_phone"),
 		Admin:     true,
 	}
-	/*userExists, _ := store.UserExists(user.Email)
+	userExists, err := store.UserExists(user.Email)
 	if userExists {
-		logrus.Infoln(`Seed user already exists`)
-		return nil
-	}*/
-
-	if store.CreateUser(user) != nil {
-		logrus.Warnln(`Error when creating user`)
+		logrus.Infoln(`Seed user already exists`, err)
+	} else {
+		if err := store.CreateUser(user); err != nil {
+			logrus.Warnln(`Error when creating user:`, err)
+		}
 	}
 
-	if store.ActivateUser(user.ActivationKey, string(user.Id)) != nil {
-		logrus.Warnln(`Error when activating user`)
+	dbUser, err := store.FindUser(params.M{"email": a.Config.GetString("admin_email")})
+	if err != nil {
+		logrus.Warnln(err)
+	}
+	fmt.Println("Found user", dbUser.Id, ":", dbUser)
+
+	if err := store.ActivateUser(dbUser.ActivationKey, /*strconv.Itoa(dbUser.Id)*/ dbUser.Email); err != nil {
+		logrus.Warnln(`Error when activating user`, err)
 	}
 	fmt.Println("Checked")
 

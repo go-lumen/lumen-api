@@ -83,7 +83,7 @@ func (db *mongo) ActivateUser(activationKey string, id string) error {
 	defer session.Close()
 	users := db.C(models.UsersCollection).With(session)
 
-	err := users.Update(bson.M{"$and": []bson.M{{"_id": id}, {"activationKey": activationKey}}}, bson.M{"$set": bson.M{"active": true}})
+	err := users.Update(bson.M{"$and": []bson.M{{"_id": id}, {"activation_key": activationKey}}}, bson.M{"$set": bson.M{"active": true}})
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_activation_failed", "Couldn't find the user to activate", err)
 	}

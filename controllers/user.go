@@ -3,13 +3,13 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/config"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/services"
+	"github.com/go-lumen/lumen-api/store"
 	"github.com/sirupsen/logrus"
-	"go-lumen/lumen-api/config"
-	"go-lumen/lumen-api/helpers"
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/services"
-	"go-lumen/lumen-api/store"
 	"net/http"
 )
 
@@ -23,14 +23,50 @@ func NewUserController() UserController {
 
 // GetUser from id (in context)
 func (uc UserController) GetUser(c *gin.Context) {
-	user, err := store.FindUserById(c, c.Param("id"))
+	user, err := store.GetUserById(c, c.Param("id"))
 
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
 		return
 	}
 
-	c.JSON(http.StatusOK, user.Sanitize())
+	c.JSON(http.StatusOK, user.Sanitize("", ""))
+}
+
+// GetUserMe from id (in request)
+func (uc UserController) GetUserMe(c *gin.Context) {
+	storeUser, exists := c.Get(store.CurrentKey)
+	loggedUser := storeUser.(*models.User)
+	if exists {
+		user, err := store.GetUserById(c, loggedUser.Id)
+
+		if err != nil {
+			c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
+			return
+		}
+
+		c.JSON(http.StatusOK, user.Sanitize("", ""))
+	} else {
+		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("user_not_logged", "The user does not exist", nil))
+	}
+}
+
+// GetUserDetails from id (in request)
+func (uc UserController) GetUserDetails(c *gin.Context) {
+	storeUser, exists := c.Get(store.CurrentKey)
+	loggedUser := storeUser.(*models.User)
+	if exists {
+		user, err := store.GetUserById(c, loggedUser.Id)
+
+		if err != nil {
+			c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
+			return
+		}
+
+		c.JSON(http.StatusOK, user.Detail("", ""))
+	} else {
+		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("user_not_logged", "The user does not exist", nil))
+	}
 }
 
 // CreateUser to create a new user
@@ -48,7 +84,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	databaseUser, err := store.FindUser(c, params.M{"email": user.Email})
+	databaseUser, err := store.GetUser(c, params.M{"email": user.Email})
 	if err != nil {
 		c.Error(err)
 		c.Abort()
@@ -69,7 +105,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, user.Sanitize())
+	c.JSON(http.StatusCreated, user.Sanitize("", ""))
 }
 
 // DeleteUser to delete an existing user
@@ -85,16 +121,6 @@ func (uc UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// ChangeLanguage changes user language
-func (uc UserController) ChangeLanguage(c *gin.Context) {
-	if err := store.ChangeLanguage(c, c.Param("id"), c.Param("language")); err != nil {
-		c.Error(err)
-		c.Abort()
-		return
-	}
-	c.JSON(http.StatusOK, nil)
-}
-
 // ActivateUser to activate a user (usually via mail)
 func (uc UserController) ActivateUser(c *gin.Context) {
 	if err := store.ActivateUser(c, c.Param("activationKey"), c.Param("id")); err != nil {
@@ -104,7 +130,7 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 	}
 	//c.JSON(http.StatusOK, nil)
 
-	/*user, err := store.FindUserById(c, c.Param("id"))
+	/*user, err := store.GetUserById(c, c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
 		return
@@ -123,28 +149,28 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 
 // GetUsers to get all users
 func (uc UserController) GetUsers(c *gin.Context) {
-	users, err := store.GetUsers(c)
-	if err != nil {
-		c.Error(err)
-		c.Abort()
-		return
+	_, exists := c.Get(store.CurrentKey)
+	if exists {
+		users, err := store.GetUsers(c, "")
+		if err != nil {
+			helpers.NewError(http.StatusNotFound, "users_not_found", "Users not found", err)
+		}
+		c.JSON(http.StatusOK, users)
 	}
-
-	c.JSON(http.StatusOK, users)
 }
 
 // ResetPasswordRequest allows to send the user an email to reset his password
 func (uc UserController) ResetPasswordRequest(c *gin.Context) {
-	databaseUser, err := store.FindUser(c, params.M{"email": c.Param("email")})
+	databaseUser, err := store.GetUser(c, params.M{"email": c.Param("email")})
 	if err != nil {
-		c.Error(err)
-		c.Abort()
+		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
 		return
 	}
 
 	resetKey := helpers.RandomString(40)
 
-	if err = store.UpdateUser(c, string(databaseUser.Id), params.M{"resetKey": resetKey}); err != nil {
+	databaseUser.ResetKey = resetKey
+	if err = store.UpdateUser(c, string(databaseUser.Id), databaseUser); err != nil {
 		c.Error(err)
 		c.Abort()
 		return
@@ -163,7 +189,7 @@ func (uc UserController) ResetPasswordRequest(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, databaseUser.Sanitize())
+	c.JSON(http.StatusCreated, databaseUser.Sanitize("", ""))
 }
 
 // ResetPasswordResponse allows the user to change his password

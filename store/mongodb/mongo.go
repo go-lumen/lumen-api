@@ -1,12 +1,17 @@
 package mongodb
 
-import "github.com/globalsign/mgo"
+import (
+	"context"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
-type mongo struct {
-	*mgo.Database
+type mngo struct {
+	database *mongo.Database
+	dbName   string
+	context  context.Context
 }
 
 // New creates a database connexion
-func New(database *mgo.Database) *mongo {
-	return &mongo{database}
+func New(database *mongo.Database, dbName string, context context.Context) *mngo {
+	return &mngo{database, dbName, context}
 }

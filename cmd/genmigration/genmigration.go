@@ -11,7 +11,6 @@ import (
 	"bytes"
 	"github.com/gedex/inflector"
 	"github.com/serenize/snaker"
-	"go-lumen/lumen-api/utils"
 	"go/format"
 	"gopkg.in/godo.v2/util"
 	"io/ioutil"

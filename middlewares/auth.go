@@ -3,13 +3,12 @@ package middlewares
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"go-lumen/lumen-api/config"
-	"go-lumen/lumen-api/helpers"
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/config"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/store"
 	"net/http"
 	"strings"
-	"time"
 )
 
 // AuthMiddleware allows to analyze the token and check that it is valid
@@ -30,16 +29,16 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		user, _ := store.FindUserById(c, claims["sub"].(string))
+		user, _ := store.GetUser(c, params.M{"_id": claims["sub"].(string)})
+		//logrus.Infoln("looking for: " + claims["sub"].(string) + " Got user: " + fmt.Sprint(user))
 		c.Set(store.CurrentKey, user)
-
-		if err := store.UpdateUser(c, string(user.Id), params.M{"$set": params.M{"last_access": time.Now().Unix()}}); err != nil {
+		/*if err := store.UpdateUser(c, string(user.Id), params.M{"$set": params.M{"last_access": time.Now().Unix()}}); err != nil {
 			println(err)
-		}
+		}*/
 
-		if user.LastPasswordUpdate > claims["iat"].(int64) {
+		/*if user.LastPasswordUpdate > int64(claims["iat"].(float64)) {
 			c.AbortWithError(http.StatusBadRequest, helpers.ErrorWithCode("invalid_token_new_password", "the given token is invalid due to new password", err))
-		}
+		}*/
 
 		c.Next()
 	}

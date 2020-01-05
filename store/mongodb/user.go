@@ -1,161 +1,187 @@
 package mongodb
 
 import (
+	"context"
+	"fmt"
+	"github.com/sirupsen/logrus"
+	"log"
 	"net/http"
 
 	"github.com/globalsign/mgo/bson"
-	"go-lumen/lumen-api/helpers"
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateUser checks if user already exists, and if not, creates it
-func (db *mongo) CreateUser(user *models.User) error {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
+func (db *mngo) CreateUser(user *models.User) error {
+	c := db.database.Collection(models.UsersCollection)
 
 	err := user.BeforeCreate()
 	if err != nil {
 		return err
 	}
-
-	if count, _ := users.Find(bson.M{"email": user.Email}).Count(); count > 0 {
+	cursor, err := c.Find(db.context, bson.M{"email": user.Email})
+	var results []bson.M
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		log.Fatal(err)
+	}
+	if len(results) > 0 {
 		return helpers.NewError(http.StatusConflict, "user_already_exists", "User already exists", err)
 	}
 
-	err = users.Insert(user)
+	_, err = c.InsertOne(db.context, user)
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_creation_failed", "Failed to insert the user in the database", err)
+	}
+	//res.InsertedID
+
+	return nil
+}
+
+// GetUserById allows to retrieve a user by its id
+func (db *mngo) GetUserById(id string) (*models.User, error) {
+	c := db.database.Collection(models.UsersCollection)
+
+	user := &models.User{}
+	err := c.FindOne(db.context, bson.M{"_id": id}).Decode(&user)
+	if err != nil {
+		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
+	}
+
+	return user, err
+}
+
+// GetUser allows to retrieve a user by its characteristics
+func (db *mngo) GetUser(params params.M) (*models.User, error) {
+	c := db.database.Collection(models.UsersCollection)
+
+	user := &models.User{}
+	err := c.FindOne(db.context, params).Decode(&user)
+	if err != nil {
+		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
+	}
+
+	return user, err
+}
+
+// GetUserFromSigfoxId allows to retrieve a user by its Sigfox Id
+func (db *mngo) GetUserFromSigfoxId(sigfoxId string) (*models.User, error) {
+	c := db.database.Collection(models.UsersCollection)
+
+	user := &models.User{}
+	err := c.FindOne(db.context, bson.M{"sigfox_id": sigfoxId}).Decode(&user)
+	if err != nil {
+		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
+	}
+
+	return user, err
+}
+
+// GetUserById allows to retrieve a user by its id
+func (db *mngo) UserExists(email string) (bool, *models.User, error) {
+	c := db.database.Collection(models.UsersCollection)
+
+	user := &models.User{}
+	err := c.FindOne(db.context, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		return false, nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
+	}
+
+	return true, user, err
+}
+
+// UpdateUser allows to update one or more user characteristics
+func (db *mngo) UpdateUser(userId string, newUser *models.User) error {
+	c := db.database.Collection(models.UsersCollection)
+
+	result, err := c.UpdateOne(context.TODO(), bson.M{"_id": userId}, bson.M{"$set": newUser}, options.Update().SetUpsert(true))
+	if err != nil {
+		log.Fatal(err)
+		return helpers.NewError(http.StatusInternalServerError, "user_update_failed", "Failed to update the user", err)
+	}
+
+	if result.MatchedCount != 0 {
+		fmt.Println("matched and replaced an existing document")
+		return nil
+	}
+	if result.UpsertedCount != 0 {
+		fmt.Printf("UpdateUser: inserted a new document with ID %v\n", result.UpsertedID)
+		return nil
 	}
 
 	return nil
 }
 
-// FindUserById allows to retrieve a user by its id
-func (db *mongo) FindUserById(id string) (*models.User, error) {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
-
-	user := &models.User{}
-	err := users.FindId(id).One(user)
-	if err != nil {
-		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
-	}
-
-	return user, err
-}
-
-// FindUser allows to retrieve a user by its characteristics
-func (db *mongo) FindUser(params params.M) (*models.User, error) {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
-
-	user := &models.User{}
-
-	err := users.Find(params).One(user)
-	if err != nil {
-		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
-	}
-
-	return user, err
-}
-
 // DeleteUser allows to delete a user by its id
-func (db *mongo) DeleteUser(user *models.User, userId string) error {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
+func (db *mngo) DeleteUser(userId string) error {
+	c := db.database.Collection(models.UsersCollection)
 
-	err := users.Remove(bson.M{"_id": userId})
+	_, err := c.DeleteOne(db.context, bson.M{"_id": userId})
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_delete_failed", "Failed to delete the user", err)
 	}
 
+	//res.DeletedCount
+
 	return nil
 }
 
-// ActivateUser allows to activate a user by its id
-func (db *mongo) ActivateUser(activationKey string, id string) error {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
+func (db *mngo) ActivateUser(activationKey string, id string) error {
+	c := db.database.Collection(models.UsersCollection)
 
-	err := users.Update(bson.M{"$and": []bson.M{{"_id": id}, {"activation_key": activationKey}}}, bson.M{"$set": bson.M{"active": true}})
+	result, err := c.UpdateOne(context.TODO(), bson.M{"$and": []bson.M{{"_id": id}, {"activation_key": activationKey}}}, bson.M{"$set": bson.M{"status": "activated"}}, options.Update().SetUpsert(false))
+
 	if err != nil {
+		log.Fatal(err)
 		return helpers.NewError(http.StatusInternalServerError, "user_activation_failed", "Couldn't find the user to activate", err)
 	}
-	return nil
-}
 
-// ChangeLanguage allows to change a user language by its id
-func (db *mongo) ChangeLanguage(id string, language string) error {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
-
-	if err := users.UpdateId(id, bson.M{"$set": bson.M{"language": language}}); err != nil {
-		return helpers.NewError(http.StatusInternalServerError, "user_activation_failed", "Couldn't find the user to change language", err)
+	if result.MatchedCount != 0 {
+		fmt.Println("matched and activated a user")
+		return nil
 	}
-	return nil
-}
-
-// UpdateUser allows to update one or more user characteristics
-func (db *mongo) UpdateUser(userId string, params params.M) error {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
-
-	if err := users.UpdateId(userId, params); err != nil {
-		return helpers.NewError(http.StatusInternalServerError, "user_update_failed", "Failed to update the user", err)
+	if result.UpsertedCount != 0 {
+		fmt.Printf("ActivateUser: inserted a new document with ID %v\n", result.UpsertedID)
+		return nil
 	}
 
 	return nil
 }
 
 // GetUsers allows to get all users
-func (db *mongo) GetUsers() ([]*models.User, error) {
-	session := db.Session.Copy()
-	defer session.Close()
-
-	users := db.C(models.UsersCollection).With(session)
+func (db *mngo) GetUsers(groupId string) ([]*models.User, error) {
+	c := db.database.Collection(models.UsersCollection)
 
 	list := []*models.User{}
-	if err := users.Find(params.M{}).All(&list); err != nil {
-		return nil, helpers.NewError(http.StatusNotFound, "users_not_found", "Users not found", err)
+
+	var filter bson.M
+	if groupId != "" {
+		filter = bson.M{"group_id": groupId}
+	}
+	cur, err := c.Find(context.TODO(), filter)
+	if err != nil {
+		logrus.Warnln("Error on Finding all the documents", err)
 	}
 
-	return list, nil
+	for cur.Next(context.TODO()) {
+		var elem models.User
+		err = cur.Decode(&elem)
+		if err != nil {
+			logrus.Warnln("Error on Decoding the document", err)
+		}
+		list = append(list, &elem)
+	}
+
+	return list, err
 }
 
 // CountUsers allows to count all users
-func (db *mongo) CountUsers() (int, error) {
-	session := db.Session.Copy()
-	defer session.Close()
+func (db *mngo) CountUsers() (int, error) {
+	c := db.database.Collection(models.UsersCollection)
 
-	users := db.C(models.UsersCollection).With(session)
+	count, err := c.CountDocuments(context.TODO(), nil)
 
-	nbr, err := users.Find(params.M{}).Count()
-	if err != nil {
-		return -1, helpers.NewError(http.StatusNotFound, "users_not_found", "Users not found", err)
-	}
-	return nbr, nil
-}
-
-// UserExists allows to know if a user exists through his mail
-func (db *mongo) UserExists(userEmail string) (bool, error) {
-	session := db.Session.Copy()
-	defer session.Close()
-	users := db.C(models.UsersCollection).With(session)
-
-	user := &models.User{}
-
-	err := users.Find(params.M{"email": userEmail}).One(user)
-	if err != nil {
-		return false, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
-	}
-
-	return true, err
+	return int(count), err
 }

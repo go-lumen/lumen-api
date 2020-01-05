@@ -2,15 +2,14 @@ package controllers
 
 import (
 	"fmt"
-	"go-lumen/lumen-api/utils"
-	"net/http"
-
-	"go-lumen/lumen-api/config"
-	"go-lumen/lumen-api/helpers"
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/config"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/utils"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,13 +31,12 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 		return
 	}
 
-	user, err := store.FindUser(c, params.M{"email": userInput.Email})
+	user, err := store.GetUser(c, params.M{"email": userInput.Email})
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_does_not_exist", "User does not exist", err))
 		return
 	}
 
-	fmt.Println("Comparing", string([]byte(user.Password)), "and", string([]byte(userInput.Password)))
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userInput.Password))
 	if err != nil {
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("incorrect_password", "Password is not correct", err))
@@ -46,7 +44,7 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 		return
 	}
 
-	if !user.Active {
+	if user.Status == "created" {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_needs_activation", "User needs to be activated via email", nil))
 		return
 	}
@@ -60,5 +58,5 @@ func (ac AuthController) UserAuthentication(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": accessToken, "user": user.Sanitize()})
+	c.JSON(http.StatusOK, gin.H{"token": accessToken, "user": user.Sanitize("", "")})
 }

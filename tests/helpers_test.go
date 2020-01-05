@@ -11,10 +11,10 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/globalsign/mgo/bson"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/services"
 	"github.com/spf13/viper"
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/server"
-	"go-lumen/lumen-api/services"
 	"golang.org/x/crypto/bcrypt"
 )
 

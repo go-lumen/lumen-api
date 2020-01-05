@@ -1,29 +1,38 @@
 package server
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"github.com/globalsign/mgo"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/sirupsen/logrus"
-	"go-lumen/lumen-api/utils"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
 type dbLogger struct{}
 
 // SetupMongoDatabase establishes the connexion with the mongo database
-func (a *API) SetupMongoDatabase() (*mgo.Session, error) {
-	session, err := mgo.Dial(a.Config.GetString("mongo_db_host"))
-	if err != nil {
-		logrus.Errorln(err)
-		return nil, err
+func (a *API) SetupMongoDatabase() (*mongo.Database, error) {
+	uri := "mongodb://"
+
+	if (a.Config.GetString("mongo_db_user") != "") && (a.Config.GetString("mongo_db_password") != "") {
+		uri += a.Config.GetString("mongo_db_user") + ":" + a.Config.GetString("mongo_db_password") + "@"
 	}
+	uri += a.Config.GetString("mongo_db_host")
+	clientOptions := options.Client().ApplyURI(uri)
 
-	a.MongoDatabase = session.DB(a.Config.GetString("mongo_db_name"))
+	// Connect to MongoDB
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		return nil, fmt.Errorf("Mongo client couldn't connect with background context: %v", err)
+	}
+	database := client.Database(a.Config.GetString("mongo_db_name"))
+	a.MongoDatabase = database
 
-	return session, nil
+	return database, nil
 }
 
 // SetupPostgreDatabase establishes the connexion with the PostgreSQL database

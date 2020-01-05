@@ -2,9 +2,9 @@ package postgresql
 
 import (
 	"fmt"
-	"go-lumen/lumen-api/helpers"
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
 	"net/http"
 )
 

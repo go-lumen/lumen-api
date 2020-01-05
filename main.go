@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/migrations"
+	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/services"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/spf13/viper"
-	"go-lumen/lumen-api/migrations"
-	"go-lumen/lumen-api/server"
-	"go-lumen/lumen-api/services"
-	"go-lumen/lumen-api/utils"
 )
 
 func main() {
@@ -25,9 +25,8 @@ func main() {
 	dbType := api.Config.GetString("db_type")
 	switch dbType {
 	case "mongo":
-		session, err := api.SetupMongoDatabase()
+		_, err := api.SetupMongoDatabase()
 		utils.CheckErr(err)
-		defer session.Close()
 
 		err = api.SetupMongoIndexes()
 		utils.CheckErr(err)

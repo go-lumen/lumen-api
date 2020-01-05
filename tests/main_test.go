@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/server"
 )
 
 var api *server.API

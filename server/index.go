@@ -1,15 +1,10 @@
 package server
 
-import (
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/utils"
-
-	"github.com/globalsign/mgo"
-)
+import ()
 
 // SetupMongoIndexes allows to setup MongoDB index
 func (a *API) SetupMongoIndexes() error {
-	database := a.MongoDatabase
+	/*database := a.MongoDatabase
 
 	// Creates a list of indexes to ensure
 	collectionIndexes := make(map[*mgo.Collection][]mgo.Index)
@@ -29,7 +24,7 @@ func (a *API) SetupMongoIndexes() error {
 
 			utils.CheckErr(err)
 		}
-	}
+	}*/
 	return nil
 }
 

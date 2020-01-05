@@ -2,19 +2,18 @@ package server
 
 import (
 	"fmt"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/store/mongodb"
+	"github.com/go-lumen/lumen-api/store/mysql"
+	"github.com/go-lumen/lumen-api/store/postgresql"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/models"
-	"go-lumen/lumen-api/store/mongodb"
-	"go-lumen/lumen-api/store/mysql"
-	"go-lumen/lumen-api/store/postgresql"
 )
 
 // SetupMongoSeeds creates the first user
 func (a *API) SetupMongoSeeds() error {
-	store := mongodb.New(a.MongoDatabase)
-
-	//Mails: 0.10$/1000         Texts: 0.05-0.10$/1       WiFi: 5$/1000
+	store := mongodb.New(a.MongoDatabase, a.Config.GetString("mongo_db_name"), nil)
 
 	user := &models.User{
 		FirstName: a.Config.GetString("admin_firstname"),
@@ -22,21 +21,30 @@ func (a *API) SetupMongoSeeds() error {
 		Password:  a.Config.GetString("admin_password"),
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
-		Admin:     true,
+		Role: "admin",
 	}
 
-	userExists, err := store.UserExists(user.Email)
+	userExists, _, err := store.UserExists(user.Email)
 	if userExists {
-		logrus.Infoln(`Seed user already exists`, err)
-		return nil
+		utils.Log(nil, "warn", `Seed user already exists`, err)
+	} else {
+		utils.Log(nil, "info", "User doesn't exists already")
 	}
 
-	if err := store.CreateUser(user); err != nil {
-		logrus.Warnln(`Error when creating user:`, err)
-	}
+	err = store.CreateUser(user)
+	if err != nil {
+		utils.Log(nil, "warn", `Error when creating user:`, err)
+		user, _ = store.GetUser(params.M{"email": a.Config.GetString("admin_email")})
+	} else {
+		utils.Log(nil, "info", "User well created")
 
-	if err := store.ActivateUser(user.ActivationKey, string(user.Id)); err != nil {
-		logrus.Warnln(`Error when activating user`, err)
+		err = store.ActivateUser(user.ActivationKey, user.Id)
+		if err != nil {
+			utils.Log(nil, "warn", `Error when activating user`, err)
+		} else {
+			utils.Log(nil, "info", "User well activated")
+		}
+
 	}
 
 	return nil
@@ -53,7 +61,7 @@ func (a *API) SetupPostgreSeeds() error {
 		Password:  a.Config.GetString("admin_password"),
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
-		Admin:     true,
+		Role:      "admin",
 	}
 	userExists, err := store.UserExists(user.Email)
 	if userExists {
@@ -88,7 +96,7 @@ func (a *API) SetupMySQLSeeds() error {
 		Password:  a.Config.GetString("admin_password"),
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
-		Admin:     true,
+		Role:      "admin",
 	}
 
 	userExists, _ := store.UserExists(user.Email)

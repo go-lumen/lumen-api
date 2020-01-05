@@ -1,20 +1,19 @@
 package store
 
 import (
-	"go-lumen/lumen-api/helpers/params"
-	"go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
 )
 
 // Store interface
 type Store interface {
 	CreateUser(*models.User) error
-	DeleteUser(*models.User, string) error
-	FindUserById(string) (*models.User, error)
+	GetUserById(string) (*models.User, error)
+	GetUser(params.M) (*models.User, error)
+	UpdateUser(string, *models.User) error
+	DeleteUser(string) error
 	ActivateUser(string, string) error
-	FindUser(params.M) (*models.User, error)
-	UpdateUser(string, params.M) error
-	ChangeLanguage(string, string) error
-	GetUsers() ([]*models.User, error)
+	GetUsers(string) ([]*models.User, error)
 	CountUsers() (int, error)
-	UserExists(string) (bool, error)
+	UserExists(string) (bool, *models.User, error)
 }

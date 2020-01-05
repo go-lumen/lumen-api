@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/server"
 	"gopkg.in/gormigrate.v1"
 )
 

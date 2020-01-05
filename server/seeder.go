@@ -63,16 +63,16 @@ func (a *API) SetupPostgreSeeds() error {
 		Phone:     a.Config.GetString("admin_phone"),
 		Role:      "admin",
 	}
-	userExists, err := store.UserExists(user.Email)
+	userExists, userFound, err := store.UserExists(user.Email)
 	if userExists {
-		logrus.Infoln(`Seed user already exists`, err)
+		logrus.Infoln(`Seed user already exists`, err, userFound)
 	} else {
 		if err := store.CreateUser(user); err != nil {
 			logrus.Warnln(`Error when creating user:`, err)
 		}
 	}
 
-	dbUser, err := store.FindUser(params.M{"email": a.Config.GetString("admin_email")})
+	dbUser, err := store.GetUser(params.M{"email": a.Config.GetString("admin_email")})
 	if err != nil {
 		logrus.Warnln(err)
 	}

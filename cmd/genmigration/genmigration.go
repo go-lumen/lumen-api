@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	. "github.com/go-lumen/lumen-api/utils"
 	"log"
 	"os"
 	"path"
@@ -60,7 +61,7 @@ func GenerateFile(outputPath string, data interface{}) {
 
 	var buf bytes.Buffer
 	err := tmpl.Execute(&buf, data)
-	utils.CheckErr(err)
+	CheckErr(err)
 
 	src, _ := format.Source(buf.Bytes())
 	dstPath := filepath.Join(outputPath)

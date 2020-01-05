@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/utils"
 	"gopkg.in/gormigrate.v1"
 )
 
@@ -25,6 +26,8 @@ func (m *migrator) Migrate() error {
 
 	if err := gm.Migrate(); err != nil {
 		return err
+	} else {
+		utils.Log(nil, "info", "migration OK")
 	}
 	return nil
 }

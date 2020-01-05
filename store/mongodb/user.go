@@ -19,6 +19,7 @@ func (db *mngo) CreateUser(user *models.User) error {
 	c := db.database.Collection(models.UsersCollection)
 
 	err := user.BeforeCreate()
+	user.Id = bson.NewObjectId().Hex()
 	if err != nil {
 		return err
 	}

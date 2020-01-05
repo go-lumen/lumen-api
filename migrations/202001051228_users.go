@@ -7,11 +7,11 @@ import (
 
 func init() {
 	migrations = append(migrations, &gormigrate.Migration{
-		ID: "{{ $.MigrationId }}",
+		ID: "202001051228",
 		Migrate: func(tx *gorm.DB) error {
-			type {{ singularize $.ModelName }} struct {
+			type User struct {
 				gorm.Model
-				Name     string `json:"name" gorm:"type:text"`
+				Name               string `json:"name" gorm:"type:text"`
 				FirstName          string `json:"first_name" gorm:"type:text"`
 				LastName           string `json:"last_name" gorm:"type:text"`
 				Password           string `json:"password" gorm:"type:text"`
@@ -27,10 +27,10 @@ func init() {
 				LastPasswordUpdate int64  `json:"last_password_update" `
 				GroupId            string `json:"group_id" gorm:"type:text"`
 			}
-			return tx.AutoMigrate(&{{ singularize $.ModelName }}{}).Error
+			return tx.AutoMigrate(&User{}).Error
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("{{ toLower $.ModelName }}").Error
+			return tx.DropTable("users").Error
 		},
 	})
 }

@@ -23,7 +23,7 @@ func (db *Mngo) CreateUser(user *models.User) error {
 	if err != nil {
 		return err
 	}
-	cursor, err := c.Find(db.context, bson.M{"email": user.Email})
+	cursor, _ := c.Find(db.context, bson.M{"email": user.Email})
 	var results []bson.M
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		log.Fatal(err)

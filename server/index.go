@@ -1,7 +1,5 @@
 package server
 
-import ()
-
 // SetupMongoIndexes allows to setup MongoDB index
 func (a *API) SetupMongoIndexes() error {
 	/*database := a.MongoDatabase

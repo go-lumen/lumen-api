@@ -27,7 +27,7 @@ func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 }
 
 // GenerateAccessToken Generates an access token
-func GenerateAccessToken(encodedKey []byte, userId string, passwordUpdate int64) (*string, error) {
+func GenerateAccessToken(encodedKey []byte, userID string, passwordUpdate int64) (*string, error) {
 	privateKey, err := GetRSAPrivateKey(encodedKey)
 	if err != nil {
 		utils.CheckErr(err)
@@ -35,7 +35,7 @@ func GenerateAccessToken(encodedKey []byte, userId string, passwordUpdate int64)
 	}
 
 	access := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":        userId,
+		"sub":        userID,
 		"aud":        "access",
 		"updated_at": passwordUpdate,
 		"iat":        time.Now().Unix(),

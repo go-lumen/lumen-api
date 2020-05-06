@@ -12,11 +12,11 @@ type Setter interface {
 }
 
 // FromContext to get value from context
-func FromContext(c context.Context) *conf {
-	return c.Value(storeKey).(*conf)
+func FromContext(c context.Context) *Conf {
+	return c.Value(storeKey).(*Conf)
 }
 
 // ToContext to set value to context
-func ToContext(c Setter, conf *conf) {
+func ToContext(c Setter, conf *Conf) {
 	c.Set(storeKey, conf)
 }

@@ -1,12 +1,11 @@
 package middlewares
 
 import (
-	"net/http"
-
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/pkg/errors"
+	"net/http"
 )
 
 // AdminMiddleware allows to filter admin only users

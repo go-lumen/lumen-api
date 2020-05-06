@@ -8,7 +8,7 @@ import (
 // Store interface
 type Store interface {
 	CreateUser(*models.User) error
-	GetUserById(string) (*models.User, error)
+	GetUserByID(string) (*models.User, error)
 	GetUser(params.M) (*models.User, error)
 	UpdateUser(string, *models.User) error
 	DeleteUser(string) error

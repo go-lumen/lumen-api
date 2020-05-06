@@ -7,7 +7,7 @@ type EmailData struct {
 	User         *User
 	Subject      string
 	Body         string
-	ApiUrl       string
+	APIURL       string
 	AppName      string
 }
 

@@ -10,31 +10,33 @@ var (
 	migrations []*gormigrate.Migration
 )
 
-type migrator struct {
+// Migrator holds server API
+type Migrator struct {
 	api *server.API
 }
 
-func New(api *server.API) *migrator {
-	return &migrator{
+// New gene
+func New(api *server.API) *Migrator {
+	return &Migrator{
 		api: api,
 	}
 }
 
-// Run migration
-func (m *migrator) Migrate() error {
+// Migrate runs a migration
+func (m *Migrator) Migrate() error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 
 	if err := gm.Migrate(); err != nil {
 		return err
-	} else {
-		utils.Log(nil, "info", "migration OK")
 	}
+	utils.Log(nil, "info", "migration OK")
+
 	return nil
 }
 
 // MigrateTo executes all migrations that did not run yet up to
 // the migration that matches `migrationID`.
-func (m *migrator) MigrateTo(migrationID string) error {
+func (m *Migrator) MigrateTo(migrationID string) error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 
 	if err := gm.MigrateTo(migrationID); err != nil {
@@ -44,7 +46,7 @@ func (m *migrator) MigrateTo(migrationID string) error {
 }
 
 // RollbackLast undo the last migration
-func (m *migrator) RollbackLast() error {
+func (m *Migrator) RollbackLast() error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 	if err := gm.RollbackLast(); err != nil {
 		return err
@@ -54,7 +56,7 @@ func (m *migrator) RollbackLast() error {
 
 // RollbackTo undoes migrations up to the given migration that matches the `migrationID`.
 // Migration with the matching `migrationID` is not rolled back.
-func (m *migrator) RollbackTo(migrationID string) error {
+func (m *Migrator) RollbackTo(migrationID string) error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 	if err := gm.RollbackTo(migrationID); err != nil {
 		return err

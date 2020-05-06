@@ -28,8 +28,8 @@ func GetEmailSender(c context.Context) EmailSender {
 // EmailSender creates a text sender interface
 type EmailSender interface {
 	SendEmail(content string, data *models.EmailData) error
-	SendActivationEmail(user *models.User, apiUrl string, appName string, frontUrl string) error
-	SendResetEmail(user *models.User, apiUrl string, appName string, frontUrl string) error
+	SendActivationEmail(user *models.User, apiURL string, appName string, frontURL string) error
+	SendResetEmail(user *models.User, apiURL string, appName string, frontURL string) error
 }
 
 // FakeEmailSender structure
@@ -41,7 +41,7 @@ type EmailSenderParams struct {
 	senderName  string
 	apiID       string
 	apiKey      string
-	//apiUrl      string
+	//apiURL      string
 }
 
 // NewEmailSender instantiates of the sender
@@ -61,7 +61,7 @@ func (f *FakeEmailSender) SendEmail(content string, data *models.EmailData) erro
 }
 
 // SendActivationEmail is used for test purposes
-func (f *FakeEmailSender) SendActivationEmail(user *models.User, apiUrl string, appName string, frontUrl string) error {
+func (f *FakeEmailSender) SendActivationEmail(user *models.User, apiURL string, appName string, frontURL string) error {
 	return nil
 }
 
@@ -129,14 +129,14 @@ func (s *EmailSenderParams) SendEmail(content string, data *models.EmailData) er
 }
 
 // SendActivationEmail allows to send an email to user to activate his account
-func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiUrl string, appName string, frontUrl string) error {
+func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiURL string, appName string, frontURL string) error {
 	currentYear := string(time.Now().Year())
 
 	h := hermes.Hermes{
 		Theme: new(hermes.Flat),
 		Product: hermes.Product{ // Appears in header & footer of e-mails
 			Name: appName,
-			Link: frontUrl,
+			Link: frontURL,
 			//Logo: ``,
 			Copyright: `Copyright © ` + currentYear + ` ` + appName + `. All rights reserved.`,
 		},
@@ -161,7 +161,7 @@ func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiUrl string
 						Color:     `#22BC66`,
 						TextColor: `#FFFFFF`,
 						Text:      "Confirm your account",
-						Link:      apiUrl,
+						Link:      apiURL,
 					},
 				},
 			},
@@ -183,14 +183,14 @@ func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiUrl string
 }
 
 // SendResetEmail allows to send an email to user to reset his password
-func (s *EmailSenderParams) SendResetEmail(user *models.User, apiUrl string, appName string, frontUrl string) error {
+func (s *EmailSenderParams) SendResetEmail(user *models.User, apiURL string, appName string, frontURL string) error {
 	currentYear := string(int(time.Now().Year()))
 
 	h := hermes.Hermes{
 		Theme: new(hermes.Flat),
 		Product: hermes.Product{ // Appears in header & footer of e-mails
 			Name: appName,
-			Link: frontUrl,
+			Link: frontURL,
 			//Logo: ``,
 			Copyright: `Copyright © ` + currentYear + ` ` + appName + `. All rights reserved.`,
 		},
@@ -216,7 +216,7 @@ func (s *EmailSenderParams) SendResetEmail(user *models.User, apiUrl string, app
 						Color:     `#DC4D2F`,
 						TextColor: `#FFFFFF`,
 						Text:      "Reset your password",
-						Link:      apiUrl,
+						Link:      apiURL,
 					},
 				},
 			},

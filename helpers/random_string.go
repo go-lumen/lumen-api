@@ -14,6 +14,7 @@ const (
 
 var src = rand.NewSource(time.Now().UnixNano())
 
+// RandomString generates a n-long string
 func RandomString(n int) string {
 	b := make([]byte, n)
 	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {

@@ -15,11 +15,11 @@ import (
 )
 
 // CreateUser checks if user already exists, and if not, creates it
-func (db *mngo) CreateUser(user *models.User) error {
+func (db *Mngo) CreateUser(user *models.User) error {
 	c := db.database.Collection(models.UsersCollection)
 
 	err := user.BeforeCreate()
-	user.Id = bson.NewObjectId().Hex()
+	user.ID = bson.NewObjectId().Hex()
 	if err != nil {
 		return err
 	}
@@ -41,8 +41,8 @@ func (db *mngo) CreateUser(user *models.User) error {
 	return nil
 }
 
-// GetUserById allows to retrieve a user by its id
-func (db *mngo) GetUserById(id string) (*models.User, error) {
+// GetUserByID allows to retrieve a user by its id
+func (db *Mngo) GetUserByID(id string) (*models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
 	user := &models.User{}
@@ -55,7 +55,7 @@ func (db *mngo) GetUserById(id string) (*models.User, error) {
 }
 
 // GetUser allows to retrieve a user by its characteristics
-func (db *mngo) GetUser(params params.M) (*models.User, error) {
+func (db *Mngo) GetUser(params params.M) (*models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
 	user := &models.User{}
@@ -67,12 +67,12 @@ func (db *mngo) GetUser(params params.M) (*models.User, error) {
 	return user, err
 }
 
-// GetUserFromSigfoxId allows to retrieve a user by its Sigfox Id
-func (db *mngo) GetUserFromSigfoxId(sigfoxId string) (*models.User, error) {
+// GetUserFromSigfoxID allows to retrieve a user by its Sigfox Id
+func (db *Mngo) GetUserFromSigfoxID(sigfoxID string) (*models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
 	user := &models.User{}
-	err := c.FindOne(db.context, bson.M{"sigfox_id": sigfoxId}).Decode(&user)
+	err := c.FindOne(db.context, bson.M{"sigfox_id": sigfoxID}).Decode(&user)
 	if err != nil {
 		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "User not found", err)
 	}
@@ -80,8 +80,8 @@ func (db *mngo) GetUserFromSigfoxId(sigfoxId string) (*models.User, error) {
 	return user, err
 }
 
-// GetUserById allows to retrieve a user by its id
-func (db *mngo) UserExists(email string) (bool, *models.User, error) {
+// UserExists allows to retrieve a user by its id
+func (db *Mngo) UserExists(email string) (bool, *models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
 	user := &models.User{}
@@ -94,10 +94,10 @@ func (db *mngo) UserExists(email string) (bool, *models.User, error) {
 }
 
 // UpdateUser allows to update one or more user characteristics
-func (db *mngo) UpdateUser(userId string, newUser *models.User) error {
+func (db *Mngo) UpdateUser(userID string, newUser *models.User) error {
 	c := db.database.Collection(models.UsersCollection)
 
-	result, err := c.UpdateOne(context.TODO(), bson.M{"_id": userId}, bson.M{"$set": newUser}, options.Update().SetUpsert(true))
+	result, err := c.UpdateOne(context.TODO(), bson.M{"_id": userID}, bson.M{"$set": newUser}, options.Update().SetUpsert(true))
 	if err != nil {
 		log.Fatal(err)
 		return helpers.NewError(http.StatusInternalServerError, "user_update_failed", "Failed to update the user", err)
@@ -116,10 +116,10 @@ func (db *mngo) UpdateUser(userId string, newUser *models.User) error {
 }
 
 // DeleteUser allows to delete a user by its id
-func (db *mngo) DeleteUser(userId string) error {
+func (db *Mngo) DeleteUser(userID string) error {
 	c := db.database.Collection(models.UsersCollection)
 
-	_, err := c.DeleteOne(db.context, bson.M{"_id": userId})
+	_, err := c.DeleteOne(db.context, bson.M{"_id": userID})
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_delete_failed", "Failed to delete the user", err)
 	}
@@ -129,7 +129,8 @@ func (db *mngo) DeleteUser(userId string) error {
 	return nil
 }
 
-func (db *mngo) ActivateUser(activationKey string, id string) error {
+// ActivateUser activates a user with the activationKey
+func (db *Mngo) ActivateUser(activationKey string, id string) error {
 	c := db.database.Collection(models.UsersCollection)
 
 	result, err := c.UpdateOne(context.TODO(), bson.M{"$and": []bson.M{{"_id": id}, {"activation_key": activationKey}}}, bson.M{"$set": bson.M{"status": "activated"}}, options.Update().SetUpsert(false))
@@ -152,14 +153,14 @@ func (db *mngo) ActivateUser(activationKey string, id string) error {
 }
 
 // GetUsers allows to get all users
-func (db *mngo) GetUsers(groupId string) ([]*models.User, error) {
+func (db *Mngo) GetUsers(groupID string) ([]*models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
 	list := []*models.User{}
 
 	var filter bson.M
-	if groupId != "" {
-		filter = bson.M{"group_id": groupId}
+	if groupID != "" {
+		filter = bson.M{"group_id": groupID}
 	}
 	cur, err := c.Find(context.TODO(), filter)
 	if err != nil {
@@ -179,7 +180,7 @@ func (db *mngo) GetUsers(groupId string) ([]*models.User, error) {
 }
 
 // CountUsers allows to count all users
-func (db *mngo) CountUsers() (int, error) {
+func (db *Mngo) CountUsers() (int, error) {
 	c := db.database.Collection(models.UsersCollection)
 
 	count, err := c.CountDocuments(context.TODO(), nil)

@@ -6,13 +6,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-type conf struct {
+// Conf holds viper configuration
+type Conf struct {
 	*viper.Viper
 }
 
 // New allows to create a viper configuration
-func New(viper *viper.Viper) *conf {
-	return &conf{viper}
+func New(viper *viper.Viper) *Conf {
+	return &Conf{viper}
 }
 
 // GetString allows to retrieve a specific string

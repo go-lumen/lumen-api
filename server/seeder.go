@@ -13,7 +13,7 @@ import (
 
 // SetupMongoSeeds creates the first user
 func (a *API) SetupMongoSeeds() error {
-	store := mongodb.New(a.MongoDatabase, a.Config.GetString("mongo_db_name"), nil)
+	store := mongodb.New(nil, a.MongoDatabase, a.Config.GetString("mongo_db_name"))
 
 	user := &models.User{
 		FirstName: a.Config.GetString("admin_firstname"),
@@ -21,7 +21,7 @@ func (a *API) SetupMongoSeeds() error {
 		Password:  a.Config.GetString("admin_password"),
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
-		Role: "admin",
+		Role:      "admin",
 	}
 
 	userExists, _, err := store.UserExists(user.Email)
@@ -38,7 +38,7 @@ func (a *API) SetupMongoSeeds() error {
 	} else {
 		utils.Log(nil, "info", "User well created")
 
-		err = store.ActivateUser(user.ActivationKey, user.Id)
+		err = store.ActivateUser(user.ActivationKey, user.ID)
 		if err != nil {
 			utils.Log(nil, "warn", `Error when activating user`, err)
 		} else {
@@ -76,9 +76,9 @@ func (a *API) SetupPostgreSeeds() error {
 	if err != nil {
 		logrus.Warnln(err)
 	}
-	fmt.Println("Found user", dbUser.Id, ":", dbUser)
+	fmt.Println("Found user", dbUser.ID, ":", dbUser)
 
-	if err := store.ActivateUser(dbUser.ActivationKey, /*strconv.Itoa(dbUser.Id)*/ dbUser.Email); err != nil {
+	if err := store.ActivateUser(dbUser.ActivationKey /*strconv.Itoa(dbUser.Id)*/, dbUser.Email); err != nil {
 		logrus.Warnln(`Error when activating user`, err)
 	}
 	fmt.Println("Checked")
@@ -109,7 +109,7 @@ func (a *API) SetupMySQLSeeds() error {
 		logrus.Warnln(`Error when creating user`)
 	}
 
-	if store.ActivateUser(user.ActivationKey, string(user.Id)) != nil {
+	if store.ActivateUser(user.ActivationKey, string(user.ID)) != nil {
 		logrus.Warnln(`Error when activating user`)
 	}
 

@@ -36,7 +36,7 @@ type TextSenderParams struct {
 	senderName  string
 	apiID       string
 	apiKey      string
-	apiUrl      string
+	apiURL      string
 }
 
 // NewTextSender instantiates of the sender

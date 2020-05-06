@@ -12,9 +12,9 @@ func CreateUser(c context.Context, record *models.User) error {
 	return FromContext(c).CreateUser(record)
 }
 
-// GetUserById allows to retrieve a user by its id
-func GetUserById(c context.Context, id string) (*models.User, error) {
-	return FromContext(c).GetUserById(id)
+// GetUserByID allows to retrieve a user by its id
+func GetUserByID(c context.Context, id string) (*models.User, error) {
+	return FromContext(c).GetUserByID(id)
 }
 
 // GetUser allows to retrieve a user by its characteristics
@@ -23,8 +23,8 @@ func GetUser(c context.Context, params params.M) (*models.User, error) {
 }
 
 // GetUsers allows to get all users
-func GetUsers(c context.Context, groupId string) ([]*models.User, error) {
-	return FromContext(c).GetUsers(groupId)
+func GetUsers(c context.Context, groupID string) ([]*models.User, error) {
+	return FromContext(c).GetUsers(groupID)
 }
 
 // ActivateUser allows to activate a user by its id
@@ -33,13 +33,13 @@ func ActivateUser(c context.Context, activationKey string, id string) error {
 }
 
 // UpdateUser allows to update one or more user characteristics
-func UpdateUser(c context.Context, userId string, newUser *models.User) error {
-	return FromContext(c).UpdateUser(userId, newUser)
+func UpdateUser(c context.Context, userID string, newUser *models.User) error {
+	return FromContext(c).UpdateUser(userID, newUser)
 }
 
 // DeleteUser allows to delete a user by its id
-func DeleteUser(c context.Context, userId string) error {
-	return FromContext(c).DeleteUser(userId) //Current(c)
+func DeleteUser(c context.Context, userID string) error {
+	return FromContext(c).DeleteUser(userID) //Current(c)
 }
 
 // CountUsers allows to count all users

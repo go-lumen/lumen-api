@@ -15,7 +15,7 @@ func StoreMongoMiddleware(db *mongo.Database) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//fmt.Println("Store mongo middleware:", db, config.GetString(c, "mongo_db_name"), c, models.OrganizationsCollection)
 		//store.ToContext(c, mongodb.New(db, config.GetString(c, "mongo_db_name"), c))
-		store.ToContext(c, mongodb.New(db, "lumen", c))
+		store.ToContext(c, mongodb.New(c, db, "lumen"))
 		c.Next()
 	}
 }

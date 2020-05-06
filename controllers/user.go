@@ -23,7 +23,7 @@ func NewUserController() UserController {
 
 // GetUser from id (in context)
 func (uc UserController) GetUser(c *gin.Context) {
-	user, err := store.GetUserById(c, c.Param("id"))
+	user, err := store.GetUserByID(c, c.Param("id"))
 
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
@@ -38,7 +38,7 @@ func (uc UserController) GetUserMe(c *gin.Context) {
 	storeUser, exists := c.Get(store.CurrentKey)
 	loggedUser := storeUser.(*models.User)
 	if exists {
-		user, err := store.GetUserById(c, loggedUser.Id)
+		user, err := store.GetUserByID(c, loggedUser.ID)
 
 		if err != nil {
 			c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
@@ -56,7 +56,7 @@ func (uc UserController) GetUserDetails(c *gin.Context) {
 	storeUser, exists := c.Get(store.CurrentKey)
 	loggedUser := storeUser.(*models.User)
 	if exists {
-		user, err := store.GetUserById(c, loggedUser.Id)
+		user, err := store.GetUserByID(c, loggedUser.ID)
 
 		if err != nil {
 			c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
@@ -91,14 +91,14 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/` + string(user.Id) + `/activate/` + user.ActivationKey
-	frontUrl := config.GetString(c, "front_url")
+	apiURL := `https://` + config.GetString(c, "api_url") + `/v1/users/` + string(user.ID) + `/activate/` + user.ActivationKey
+	frontURL := config.GetString(c, "front_url")
 	appName := config.GetString(c, "mail_sender_name")
 
 	s := services.GetEmailSender(c)
 
 	fmt.Println("DB User:", databaseUser)
-	err = s.SendActivationEmail(databaseUser, apiUrl, appName, frontUrl)
+	err = s.SendActivationEmail(databaseUser, apiURL, appName, frontURL)
 	if err != nil {
 		logrus.Infoln(err)
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("mail_sending_error", "Error when sending mail", err))
@@ -130,7 +130,7 @@ func (uc UserController) ActivateUser(c *gin.Context) {
 	}
 	//c.JSON(http.StatusOK, nil)
 
-	/*user, err := store.GetUserById(c, c.Param("id"))
+	/*user, err := store.GetUserByID(c, c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, helpers.ErrorWithCode("user_not_found", "The user does not exist", err))
 		return
@@ -170,19 +170,19 @@ func (uc UserController) ResetPasswordRequest(c *gin.Context) {
 	resetKey := helpers.RandomString(40)
 
 	databaseUser.ResetKey = resetKey
-	if err = store.UpdateUser(c, string(databaseUser.Id), databaseUser); err != nil {
+	if err = store.UpdateUser(c, string(databaseUser.ID), databaseUser); err != nil {
 		c.Error(err)
 		c.Abort()
 		return
 	}
 
-	apiUrl := `https://` + config.GetString(c, "api_url") + `/v1/users/reset_password/` + string(databaseUser.Id) + `/` + resetKey
-	frontUrl := config.GetString(c, "front_url")
+	apiURL := `https://` + config.GetString(c, "api_url") + `/v1/users/reset_password/` + string(databaseUser.ID) + `/` + resetKey
+	frontURL := config.GetString(c, "front_url")
 	appName := config.GetString(c, "mail_sender_name")
 
 	s := services.GetEmailSender(c)
 
-	err = s.SendResetEmail(databaseUser, apiUrl, appName, frontUrl)
+	err = s.SendResetEmail(databaseUser, apiURL, appName, frontURL)
 	if err != nil {
 		logrus.Infoln(err)
 		c.AbortWithError(http.StatusUnauthorized, helpers.ErrorWithCode("mail_sending_error", "Error when sending mail", err))

@@ -7,7 +7,7 @@ type Error struct {
 	Code     string `json:"code"`
 	Message  string `json:"message"`
 	Trace    error  `json:"trace"`
-	HttpCode int    `json:"-"`
+	HTTPCode int    `json:"-"`
 }
 
 // Pretty print of the error
@@ -27,5 +27,5 @@ func ErrorWithCode(code string, message string, trace error) Error {
 
 // NewError is creating an error with code and HTTP code
 func NewError(httpCode int, code string, message string, trace error) Error {
-	return Error{Code: code, Message: message, HttpCode: httpCode, Trace: trace}
+	return Error{Code: code, Message: message, HTTPCode: httpCode, Trace: trace}
 }

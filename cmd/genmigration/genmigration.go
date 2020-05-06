@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	. "github.com/go-lumen/lumen-api/utils"
+	"github.com/go-lumen/lumen-api/utils"
 	"log"
 	"os"
 	"path"
@@ -54,14 +54,14 @@ var FuncMap = template.FuncMap{
 	"firstChar":   GetFirstChar,
 }
 
-func GenerateFile(outputPath string, data interface{}) {
+func generateFile(outputPath string, data interface{}) {
 	path := filepath.Join("migrations/template.tmpl")
 	body, _ := ioutil.ReadFile(path)
 	tmpl := template.Must(template.New("model").Option("missingkey=error").Funcs(FuncMap).Parse(string(body)))
 
 	var buf bytes.Buffer
 	err := tmpl.Execute(&buf, data)
-	CheckErr(err)
+	utils.CheckErr(err)
 
 	src, _ := format.Source(buf.Bytes())
 	dstPath := filepath.Join(outputPath)
@@ -81,7 +81,7 @@ type SelectedModel struct {
 	Namespace   string
 	ModelName   string
 	Methods     []string
-	MigrationId string
+	MigrationID string
 }
 
 // SelectModels asks user which models and methods to generate
@@ -132,8 +132,8 @@ func main() {
 		fmt.Println(selectedModel)
 		fileName := fmt.Sprintf("migrations/%s_%s.go", nowTimeString, strings.ToLower(selectedModel.ModelName))
 		longFileName := path.Join(workingDirectory, fileName)
-		selectedModel.MigrationId = nowTimeString
-		GenerateFile(longFileName, selectedModel)
+		selectedModel.MigrationID = nowTimeString
+		generateFile(longFileName, selectedModel)
 
 		fmt.Printf("Successfully created migration %s\n", fileName)
 	}

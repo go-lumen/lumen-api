@@ -4,11 +4,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type postgres struct {
+// Postgres holds db
+type Postgres struct {
 	*gorm.DB
 }
 
 // New creates a database connexion
-func New(database *gorm.DB) *postgres {
-	return &postgres{database}
+func New(database *gorm.DB) *Postgres {
+	return &Postgres{database}
 }

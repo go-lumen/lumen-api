@@ -4,14 +4,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/go-lumen/lumen-api/helpers"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // User type holds all required informations
 type User struct {
-	Id                 string `json:"id" bson:"_id,omitempty" valid:"-"`
+	ID                 string `json:"id" bson:"_id,omitempty" valid:"-"`
 	FirstName          string `json:"first_name" bson:"first_name" valid:"-"`
 	LastName           string `json:"last_name" bson:"last_name" valid:"-"`
 	Password           string `json:"password" bson:"password" valid:"required"`
@@ -25,11 +24,12 @@ type User struct {
 	ResetKey           string `json:"reset_key" bson:"reset_key" valid:"-"`
 	LastModification   int64  `json:"last_modification" bson:"last_modification" valid:"-"`
 	LastPasswordUpdate int64  `json:"last_password_update" bson:"last_password_update" valid:"-"`
-	GroupId            string `json:"group_id" bson:"group_id" valid:"-"`
+	GroupID            string `json:"group_id" bson:"group_id" valid:"-"`
 }
 
+// UserDetails is a reduced user
 type UserDetails struct {
-	Id        string `json:"id" bson:"_id,omitempty" valid:"-"`
+	ID        string `json:"id" bson:"_id,omitempty" valid:"-"`
 	FirstName string `json:"first_name" bson:"first_name" valid:"-"`
 	LastName  string `json:"last_name" bson:"last_name" valid:"-"`
 	Email     string `json:"email" bson:"email" valid:"email,required"`
@@ -42,7 +42,7 @@ type UserDetails struct {
 
 // SanitizedUser allows to expose only few characteristics
 type SanitizedUser struct {
-	Id        string `json:"id" bson:"_id,omitempty" valid:"-"`
+	ID        string `json:"id" bson:"_id,omitempty" valid:"-"`
 	FirstName string `json:"first_name" bson:"first_name" valid:"-"`
 	LastName  string `json:"last_name" bson:"last_name" valid:"-"`
 	Email     string `json:"email" bson:"email" valid:"-"`
@@ -52,11 +52,12 @@ type SanitizedUser struct {
 
 // Sanitize allows to create a lightweight user
 func (user *User) Sanitize(role string, organization string) SanitizedUser {
-	return SanitizedUser{user.Id, user.FirstName, user.LastName, user.Email, user.Status, role}
+	return SanitizedUser{user.ID, user.FirstName, user.LastName, user.Email, user.Status, role}
 }
 
+// Detail extract user details
 func (user *User) Detail(role string, organization string) UserDetails {
-	return UserDetails{user.Id, user.FirstName, user.LastName, user.Email, role, user.Address, user.Status, user.Phone, user.Language}
+	return UserDetails{user.ID, user.FirstName, user.LastName, user.Email, role, user.Address, user.Status, user.Phone, user.Language}
 }
 
 // BeforeCreate is here to check inputs and generating an encrypted password
@@ -72,10 +73,10 @@ func (user *User) BeforeCreate() error {
 	}
 	user.Password = string(hashedPassword)
 
-	_, err = govalidator.ValidateStruct(user)
+	/*_, err = govalidator.ValidateStruct(user)
 	if err != nil {
 		return helpers.NewError(http.StatusBadRequest, "input_not_valid", err.Error(), err)
-	}
+	}*/
 
 	return nil
 }

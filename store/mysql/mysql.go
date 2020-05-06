@@ -4,11 +4,12 @@ import (
 	"database/sql"
 )
 
-type mysql struct {
+// Mysql holds db
+type Mysql struct {
 	*sql.DB
 }
 
 // New creates a database connexion
-func New(database *sql.DB) *mysql {
-	return &mysql{database}
+func New(database *sql.DB) *Mysql {
+	return &Mysql{database}
 }

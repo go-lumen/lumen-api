@@ -25,7 +25,7 @@ func init() {
 				ResetKey           string `json:"reset_key" gorm:"type:text"`
 				LastModification   int64  `json:"last_modification" `
 				LastPasswordUpdate int64  `json:"last_password_update" `
-				GroupId            string `json:"group_id" gorm:"type:text"`
+				GroupID            string `json:"group_id" gorm:"type:text"`
 			}
 			return tx.AutoMigrate(&{{ singularize $.ModelName }}{}).Error
 		},

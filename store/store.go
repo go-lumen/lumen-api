@@ -11,6 +11,7 @@ type Store interface {
 	GetUserByID(string) (*models.User, error)
 	GetUser(params.M) (*models.User, error)
 	UpdateUser(string, *models.User) error
+	UpdateUserFields(string, params.M) error
 	DeleteUser(string) error
 	ActivateUser(string, string) error
 	GetUsers(string) ([]*models.User, error)

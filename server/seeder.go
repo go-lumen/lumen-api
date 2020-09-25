@@ -38,7 +38,7 @@ func (a *API) SetupMongoSeeds() error {
 	} else {
 		utils.Log(nil, "info", "User well created")
 
-		err = store.ActivateUser(user.ActivationKey, user.ID)
+		err = store.ActivateUser(user.Key, user.ID)
 		if err != nil {
 			utils.Log(nil, "warn", `Error when activating user`, err)
 		} else {
@@ -78,7 +78,7 @@ func (a *API) SetupPostgreSeeds() error {
 	}
 	fmt.Println("Found user", dbUser.ID, ":", dbUser)
 
-	if err := store.ActivateUser(dbUser.ActivationKey /*strconv.Itoa(dbUser.Id)*/, dbUser.Email); err != nil {
+	if err := store.ActivateUser(dbUser.Key /*strconv.Itoa(dbUser.Id)*/, dbUser.Email); err != nil {
 		logrus.Warnln(`Error when activating user`, err)
 	}
 	fmt.Println("Checked")
@@ -109,7 +109,7 @@ func (a *API) SetupMySQLSeeds() error {
 		logrus.Warnln(`Error when creating user`)
 	}
 
-	if store.ActivateUser(user.ActivationKey, string(user.ID)) != nil {
+	if store.ActivateUser(user.Key, string(user.ID)) != nil {
 		logrus.Warnln(`Error when activating user`)
 	}
 

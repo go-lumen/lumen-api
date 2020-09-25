@@ -37,6 +37,11 @@ func UpdateUser(c context.Context, userID string, newUser *models.User) error {
 	return FromContext(c).UpdateUser(userID, newUser)
 }
 
+// UpdateUserFields allows to update one or more user characteristics
+func UpdateUserFields(c context.Context, userID string, fields params.M) error {
+	return FromContext(c).UpdateUserFields(userID, fields)
+}
+
 // DeleteUser allows to delete a user by its id
 func DeleteUser(c context.Context, userID string) error {
 	return FromContext(c).DeleteUser(userID) //Current(c)

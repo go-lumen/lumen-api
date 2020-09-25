@@ -26,8 +26,8 @@ func GetRSAPrivateKey(encodedKey []byte) (*rsa.PrivateKey, error) {
 	return privateKey, nil
 }
 
-// GenerateAccessToken Generates an access token
-func GenerateAccessToken(encodedKey []byte, userID string, passwordUpdate int64) (*string, error) {
+// GenerateToken Generates an access token
+func GenerateToken(encodedKey []byte, userID string, audience string, expiration int64) (*string, error) {
 	privateKey, err := GetRSAPrivateKey(encodedKey)
 	if err != nil {
 		utils.CheckErr(err)
@@ -35,11 +35,10 @@ func GenerateAccessToken(encodedKey []byte, userID string, passwordUpdate int64)
 	}
 
 	access := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":        userID,
-		"aud":        "access",
-		"updated_at": passwordUpdate,
-		"iat":        time.Now().Unix(),
-		"exp":        time.Now().Add(time.Minute * time.Duration(8760)).Unix(),
+		"sub": userID,
+		"aud": audience,
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Minute * time.Duration(expiration)).Unix(),
 	})
 
 	accessString, err := access.SignedString(privateKey)
@@ -64,7 +63,6 @@ func ValidateJwtToken(token string, encodedKey []byte, audience string) (jwt.Map
 		return &publicKey, nil
 	})
 	if err != nil {
-		utils.CheckErr(err)
 		return nil, err
 	}
 

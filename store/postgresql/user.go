@@ -62,7 +62,7 @@ func (db *Postgres) ActivateUser(activationKey string, email string) error {
 		return helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user", err)
 	}
 
-	if user.ActivationKey != activationKey {
+	if user.Key != activationKey {
 		return helpers.NewError(http.StatusBadRequest, "invalid_validation_code", "the provided activation code is invalid", nil)
 	}
 
@@ -81,6 +81,11 @@ func (db *Postgres) ChangeLanguage(id string, language string) error {
 
 // UpdateUser allows to update one or more user characteristics
 func (db *Postgres) UpdateUser(userID string, newUser *models.User) error {
+	return nil
+}
+
+// UpdateUserFields allows to update one or more user characteristics
+func (db *Postgres) UpdateUserFields(userID string, fields params.M) error {
 	return nil
 }
 

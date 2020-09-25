@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
 
-	"github.com/globalsign/mgo/bson"
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/helpers/params"
 	"github.com/go-lumen/lumen-api/models"
@@ -19,11 +19,10 @@ func (db *Mngo) CreateUser(user *models.User) error {
 	c := db.database.Collection(models.UsersCollection)
 
 	err := user.BeforeCreate()
-	user.ID = bson.NewObjectId().Hex()
 	if err != nil {
 		return err
 	}
-	cursor, _ := c.Find(db.context, bson.M{"email": user.Email})
+	cursor, err := c.Find(db.context, bson.M{"email": user.Email})
 	var results []bson.M
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		log.Fatal(err)
@@ -67,7 +66,7 @@ func (db *Mngo) GetUser(params params.M) (*models.User, error) {
 	return user, err
 }
 
-// GetUserFromSigfoxID allows to retrieve a user by its Sigfox Id
+// GetUserFromSigfoxID allows to retrieve a user by its Sigfox ID
 func (db *Mngo) GetUserFromSigfoxID(sigfoxID string) (*models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
@@ -80,7 +79,7 @@ func (db *Mngo) GetUserFromSigfoxID(sigfoxID string) (*models.User, error) {
 	return user, err
 }
 
-// UserExists allows to retrieve a user by its id
+// GetUserByID allows to retrieve a user by its id
 func (db *Mngo) UserExists(email string) (bool, *models.User, error) {
 	c := db.database.Collection(models.UsersCollection)
 
@@ -115,6 +114,27 @@ func (db *Mngo) UpdateUser(userID string, newUser *models.User) error {
 	return nil
 }
 
+func (db *Mngo) UpdateUserFields(userID string, fields params.M) error {
+	c := db.database.Collection(models.UsersCollection)
+
+	result, err := c.UpdateOne(context.TODO(), bson.M{"_id": userID}, fields, options.Update().SetUpsert(false))
+	if err != nil {
+		log.Fatal(err)
+		return helpers.NewError(http.StatusInternalServerError, "user_update_failed", "Failed to update the user", err)
+	}
+
+	if result.MatchedCount != 0 {
+		fmt.Println("matched and replaced an existing user")
+		return nil
+	}
+	if result.UpsertedCount != 0 {
+		fmt.Printf("UpdateUser: inserted a new document with ID %v\n", result.UpsertedID)
+		return nil
+	}
+
+	return nil
+}
+
 // DeleteUser allows to delete a user by its id
 func (db *Mngo) DeleteUser(userID string) error {
 	c := db.database.Collection(models.UsersCollection)
@@ -129,7 +149,6 @@ func (db *Mngo) DeleteUser(userID string) error {
 	return nil
 }
 
-// ActivateUser activates a user with the activationKey
 func (db *Mngo) ActivateUser(activationKey string, id string) error {
 	c := db.database.Collection(models.UsersCollection)
 

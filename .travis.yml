@@ -16,6 +16,7 @@ notifications:
 before_install:
   - openssl genrsa -out base.rsa 1024
   - openssl rsa -in base.rsa -pubout > base.rsa.pub
+  - bash <(curl -s https://codecov.io/bash)
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

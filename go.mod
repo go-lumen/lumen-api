@@ -3,12 +3,13 @@ module github.com/go-lumen/lumen-api
 go 1.13
 
 require (
-	github.com/DataDog/zstd v1.4.4 // indirect
 	github.com/MichaelTJones/walk v0.0.0-20161122175330-4748e29d5718 // indirect
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
-	github.com/aws/aws-sdk-go v1.27.0
+	github.com/aws/aws-sdk-go v1.34.28
+	github.com/chzyer/logex v1.1.10 // indirect
+	github.com/chzyer/test v0.0.0-20210722231415-061457976a23 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.8.0 // indirect
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
@@ -22,17 +23,14 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mgutz/str v1.2.0 // indirect
-	github.com/pkg/errors v0.8.1
 	github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516
 	github.com/sirupsen/logrus v1.4.2
 	github.com/snwfdhmp/errlog v0.0.0-20191219134421-4c9e67f11ebc
 	github.com/spf13/viper v1.6.1
-	github.com/stretchr/testify v1.4.0
-	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
-	github.com/xdg/stringprep v1.0.0 // indirect
-	go.mongodb.org/mongo-driver v1.2.0
-	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+	github.com/stretchr/testify v1.6.1
+	go.mongodb.org/mongo-driver v1.5.1
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	gopkg.in/godo.v2 v2.0.9
 	gopkg.in/gormigrate.v1 v1.6.0
 )

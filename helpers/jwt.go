@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"github.com/adrien3d/stokelp-poc/utils"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"time"
 )
 

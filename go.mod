@@ -5,12 +5,12 @@ go 1.18
 require (
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
-	github.com/aws/aws-sdk-go v1.43.39
+	github.com/aws/aws-sdk-go v1.43.41
 	github.com/chidiwilliams/flatbson v0.3.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813
 	github.com/gin-gonic/gin v1.7.7
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.4.0
 	github.com/matcornic/hermes/v2 v2.1.0

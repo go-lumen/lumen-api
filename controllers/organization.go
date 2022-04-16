@@ -1,0 +1,210 @@
+package controllers
+
+import (
+	"github.com/adrien3d/stokelp-poc/helpers"
+	"github.com/adrien3d/stokelp-poc/models"
+	"github.com/adrien3d/stokelp-poc/store"
+	"github.com/adrien3d/stokelp-poc/utils"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"net/http"
+)
+
+// OrganizationController holds all controller functions related to the organization entity
+type OrganizationController struct {
+	BaseController
+}
+
+// NewOrganizationController instantiates the controller
+func NewOrganizationController() OrganizationController {
+	return OrganizationController{}
+}
+
+// CreateOrganization to create a new organization
+func (oc OrganizationController) CreateOrganization(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	organization := &models.Organization{}
+
+	if oc.BindJSONError(c, organization) {
+		return
+	}
+
+	if _, group, ok := oc.LoggedUser(c); ok {
+		switch group.GetRole() {
+		case store.RoleGod:
+			if oc.ErrorInternal(c, models.CreateOrganization(ctx, organization)) {
+				return
+			}
+			c.JSON(http.StatusCreated, organization)
+		case store.RoleAdmin, store.RoleUser, store.RoleCustomer:
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		}
+	}
+}
+
+// GetOrganizationsIndex to get organizations index
+func (oc OrganizationController) GetOrganizationsIndex(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	dbOrganizations, err := models.GetOrganizations(ctx, bson.M{})
+	if oc.Error(c, err, helpers.ErrorResourceNotFound) {
+		return
+	}
+
+	organizationsIndex := int64(0)
+	for _, organization := range dbOrganizations {
+		if organization.Index > organizationsIndex {
+			organizationsIndex = organization.Index
+		}
+	}
+
+	if _, group, ok := oc.LoggedUser(c); ok {
+		switch group.GetRole() {
+		case store.RoleGod, store.RoleAdmin:
+			c.JSON(http.StatusOK, organizationsIndex)
+		case store.RoleUser, store.RoleCustomer:
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		}
+	}
+}
+
+// GetOrganizations to get all organizations
+func (oc OrganizationController) GetOrganizations(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	dbOrganizations, err := models.GetOrganizations(ctx, bson.M{})
+	if oc.ErrorInternal(c, err) {
+		return
+	}
+
+	if _, group, ok := oc.LoggedUser(c); ok {
+		switch group.GetRole() {
+		case store.RoleGod: // Get all
+			c.JSON(http.StatusOK, dbOrganizations)
+		case store.RoleAdmin, store.RoleUser: // Get all from devices with same group ID (and organization for admin)
+			userOrganization, err := models.GetOrganization(ctx, utils.ParamID(group.GetOrgID()))
+			if oc.Error(c, err, helpers.ErrorResourceNotFound) {
+				return
+			}
+			c.JSON(http.StatusOK, []*models.Organization{userOrganization})
+		case store.RoleCustomer:
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		}
+	}
+}
+
+// GetOrganization allows to get a specific Organization
+func (oc OrganizationController) GetOrganization(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	organization, err := models.GetOrganization(ctx, oc.ParamID(c))
+	if oc.Error(c, err, helpers.ErrorResourceNotFound) {
+		return
+	}
+
+	if _, group, ok := oc.LoggedUser(c); ok {
+		switch group.GetRole() {
+		case store.RoleGod:
+			c.JSON(http.StatusOK, organization)
+		case store.RoleAdmin, store.RoleUser:
+			if organization.ID == group.GetOrgID() {
+				c.JSON(http.StatusOK, organization)
+				return
+			}
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		case store.RoleCustomer:
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		}
+	}
+}
+
+// GetOrganizationGroups allows to get groups from an organization
+func (oc OrganizationController) GetOrganizationGroups(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	organization, err := models.GetOrganization(ctx, oc.ParamID(c))
+	if oc.Error(c, err, helpers.ErrorResourceNotFound) {
+		return
+	}
+
+	groups, err := models.GetGroups(ctx, bson.M{"organization_id": c.Param("id")})
+	if oc.Error(c, err, helpers.ErrorResourceNotFound) {
+		return
+	}
+
+	if _, group, ok := oc.LoggedUser(c); ok {
+		switch group.GetRole() {
+		case store.RoleGod:
+			c.JSON(http.StatusOK, groups)
+		case store.RoleAdmin, store.RoleUser:
+			if organization.ID == group.GetOrgID() {
+				c.JSON(http.StatusOK, groups)
+				return
+			}
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		case store.RoleCustomer:
+			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
+		}
+	}
+}
+
+// GetUserOrganization to get organization from user stored in context
+func (oc OrganizationController) GetUserOrganization(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	if _, group, ok := oc.LoggedUser(c); ok {
+		userOrganization, err := models.GetOrganization(ctx, utils.ParamID(group.GetOrgID()))
+		if oc.Error(c, err, helpers.ErrorResourceNotFound) {
+			return
+		}
+
+		switch group.GetRole() {
+		case store.RoleGod: // Get all
+			c.JSON(http.StatusOK, userOrganization)
+		case store.RoleAdmin, store.RoleUser: // Get all from devices with same group ID (and organization for admin)
+			c.JSON(http.StatusOK, userOrganization.Sanitize())
+		case store.RoleCustomer:
+			c.JSON(http.StatusOK, userOrganization.Sanitize())
+		}
+	}
+}
+
+// GetOrganizationByAppKey to get organization from AppKey
+func (oc OrganizationController) GetOrganizationByAppKey(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	var org models.Organization
+	if oc.Error(c, ctx.Store.Find(ctx, models.OrgByAppKey(c.Param("id")), &org), helpers.ErrorResourceNotFound) {
+		return
+	}
+
+	c.JSON(http.StatusOK, org)
+}
+
+/*
+// ListOrgDevices allows to get organization available devices
+func (oc OrganizationController) ListOrgDevices(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	var org models.Organization
+	if oc.Error(c, ctx.Store.Find(ctx, models.OrgByAppKey(c.Param("id")), &org), helpers.ErrorResourceNotFound) {
+		return
+	}
+
+	var sigfoxIDs []string
+	/var dbFleets []*models.Fleet
+	if oc.ErrorInternal(c, ctx.Store.FindAll(ctx, models.All(), &dbFleets)) {
+		return
+	}
+
+	for _, fleet := range dbFleets {
+		var dbFleetGroup models.Group
+		err := ctx.Store.Find(ctx, models.ByID(fleet.GroupID), &dbFleetGroup)
+
+		if err == nil && dbFleetGroup.OrganizationID == org.ID {
+			fleetDevices, _ := models.GetFleetDevices(ctx, fleet.ID)
+			for _, device := range fleetDevices {
+				if _, err := models.GetThing(ctx, bson.M{"tracker_ids.0": device.ID}); err == nil {
+					sigfoxIDs = append(sigfoxIDs, device.SigfoxID)
+				}
+			}
+		}
+
+		c.JSON(http.StatusOK, sigfoxIDs)
+		return
+	}
+}
+*/

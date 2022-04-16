@@ -1,0 +1,13 @@
+version: '2'
+services:
+  mongo-db:
+    image: mongo:latest
+  api:
+    container_name: lumen-api
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      LUMEN_ENV: prod
+    links:
+      - mongo-db:mongo

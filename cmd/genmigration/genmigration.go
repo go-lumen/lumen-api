@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"bytes"
-	"github.com/adrien3d/stokelp-poc/utils"
 	"github.com/gedex/inflector"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/serenize/snaker"
 	"go/format"
 	"gopkg.in/godo.v2/util"

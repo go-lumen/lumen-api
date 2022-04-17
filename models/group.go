@@ -2,9 +2,9 @@ package models
 
 import (
 	"errors"
-	"github.com/adrien3d/stokelp-poc/helpers"
-	"github.com/adrien3d/stokelp-poc/store"
 	"github.com/asaskevich/govalidator"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/store"
 	"github.com/sahilm/fuzzy"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"

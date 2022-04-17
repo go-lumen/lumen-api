@@ -2,9 +2,9 @@ package postgresql
 
 import (
 	"fmt"
-	"github.com/adrien3d/stokelp-poc/helpers"
-	"github.com/adrien3d/stokelp-poc/helpers/params"
-	"github.com/adrien3d/stokelp-poc/models"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
 	"net/http"
 )
 

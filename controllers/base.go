@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"errors"
-	"github.com/adrien3d/stokelp-poc/helpers"
-	"github.com/adrien3d/stokelp-poc/models"
-	"github.com/adrien3d/stokelp-poc/store"
-	"github.com/adrien3d/stokelp-poc/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/helpers"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"

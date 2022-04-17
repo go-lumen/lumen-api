@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/adrien3d/stokelp-poc/utils"
+	"github.com/go-lumen/lumen-api/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

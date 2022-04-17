@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/adrien3d/stokelp-poc/server"
+	"github.com/go-lumen/lumen-api/server"
 	"gopkg.in/gormigrate.v1"
 )
 

@@ -4,7 +4,7 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"errors"
-	"github.com/adrien3d/stokelp-poc/utils"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/golang-jwt/jwt"
 	"time"
 )

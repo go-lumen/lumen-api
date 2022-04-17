@@ -3,9 +3,9 @@ package mongodb
 import (
 	"context"
 	"encoding/json"
-	"github.com/adrien3d/stokelp-poc/store"
-	"github.com/adrien3d/stokelp-poc/utils"
 	"github.com/chidiwilliams/flatbson"
+	"github.com/go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"

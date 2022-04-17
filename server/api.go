@@ -2,8 +2,8 @@ package server
 
 import (
 	"database/sql"
-	"github.com/adrien3d/stokelp-poc/services"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/services"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"

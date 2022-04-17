@@ -1,4 +1,4 @@
-module github.com/adrien3d/stokelp-poc
+module github.com/go-lumen/lumen-api
 
 go 1.18
 

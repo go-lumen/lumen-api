@@ -1,14 +1,14 @@
 package server
 
 import (
-	"github.com/adrien3d/stokelp-poc/config"
+	"github.com/go-lumen/lumen-api/config"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"time"
 
-	"github.com/adrien3d/stokelp-poc/controllers"
-	"github.com/adrien3d/stokelp-poc/middlewares"
+	"github.com/go-lumen/lumen-api/controllers"
+	"github.com/go-lumen/lumen-api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

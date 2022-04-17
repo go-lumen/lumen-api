@@ -1,8 +1,8 @@
 package postgresql
 
 import (
-	"github.com/adrien3d/stokelp-poc/helpers/params"
-	"github.com/adrien3d/stokelp-poc/models"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
 )
 
 // CreateGroup checks if group already exists, and if not, creates it

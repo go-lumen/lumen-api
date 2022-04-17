@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/adrien3d/stokelp-poc/migrations"
-	"github.com/adrien3d/stokelp-poc/server"
-	"github.com/adrien3d/stokelp-poc/services"
-	"github.com/adrien3d/stokelp-poc/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/migrations"
+	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/services"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )

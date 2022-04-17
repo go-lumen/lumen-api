@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"github.com/adrien3d/stokelp-poc/utils"
+	"github.com/go-lumen/lumen-api/utils"
 	"time"
 )
 

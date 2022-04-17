@@ -2,7 +2,7 @@ package utils
 
 import (
 	"context"
-	"github.com/adrien3d/stokelp-poc/config"
+	"github.com/go-lumen/lumen-api/config"
 	"github.com/sirupsen/logrus"
 	"github.com/snwfdhmp/errlog"
 	"go.mongodb.org/mongo-driver/bson"

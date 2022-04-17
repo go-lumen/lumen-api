@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"github.com/adrien3d/stokelp-poc/config"
-	"github.com/adrien3d/stokelp-poc/store"
-	"github.com/adrien3d/stokelp-poc/store/mongodb"
+	"github.com/go-lumen/lumen-api/config"
+	"github.com/go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/store/mongodb"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gin-gonic/gin"

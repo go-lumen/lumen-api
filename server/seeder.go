@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
-	"github.com/adrien3d/stokelp-poc/helpers/params"
-	"github.com/adrien3d/stokelp-poc/models"
-	"github.com/adrien3d/stokelp-poc/store"
-	"github.com/adrien3d/stokelp-poc/store/mongodb"
-	"github.com/adrien3d/stokelp-poc/store/postgresql"
-	"github.com/adrien3d/stokelp-poc/utils"
+	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/store"
+	"github.com/go-lumen/lumen-api/store/mongodb"
+	"github.com/go-lumen/lumen-api/store/postgresql"
+	"github.com/go-lumen/lumen-api/utils"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

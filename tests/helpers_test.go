@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/adrien3d/stokelp-poc/models"
-	"github.com/adrien3d/stokelp-poc/server"
+	"github.com/go-lumen/lumen-api/models"
+	"github.com/go-lumen/lumen-api/server"
 	"github.com/spf13/viper"
 )
 

@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/adrien3d/stokelp-poc/helpers"
 	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/helpers"
 )
 
 // ErrorMiddleware with logging if there is an error

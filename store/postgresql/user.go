@@ -10,10 +10,9 @@ import (
 
 // CreateUser checks if user already exists, and if not, creates it
 func (db *postgresql) CreateUser(user *models.User) error {
-	var count int
-	if err := db.Model(user).Where("email = ?", user.Email).Count(&count).Error; err != nil || count > 0 {
-		fmt.Println("user_exists", err)
-		return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists", err)
+	if res := db.Model(user).Where("email = ?", user.Email); res.Error != nil || res.RowsAffected > 0 {
+		fmt.Println("user_exists", res.Error)
+		return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists", res.Error)
 	}
 
 	if err := db.Create(user).Error; err != nil {
@@ -35,14 +34,19 @@ func (db *postgresql) GetUserByID(id string) (*models.User, error) {
 
 // GetUser allows to retrieve a user by its characteristics
 func (db *postgresql) GetUser(params params.M) (*models.User, error) {
-	session := db.New()
-
+	fieldsNames, i := "", 0
+	var fieldValues []interface{}
 	var user models.User
 	for key, value := range params {
-		session = session.Where(key+" = ?", value)
+		if i != 0 {
+			fieldsNames += "AND "
+		}
+		i++
+		fieldsNames += key + " = ? "
+		fieldValues = append(fieldValues, value)
 	}
 
-	if err := session.First(&user).Error; err != nil {
+	if err := db.First(&user, fieldsNames, fieldValues).Error; err != nil {
 		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user", err)
 	}
 

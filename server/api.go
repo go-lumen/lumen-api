@@ -7,12 +7,12 @@ import (
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/store/mongodb"
 	"github.com/go-lumen/lumen-api/utils"
-	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 	"os"
 )
 

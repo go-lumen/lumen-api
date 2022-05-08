@@ -24,6 +24,6 @@ func TestLogOut(t *testing.T) {
 	resp := SendRequestWithToken(nil, "GET", "/v1/auth/logout", authToken)
 	assert.Equal(t, http.StatusOK, resp.Code)
 
-	resp = SendRequestWithToken(nil, "GET", "/v1/users/"+user.ID, authToken)
+	resp = SendRequestWithToken(nil, "GET", "/v1/users/"+user.ID.Hex(), authToken)
 	assert.Equal(t, http.StatusUnauthorized, resp.Code)
 }

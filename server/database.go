@@ -9,8 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type dbLogger struct{}
-
+// SetupMongoDatabase  establishes the connexion with the Mongo database
 func (a *API) SetupMongoDatabase() (*mongo.Database, error) {
 	uri := a.Config.GetString("mongo_db_prefix")
 

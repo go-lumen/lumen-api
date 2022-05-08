@@ -93,11 +93,53 @@ func (a *API) SetupMongoSeeds() error {
 		utils.Log(nil, "info", "User well created")
 	}
 
-	err = models.ActivateUser(ctx, user.Key, user.ID)
+	err = models.ActivateUser(ctx, user.Key, user.ID.Hex())
 	if err != nil {
 		utils.Log(nil, "warn", `ErrorInternal when activating user`, err)
 	} else {
 		utils.Log(nil, "info", "User well activated")
+	}
+
+	ad1 := &models.Ad{
+		UserID:               user.ID,
+		Name:                 "Ananas IQF 10*10 (100772)",
+		Category:             "frozen",
+		Place:                "Kervignac",
+		Quantity:             1270,
+		Price:                2.70,
+		Description:          "Ananas préparés à partir d'ananas frais\nCalibre : Cubes 10x10 mm (80% en masse)\nIls sont pelés, étrognés, triés, coupés en cubes puis surgelés individuellement selon le procédé IQF\nPour plus de détails => demander FT",
+		PicturesURLs:         []string{"https://cdn.kreezalid.com/kreezalid/554097/catalog/8088/36/1000x1000_juno-jo-hrdnnog-y-a-unsplash_nuq3f_1243822212.jpg"},
+		Certifications:       []string{"IFS", "BRC", "FSSC 22000"},
+		OriginType:           "other",
+		Origin:               "Costa Rica / Vietnam\n",
+		VendorLinkToMaterial: "bought-to-transform",
+		ExpirationDateType:   "dluo",
+		ExpirationDate:       1658959200, //1665093600
+		IsOrganic:            false,
+		PackingType:          "other",
+		Packing:              "Carton doublé d'un sac polyéthylène bleu\n",
+		PackingWeight:        10,
+		PalletType:           "eur",
+		PalletWeight:         640,
+		CuttingType:          "10*10",
+		SellingReason:        "no-longer-needed",
+		DeliveryAvailable:    false,
+	}
+
+	/*adExists, _, err := models.AdExists(ctx, ad1.Name)
+	if adExists {
+		utils.Log(nil, "warn", `Seed ad 1 already exists`)
+	} else {
+		utils.Log(nil, "info", "Ad 1 doesn't exists already")
+	}*/
+
+	err = models.CreateAd(ctx, ad1)
+	if err != nil {
+		ad1, _ = models.GetAd(ctx, bson.M{"name": ad1.Name})
+		utils.Log(nil, "warn", `ErrorInternal when creating ad1:`, err)
+		utils.Log(nil, "warn", `ErrorInternal when creating ad1:`, err.Error())
+	} else {
+		utils.Log(nil, "info", "Ad1 well created")
 	}
 
 	/*

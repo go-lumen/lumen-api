@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -48,7 +49,7 @@ func (uc UserController) GetUser(c *gin.Context) {
 			c.JSON(http.StatusOK, user)
 		case store.RoleAdmin, store.RoleUser:
 			user, err := models.GetUser(ctx, uc.ParamID(c))
-			if user.GroupID == loggedUser.GetGroupID() {
+			if user.GroupID.Hex() == loggedUser.GetGroupID() {
 				c.JSON(http.StatusOK, user)
 				return
 			}
@@ -72,12 +73,12 @@ func (uc UserController) GetUserMe(c *gin.Context) {
 			return
 		}
 
-		var dbUSer models.User
-		if uc.ErrorInternal(c, ctx.Store.Find(ctx, store.ID(user.GetID()), &dbUSer)) {
+		var dbUser models.User
+		if uc.ErrorInternal(c, ctx.Store.Find(ctx, store.ID(user.GetID()), &dbUser)) {
 			return
 		}
 
-		c.JSON(http.StatusOK, dbUSer.Sanitize(group.GetRole(), organization.ID, organization.Name))
+		c.JSON(http.StatusOK, dbUser.Sanitize(ctx.Role, ctx.Group.GetName(), organization.ID.Hex(), organization.Name))
 	} else {
 		uc.AbortWithError(c, helpers.ErrorUserUnauthorized)
 	}
@@ -109,8 +110,9 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 
 	switch ctx.Role {
 	case store.RoleGod:
-		dbUser.GroupID = desiredGroupID
-		err := models.UpdateUser(ctx, dbUser.ID, &dbUser)
+		objID, _ := primitive.ObjectIDFromHex(desiredGroupID)
+		dbUser.GroupID = objID
+		err := models.UpdateUser(ctx, dbUser.ID.Hex(), &dbUser)
 		if err != nil {
 			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 			return
@@ -118,8 +120,9 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 		c.JSON(http.StatusOK, dbUser)
 	case store.RoleAdmin, store.RoleUser:
 		if desiredGroup.OrganizationID == userOrganization.ID {
-			dbUser.GroupID = desiredGroupID
-			err := models.UpdateUser(ctx, dbUser.ID, &dbUser)
+			objID, _ := primitive.ObjectIDFromHex(desiredGroupID)
+			dbUser.GroupID = objID
+			err := models.UpdateUser(ctx, dbUser.ID.Hex(), &dbUser)
 			if err != nil {
 				uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 				return
@@ -133,27 +136,6 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 	}
 }
 
-// GetUserDetails from id (in request)
-func (uc UserController) GetUserDetails(c *gin.Context) {
-	ctx := store.AuthContext(c)
-	if !uc.ShouldBeLogged(ctx) {
-		return
-	}
-
-	organization, err := models.GetOrganization(ctx, utils.ParamID(ctx.Group.GetOrgID()))
-	if err != nil {
-		uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
-		return
-	}
-
-	var dbUser models.User
-	if uc.ErrorInternal(c, ctx.Store.Find(ctx, store.ID(ctx.User.GetID()), &dbUser)) {
-		return
-	}
-
-	c.JSON(http.StatusOK, dbUser.Detail(ctx.Role, organization.Name))
-}
-
 // CreateUser to create a new user
 func (uc UserController) CreateUser(c *gin.Context) {
 	ctx := store.AuthContext(c)
@@ -164,13 +146,13 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID))
+	userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorInvalidInput(err))
 		return
 	}
 
-	organization, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID))
+	organization, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID.Hex()))
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorInvalidInput(err))
 		return
@@ -214,7 +196,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, user.Sanitize(userGroup.Role, organization.ID, organization.Name))
+	c.JSON(http.StatusCreated, user.Sanitize(userGroup.Role, userGroup.Name, organization.ID.Hex(), organization.Name))
 }
 
 // DeleteUser to delete an existing user
@@ -244,9 +226,10 @@ func (uc UserController) GetUsers(c *gin.Context) {
 	case store.RoleGod:
 		users, err := models.GetUsers(ctx, bson.M{})
 		for _, user := range users {
-			group, err := models.FindGroup(dbGroups, user.GroupID)
+			group, err := models.FindGroup(dbGroups, user.GroupID.Hex())
 			if err == nil {
-				user.GroupID = group.Name
+				objID, _ := primitive.ObjectIDFromHex(group.Name)
+				user.GroupID = objID
 			}
 		}
 		if err != nil {
@@ -257,9 +240,10 @@ func (uc UserController) GetUsers(c *gin.Context) {
 	case store.RoleAdmin, store.RoleUser:
 		users, err := models.GetUsers(ctx, bson.M{"group_id": ctx.User.GetGroupID()})
 		for _, user := range users {
-			group, err := models.FindGroup(dbGroups, user.GroupID)
+			group, err := models.FindGroup(dbGroups, user.GroupID.Hex())
 			if err == nil {
-				user.GroupID = group.Name
+				objID, _ := primitive.ObjectIDFromHex(group.Name)
+				user.GroupID = objID
 			}
 		}
 		if err != nil {
@@ -361,7 +345,7 @@ func (uc UserController) UpdateUser(c *gin.Context) {
 	}
 
 	dbUser.LastModification = time.Now().Unix()
-	err = models.UpdateUser(ctx, dbUser.ID, dbUser)
+	err = models.UpdateUser(ctx, dbUser.ID.Hex(), dbUser)
 	utils.CheckErr(err)
 
 	c.JSON(http.StatusOK, "User well modified")

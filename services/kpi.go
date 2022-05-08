@@ -20,7 +20,7 @@ func KPITask(ctx *store.Context) {
 	dbUsers, _ := models.GetUsers(ctx, bson.M{})
 
 	for _, user := range dbUsers {
-		userCreationTS := utils.MongoIDToTimestamp(user.ID).Unix()
+		userCreationTS := utils.MongoIDToTimestamp(user.ID.Hex()).Unix()
 		if (userCreationTS > fromT.Unix()) && (userCreationTS < toT.Unix()) {
 			utils.Log(ctx.C, "info", "New user registered:", user.Email)
 		}

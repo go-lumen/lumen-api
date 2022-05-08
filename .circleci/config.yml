@@ -1,0 +1,96 @@
+version: 2.1
+
+orbs:
+  azure-acr: circleci/azure-acr@0.2.0
+  azure-cli: circleci/azure-cli@1.2.2
+
+jobs:
+  test:
+    parallelism: 1
+    docker:
+      - image: cimg/go:1.18.1
+    steps:
+      - run:
+          command: go install golang.org/x/lint/golint@latest
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install Dependencies
+          command: go get ./...
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - run:
+          name: "Enforce Go Formatted Code"
+          command: "! go fmt ./... 2>&1 | read"
+      - run:
+          name: "Go lint"
+          command: golint ./...
+      - run:
+          name: "Go vet"
+          command: go vet ./...
+      - run:
+          name: Run tests
+          command: go test -v
+  deploy-containers:
+    executor: azure-cli/default
+    steps:
+      - azure-cli/install
+      - azure-cli/login-with-service-principal:
+          azure-sp: AZURE_SP
+          azure-sp-password: AZURE_SP_PASSWORD
+          azure-sp-tenant: AZURE_SP_TENANT
+      - run:
+          name: Deploy worker
+          shell: /bin/bash
+          command: |
+            #az container create --vnet fline-demo-network --subnet workers --resource-group $FLINE_RESSOURCE_GROUP --name $FLINE_WORKER_RESSOURCE --image $FLINE_WORKER_IMAGE --cpu 1 --memory 1 --location $AZURE_LOCATION --registry-login-server $ACR_LOGIN_SERVER --registry-username $ACR_LOGIN_USERNAME --registry-password $ACR_LOGIN_PASSWORD
+
+workflows:
+  version: 2
+  test_build_deploy:
+    jobs:
+      ### DEV
+      - test
+      - azure-acr/build-and-push-image:
+          name: build-sam-dev-container
+          filters:
+            branches:
+              only: develop
+          context: lumen-sam-dev-context
+          login-server-name: fline.azurecr.io
+          registry-name: fline
+          repo: sam-api
+          tag: dev
+      - deploy-containers:
+          name: deploy-dev-containers
+          requires:
+            - build-sam-dev-container
+          context: lumen-sam-dev-context
+          filters:
+            branches:
+              only: develop
+
+      ### PROD
+      - test
+      - azure-acr/build-and-push-image:
+          name: build-sam-prod-container
+          filters:
+            branches:
+              only: master
+          context: lumen-sam-prod-context
+          login-server-name: fline.azurecr.io
+          registry-name: fline
+          repo: sam-api
+          tag: prod
+      - deploy-containers:
+          name: deploy-prod-containers
+          requires:
+            - build-sam-prod-container
+          context: lumen-sam-prod-context
+          filters:
+            branches:
+              only: master

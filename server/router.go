@@ -62,7 +62,6 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 			authentication.POST("/renew", authController.TokenRenewal)
 			authentication.Use(authenticationMiddleware)
 			authentication.GET("/", userController.GetUserMe)
-			authentication.GET("/details", userController.GetUserDetails)
 			//https://skarlso.github.io/2016/06/12/google-signin-with-go/
 			//https://github.com/zalando/gin-oauth2/blob/master/google/google.go
 		}
@@ -103,6 +102,13 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 			groups.GET("/", groupController.GetGroups)
 			groups.GET("/:id", groupController.GetGroup)
 			groups.GET("/me", groupController.GetUserGroup)
+		}
+
+		imports := v1.Group("/imports")
+		{
+			importController := controllers.NewImportController()
+			imports.Use(authenticationMiddleware)
+			imports.POST("/", importController.ImportAdsFile)
 		}
 	}
 	return a.MongoDatabase, a.Config

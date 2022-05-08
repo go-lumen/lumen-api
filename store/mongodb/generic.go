@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
+	"strings"
 )
 
 const idName = "ID"
@@ -29,7 +30,12 @@ func ensureMongoModel(model store.Model) store.MongoModel {
 func setID(model store.Model, id string) {
 	v := reflect.ValueOf(model).Elem().FieldByName(idName)
 	if v.IsValid() && v.CanSet() {
-		v.SetString(id)
+		if strings.Contains(v.String(), "Object") {
+			objID, _ := primitive.ObjectIDFromHex(id)
+			v.Set(reflect.ValueOf(objID))
+		} else {
+			v.SetString(id)
+		}
 	}
 }
 
@@ -79,7 +85,6 @@ func (db *Mngo) Create(c *store.Context, model store.Model) error {
 		logrus.WithError(err).Errorln("cannot insert model")
 		return errors.Wrap(err, "cannot insert model")
 	}
-
 	// update with inserted id
 	if id, ok := res.InsertedID.(primitive.ObjectID); ok {
 		setID(model, id.Hex())

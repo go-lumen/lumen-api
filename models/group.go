@@ -8,22 +8,23 @@ import (
 	"github.com/sahilm/fuzzy"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
 // Group type holds all required informations
 type Group struct {
 	store.DefaultRoles `bson:"-,omitempty"`
-	ID                 string `json:"id" bson:"_id,omitempty" valid:"-"`
-	Index              int64  `json:"index" bson:"index" valid:"-"`
-	Name               string `json:"name" bson:"name" valid:"-"`
-	Role               string `json:"role" bson:"role" valid:"-"`
-	OrganizationID     string `json:"organization_id" bson:"organization_id" valid:"-"`
+	ID                 primitive.ObjectID `json:"id" bson:"_id,omitempty" valid:"-"`
+	Index              int64              `json:"index" bson:"index" valid:"-"`
+	Name               string             `json:"name" bson:"name" valid:"-"`
+	Role               string             `json:"role" bson:"role" valid:"-"`
+	OrganizationID     primitive.ObjectID `json:"organization_id" bson:"organization_id" valid:"-"`
 }
 
 // GetID returns ID
 func (group *Group) GetID() string {
-	return group.ID
+	return group.ID.Hex()
 }
 
 // GetRole returns role
@@ -31,9 +32,14 @@ func (group *Group) GetRole() store.UserRole {
 	return group.Role
 }
 
+// GetName returns name
+func (group *Group) GetName() string {
+	return group.Name
+}
+
 // GetOrgID returns organization ID
-func (group *Group) GetOrgID() store.UserRole {
-	return group.OrganizationID
+func (group *Group) GetOrgID() string {
+	return group.OrganizationID.Hex()
 }
 
 // GetCollection returns mongodb collection
@@ -55,7 +61,7 @@ func (group *Group) BeforeCreate() error {
 // FindGroup is used to find a group in a groups list (for performance purposes, only 1 db request)
 func FindGroup(dbGroups []*Group, groupID string) (ret *Group, err error) {
 	for _, group := range dbGroups {
-		if group.ID == groupID {
+		if group.ID.Hex() == groupID {
 			return group, nil
 		}
 	}
@@ -131,9 +137,8 @@ func GetGroups(c *store.Context, filter bson.M) ([]*Group, error) {
 
 // ChangeGroupOrganization allows to change the organization of a group by its id
 func ChangeGroupOrganization(c *store.Context, groupID string, organizationID string) error {
-	err := c.Store.Update(c, store.ID(groupID), &Group{OrganizationID: organizationID},
-		store.OnlyFields([]string{"organization_id"}),
-		store.CreateIfNotExists(true))
+	obID, err := primitive.ObjectIDFromHex(organizationID)
+	err = c.Store.Update(c, store.ID(groupID), &Group{OrganizationID: obID}, store.OnlyFields([]string{"organization_id"}), store.CreateIfNotExists(true))
 
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "group_group_change_failed", "Couldn't find the group to change group", err)

@@ -9,7 +9,7 @@ import (
 )
 
 // CreateUser checks if user already exists, and if not, creates it
-func (db *postgresql) CreateUser(user *models.User) error {
+func (db *Postgresql) CreateUser(user *models.User) error {
 	if res := db.Model(user).Where("email = ?", user.Email); res.Error != nil || res.RowsAffected > 0 {
 		fmt.Println("user_exists", res.Error)
 		return helpers.NewError(http.StatusBadRequest, "user_exists", "the user already exists", res.Error)
@@ -24,7 +24,7 @@ func (db *postgresql) CreateUser(user *models.User) error {
 }
 
 // GetUserByID allows to retrieve a user by its id
-func (db *postgresql) GetUserByID(id string) (*models.User, error) {
+func (db *Postgresql) GetUserByID(id string) (*models.User, error) {
 	var user models.User
 	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, helpers.NewError(http.StatusNotFound, "user_not_found", "could not find the user", err)
@@ -33,7 +33,7 @@ func (db *postgresql) GetUserByID(id string) (*models.User, error) {
 }
 
 // GetUser allows to retrieve a user by its characteristics
-func (db *postgresql) GetUser(params params.M) (*models.User, error) {
+func (db *Postgresql) GetUser(params params.M) (*models.User, error) {
 	fieldsNames, i := "", 0
 	var fieldValues []interface{}
 	var user models.User
@@ -54,12 +54,12 @@ func (db *postgresql) GetUser(params params.M) (*models.User, error) {
 }
 
 // DeleteUser allows to delete a user by its id
-func (db *postgresql) DeleteUser(userID string) error {
+func (db *Postgresql) DeleteUser(userID string) error {
 	return nil
 }
 
 // ActivateUser allows to activate a user by its id
-func (db *postgresql) ActivateUser(activationKey string, email string) error {
+func (db *Postgresql) ActivateUser(activationKey string, email string) error {
 	var user models.User
 	fmt.Println("Trying to find user:", email, "with activationKey:", activationKey)
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
@@ -79,17 +79,17 @@ func (db *postgresql) ActivateUser(activationKey string, email string) error {
 }
 
 // ChangeLanguage allows to change a user language by its id
-func (db *postgresql) ChangeLanguage(id string, language string) error {
+func (db *Postgresql) ChangeLanguage(id string, language string) error {
 	return nil
 }
 
 // UpdateUser allows to update one or more user characteristics
-func (db *postgresql) UpdateUser(userID string, params params.M) error {
+func (db *Postgresql) UpdateUser(userID string, params params.M) error {
 	return nil
 }
 
 // GetUsers allows to get all users
-func (db *postgresql) GetUsers() ([]*models.User, error) {
+func (db *Postgresql) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 	db.Find(&users)
 
@@ -97,12 +97,12 @@ func (db *postgresql) GetUsers() ([]*models.User, error) {
 }
 
 // CountUsers allows to count all users
-func (db *postgresql) CountUsers() (int, error) {
+func (db *Postgresql) CountUsers() (int, error) {
 	return 0, nil
 }
 
 // UserExists allows to know if a user exists through his mail
-func (db *postgresql) UserExists(userEmail string) (bool, error) {
+func (db *Postgresql) UserExists(userEmail string) (bool, error) {
 	var user models.User
 	if err := db.Where("email = ?", userEmail).First(&user).Error; err == nil {
 		return true, nil

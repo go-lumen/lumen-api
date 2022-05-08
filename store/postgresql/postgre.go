@@ -4,11 +4,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type postgresql struct {
+// Postgresql contains default DB structure
+type Postgresql struct {
 	*gorm.DB
 }
 
 // New creates a database connexion
-func New(database *gorm.DB) *postgresql {
-	return &postgresql{database}
+func New(database *gorm.DB) *Postgresql {
+	return &Postgresql{database}
 }

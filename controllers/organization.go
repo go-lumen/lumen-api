@@ -104,7 +104,7 @@ func (oc OrganizationController) GetOrganization(c *gin.Context) {
 		case store.RoleGod:
 			c.JSON(http.StatusOK, organization)
 		case store.RoleAdmin, store.RoleUser:
-			if organization.ID == group.GetOrgID() {
+			if organization.ID.Hex() == group.GetOrgID() {
 				c.JSON(http.StatusOK, organization)
 				return
 			}
@@ -133,7 +133,7 @@ func (oc OrganizationController) GetOrganizationGroups(c *gin.Context) {
 		case store.RoleGod:
 			c.JSON(http.StatusOK, groups)
 		case store.RoleAdmin, store.RoleUser:
-			if organization.ID == group.GetOrgID() {
+			if organization.ID.Hex() == group.GetOrgID() {
 				c.JSON(http.StatusOK, groups)
 				return
 			}

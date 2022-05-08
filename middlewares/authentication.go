@@ -34,7 +34,7 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 		user, _ := models.GetUser(ctx, utils.ParamID(claims["sub"].(string)))
 		//logrus.Infoln("looking for: " + claims["sub"].(string) + " Got user: " + fmt.Sprint(user))
 		c.Set(store.CurrentUserKey, user)
-		group, err := models.GetGroup(ctx, utils.ParamID(user.GroupID))
+		group, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
 		if err != nil {
 			utils.Log(c, "error", "Group not found")
 		}

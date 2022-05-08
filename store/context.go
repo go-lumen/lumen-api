@@ -59,8 +59,9 @@ type User interface {
 // Group is a generic store group
 type Group interface {
 	GetID() string
+	GetName() string
 	GetRole() UserRole
-	GetOrgID() UserRole
+	GetOrgID() string
 }
 
 // Context is an advanced context for authenticated users
@@ -121,6 +122,7 @@ func (u user) GetGroupID() string { return "fline" }
 type group struct{}
 
 func (g group) GetID() string      { return "" }
+func (g group) GetName() string    { return "" }
 func (g group) GetRole() UserRole  { return RoleGod }
 func (g group) GetOrgID() UserRole { return "fline" }
 

@@ -25,6 +25,7 @@ func CheckErr(e error) bool {
 	return false
 }
 
+// CheckErrAndAbort checks error and returns a gin one
 func CheckErrAndAbort(c *gin.Context, e error) {
 	if e != nil {
 		_ = c.AbortWithError(http.StatusNotFound, e)

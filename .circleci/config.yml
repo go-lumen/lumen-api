@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  azure-acr: circleci/azure-acr@0.2.0
-  azure-cli: circleci/azure-cli@1.2.2
+  aws-ecr: circleci/aws-ecr@8.1.2
+  aws-ecs: circleci/aws-ecs@2.2.1
 
 jobs:
   test:
@@ -35,19 +35,6 @@ jobs:
       - run:
           name: Run tests
           command: go test -v
-  deploy-containers:
-    executor: azure-cli/default
-    steps:
-      - azure-cli/install
-      - azure-cli/login-with-service-principal:
-          azure-sp: AZURE_SP
-          azure-sp-password: AZURE_SP_PASSWORD
-          azure-sp-tenant: AZURE_SP_TENANT
-      - run:
-          name: Deploy worker
-          shell: /bin/bash
-          command: |
-            #az container create --vnet fline-demo-network --subnet workers --resource-group $FLINE_RESSOURCE_GROUP --name $FLINE_WORKER_RESSOURCE --image $FLINE_WORKER_IMAGE --cpu 1 --memory 1 --location $AZURE_LOCATION --registry-login-server $ACR_LOGIN_SERVER --registry-username $ACR_LOGIN_USERNAME --registry-password $ACR_LOGIN_PASSWORD
 
 workflows:
   version: 2
@@ -55,42 +42,38 @@ workflows:
     jobs:
       ### DEV
       - test
-      - azure-acr/build-and-push-image:
+      - aws-ecr/build-and-push-image:
           name: build-sam-dev-container
+          context: lumen-sam-dev-context
+          public-registry: false
+          repo: sam-api
           filters:
             branches:
               only: develop
-          context: lumen-sam-dev-context
-          login-server-name: fline.azurecr.io
-          registry-name: fline
-          repo: sam-api
-          tag: dev
-      - deploy-containers:
+      - aws-ecs/deploy-service-update:
           name: deploy-dev-containers
           requires:
             - build-sam-dev-container
           context: lumen-sam-dev-context
-          filters:
-            branches:
-              only: develop
+          cluster-name: '${MY_APP_PREFIX}-cluster'
+          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+          family: '${MY_APP_PREFIX}-service'
 
       ### PROD
       - test
-      - azure-acr/build-and-push-image:
+      - aws-ecr/build-and-push-image:
           name: build-sam-prod-container
+          context: lumen-sam-prod-context
+          public-registry: false
+          repo: sam-api
           filters:
             branches:
-              only: master
-          context: lumen-sam-prod-context
-          login-server-name: fline.azurecr.io
-          registry-name: fline
-          repo: sam-api
-          tag: prod
-      - deploy-containers:
+              only: prodelop
+      - aws-ecs/deploy-service-update:
           name: deploy-prod-containers
           requires:
             - build-sam-prod-container
           context: lumen-sam-prod-context
-          filters:
-            branches:
-              only: master
+          cluster-name: '${MY_APP_PREFIX}-cluster'
+          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+          family: '${MY_APP_PREFIX}-service'

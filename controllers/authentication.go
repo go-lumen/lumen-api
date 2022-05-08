@@ -56,7 +56,7 @@ func (ac AuthController) returnToken(c *gin.Context, encodedKey []byte, dbUser *
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": accessToken, "refresh_token": refreshToken, store.RoleUser: dbUser.Sanitize(ctx.Role, group.Name, organization.ID.Hex(), organization.Name)})
+	c.JSON(http.StatusOK, gin.H{"token": accessToken, "refresh_token": refreshToken, store.RoleUser: dbUser.Sanitize(group.Role, group.Name, organization.ID.Hex(), organization.Name)})
 }
 
 // TokensGeneration to authenticate the user and generate a new token

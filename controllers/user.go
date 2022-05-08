@@ -41,19 +41,27 @@ func (uc UserController) GetUser(c *gin.Context) {
 		switch loggedGroup.GetRole() {
 		case store.RoleGod:
 			user, err := models.GetUser(ctx, uc.ParamID(c))
+			utils.CheckErrAndAbort(c, err)
+			userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
+			utils.CheckErrAndAbort(c, err)
+			userOrga, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID.Hex()))
+			utils.CheckErrAndAbort(c, err)
+			userSanitized := user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name)
 
-			if err != nil {
-				uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
-				return
-			}
-			c.JSON(http.StatusOK, user)
+			c.JSON(http.StatusOK, userSanitized)
 		case store.RoleAdmin, store.RoleUser:
 			user, err := models.GetUser(ctx, uc.ParamID(c))
+			utils.CheckErrAndAbort(c, err)
 			if user.GroupID.Hex() == loggedUser.GetGroupID() {
-				c.JSON(http.StatusOK, user)
-				return
+				userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
+				utils.CheckErrAndAbort(c, err)
+				userOrga, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID.Hex()))
+				utils.CheckErrAndAbort(c, err)
+				userSanitized := user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name)
+
+				c.JSON(http.StatusOK, userSanitized)
 			}
-			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
+			uc.AbortWithError(ctx.C, helpers.ErrorUserUnauthorized)
 			return
 
 		case store.RoleCustomer:
@@ -221,36 +229,33 @@ func (uc UserController) GetUsers(c *gin.Context) {
 
 	dbGroups, err := models.GetGroups(ctx, bson.M{})
 	utils.CheckErr(err)
+	dbOrgas, err := models.GetOrganizations(ctx, bson.M{})
+	utils.CheckErr(err)
 
+	var retUsers []models.SanitizedUser
 	switch ctx.Role {
 	case store.RoleGod:
 		users, err := models.GetUsers(ctx, bson.M{})
+		utils.CheckErrAndAbort(c, err)
 		for _, user := range users {
-			group, err := models.FindGroup(dbGroups, user.GroupID.Hex())
-			if err == nil {
-				objID, _ := primitive.ObjectIDFromHex(group.Name)
-				user.GroupID = objID
-			}
+			userGroup, err := models.FindGroup(dbGroups, user.GroupID.Hex())
+			utils.CheckErrAndAbort(c, err)
+			userOrga, err := models.FindOrganization(dbOrgas, userGroup.OrganizationID.Hex())
+			utils.CheckErrAndAbort(c, err)
+			retUsers = append(retUsers, user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name))
 		}
-		if err != nil {
-			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
-			return
-		}
-		c.JSON(http.StatusOK, users)
+		c.JSON(http.StatusOK, retUsers)
 	case store.RoleAdmin, store.RoleUser:
 		users, err := models.GetUsers(ctx, bson.M{"group_id": ctx.User.GetGroupID()})
+		utils.CheckErrAndAbort(c, err)
 		for _, user := range users {
-			group, err := models.FindGroup(dbGroups, user.GroupID.Hex())
-			if err == nil {
-				objID, _ := primitive.ObjectIDFromHex(group.Name)
-				user.GroupID = objID
-			}
+			userGroup, err := models.FindGroup(dbGroups, user.GroupID.Hex())
+			utils.CheckErrAndAbort(c, err)
+			userOrga, err := models.FindOrganization(dbOrgas, userGroup.OrganizationID.Hex())
+			utils.CheckErrAndAbort(c, err)
+			retUsers = append(retUsers, user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name))
 		}
-		if err != nil {
-			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
-			return
-		}
-		c.JSON(http.StatusOK, users)
+		c.JSON(http.StatusOK, retUsers)
 	case store.RoleCustomer:
 		uc.AbortWithError(c, helpers.ErrorUserUnauthorized)
 	}

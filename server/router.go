@@ -104,12 +104,6 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 			groups.GET("/me", groupController.GetUserGroup)
 		}
 
-		imports := v1.Group("/imports")
-		{
-			importController := controllers.NewImportController()
-			imports.Use(authenticationMiddleware)
-			imports.POST("/", importController.ImportAdsFile)
-		}
 	}
 	return a.MongoDatabase, a.Config
 }

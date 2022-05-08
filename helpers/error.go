@@ -61,7 +61,7 @@ var (
 	// ErrorResourceNotFound occurs
 	ErrorResourceNotFound = declare("resource_not_found", http.StatusNotFound, "Resource does not exist")
 
-	// ErrorUserUnauthorized occurs when user doesn't have enough permissions to access au resource
+	// ErrorUserUnauthorized occurs when user doesn't have enough permissions to access a resource
 	ErrorUserUnauthorized = Error{Code: "user_unauthorized", HTTPCode: http.StatusUnauthorized, Message: "Insufficient permissions to access this resource"}
 	// ErrorUserUpdate occurs when user failed to be updated
 	ErrorUserUpdate = declare("update_user_failed", http.StatusInternalServerError, "Could not update the user")

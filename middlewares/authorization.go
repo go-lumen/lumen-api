@@ -6,7 +6,7 @@ import (
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/go-lumen/lumen-api/utils"
+	"go.mongodb.org/mongo-driver/bson"
 	"strings"
 )
 
@@ -19,7 +19,7 @@ func AuthorizationMiddleware() gin.HandlerFunc {
 		encodedKey := []byte(config.GetString(c, "rsa_private"))
 		claims, _ := helpers.ValidateJwtToken(authHeaderParts[1], encodedKey, "access")
 		ctx := store.AuthContext(c)
-		user, _ := models.GetUser(ctx, utils.ParamID(claims["sub"].(string)))
+		user, _ := models.GetUser(ctx, bson.M{"_id": claims["sub"]})
 		c.Set(store.CurrentUserKey, user)
 
 		c.Next()

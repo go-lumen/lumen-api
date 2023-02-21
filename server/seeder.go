@@ -1,8 +1,7 @@
 package server
 
 import (
-	"fmt"
-	"github.com/go-lumen/lumen-api/helpers/params"
+	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/store/mongodb"
@@ -29,32 +28,11 @@ func (a *API) SetupMongoSeeds() error {
 	dbOrga := &models.Organization{}
 	if err := s.Find(ctx, bson.M{"name": organization.Name}, dbOrga); err == nil {
 		utils.Log(nil, "warn", `Organization:`, organization.Name, `already exists`)
-	} else if err := s.Create(ctx, organization); err != nil {
+	} else if err := s.Create(ctx, "", organization); err != nil {
 		utils.Log(nil, "err", `ErrorInternal when creating organization:`, err)
 	} else {
 		utils.Log(nil, "info", `Organization:`, organization.Name, `well created`)
 	}
-	/*
-		poiA := &models.POI{
-			Name:    "Fline",
-			Code:    "Fline-Paris",
-			Type:    "office",
-			Country: "FR",
-			Location: models.Location{
-				Type:        "Point",
-				Coordinates: []float64{2.2945, 48.8582},
-			},
-			OrganizationID: organization.ID,
-			MacAdresses:    nil,
-		}
-		dbPoi := &models.POI{}
-		if err := s.Find(ctx, bson.M{"name": poiA.Name}, dbPoi); err == nil {
-			utils.Log(nil, "warn", `POI:`, poiA.Name, `already exists`)
-		} else if err := s.Create(ctx, poiA); err != nil {
-			utils.Log(nil, "err", `ErrorInternal when creating POI A:`, err)
-		} else {
-			utils.Log(nil, "info", `POI:`, poiA.Name, `well created`)
-		}*/
 
 	group := &models.Group{
 		Name:           a.Config.GetString("project_name") + " superadmin",
@@ -63,7 +41,7 @@ func (a *API) SetupMongoSeeds() error {
 	}
 	if err := s.Find(ctx, bson.M{"name": group.Name}, group); err == nil {
 		utils.Log(nil, "warn", `Group:`, group.Name, `already exists`)
-	} else if err := s.Create(ctx, group); err != nil {
+	} else if err := s.Create(ctx, "", group); err != nil {
 		utils.Log(nil, "err", `ErrorInternal when creating group:`, group.Name, err)
 	} else {
 		utils.Log(nil, "info", "Group well created")
@@ -76,9 +54,10 @@ func (a *API) SetupMongoSeeds() error {
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
 		GroupID:   group.ID,
+		Balance:   123.45,
 	}
 
-	userExists, _, err := models.UserExists(ctx, user.Email)
+	userExists, user, err := models.UserExists(ctx, user.Email)
 	if userExists {
 		utils.Log(nil, "warn", `Seed user already exists`)
 	} else {
@@ -93,28 +72,12 @@ func (a *API) SetupMongoSeeds() error {
 		utils.Log(nil, "info", "User well created")
 	}
 
-	err = models.ActivateUser(ctx, user.Key, user.ID.Hex())
+	err = models.ActivateUser(ctx, user.Key, user.ID)
 	if err != nil {
 		utils.Log(nil, "warn", `ErrorInternal when activating user`, err)
 	} else {
 		utils.Log(nil, "info", "User well activated")
 	}
-
-	/*
-		fleet := &models.Fleet{
-			Name:               a.Config.GetString("project_name") + " v1",
-			SigfoxDeviceTypeID: "5b5726889e93a1464b6e552c",
-			UserID:             user.ID,
-			GroupID:            group.ID,
-			Status:             "available",
-			Resolver:           models.TrackerHWWisoliHere,
-		}
-		if err := models.CreateFleet(ctx, fleet); err != nil {
-			dbFleet, _ := models.GetFleet(ctx, bson.M{"sigfox_device_type_id": fleet.SigfoxDeviceTypeID})
-			utils.Log(nil, "warn", `Fleet already exists, id:`, dbFleet.ID, `SigfoxDeviceTypeID:`, dbFleet.SigfoxDeviceTypeID, `AppKey:`, dbFleet.AppKey)
-		} else {
-			utils.Log(nil, "info", "Fleet ", fleet.Name, " well created, Sfx Device Type:", fleet.SigfoxDeviceTypeID, " appKey:", fleet.AppKey)
-		}*/
 
 	return nil
 }
@@ -122,34 +85,55 @@ func (a *API) SetupMongoSeeds() error {
 // SetupPostgreSeeds creates the first user
 func (a *API) SetupPostgreSeeds() error {
 	utils.Log(nil, "info", "Setup postgre seeds")
-	store := postgresql.New(a.PostgreDatabase)
+	s := postgresql.New(&gin.Context{}, a.PostgreDatabase, a.Config.GetString("POSTGRES_DB_NAME"))
+	//ctx := store.NewGodContext(s)
 
-	user := &models.User{
+	organization := &models.Organization{
+		Name: a.Config.GetString("project_name"),
+	}
+	s.Create(a.Context, "", organization)
+
+	adminGroup := &models.Group{
+		Name:           a.Config.GetString("project_name") + " Admin",
+		Role:           "god",
+		OrganizationID: organization.ID,
+	}
+	s.Create(a.Context, "", adminGroup)
+
+	adminUser := &models.User{
 		FirstName: a.Config.GetString("admin_firstname"),
 		LastName:  a.Config.GetString("admin_lastname"),
 		Password:  a.Config.GetString("admin_password"),
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
+		Status:    "activated",
+		GroupID:   adminGroup.ID,
+		Balance:   123.45,
 	}
-	userExists, err := store.UserExists(user.Email)
-	if userExists {
-		utils.Log(nil, "warn", `Seed user already exists`, err)
-	} else {
-		if err := store.CreateUser(user); err != nil {
-			utils.Log(nil, "warn", `Error when creating user:`, err)
-		}
-	}
-
-	dbUser, err := store.GetUser(params.M{"email": a.Config.GetString("admin_email")})
+	s.GetOrCreateUser(adminUser)
+	/*err := models.ActivateUser(ctx, adminUser.Key, adminUser.ID)
 	if err != nil {
-		utils.Log(nil, "warn", err)
-	}
-	fmt.Println("Found user", dbUser.ID, ":", dbUser)
+		utils.Log(nil, "warn", `ErrorInternal when activating user`, err)
+	} else {
+		utils.Log(nil, "info", "User well activated")
+	}*/
 
-	if err := store.ActivateUser(dbUser.Key /*strconv.Itoa(dbUser.ID)*/, dbUser.Email); err != nil {
-		utils.Log(nil, "warn", `Error when activating user`, err)
+	user1 := &models.User{
+		FirstName: a.Config.GetString("user1_firstname"),
+		LastName:  a.Config.GetString("user1_lastname"),
+		Password:  a.Config.GetString("user1_password"),
+		Email:     a.Config.GetString("user1_email"),
+		GroupID:   adminGroup.ID,
 	}
-	utils.Log(nil, "info", "Checked")
+	s.GetOrCreateUser(user1)
+	user2 := &models.User{
+		FirstName: a.Config.GetString("user2_firstname"),
+		LastName:  a.Config.GetString("user2_lastname"),
+		Password:  a.Config.GetString("user2_password"),
+		Email:     a.Config.GetString("user2_email"),
+		GroupID:   adminGroup.ID,
+	}
+	s.GetOrCreateUser(user2)
 
 	return nil
 }

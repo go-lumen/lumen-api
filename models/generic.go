@@ -2,6 +2,13 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson"
 
+type QueryParams struct {
+	Limit     uint32
+	Order     int8
+	StartTime uint32
+	EndTime   uint32
+}
+
 // All returns an empty filter (for semantic)
 func All() bson.M { return bson.M{} }
 

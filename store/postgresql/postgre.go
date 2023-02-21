@@ -1,15 +1,17 @@
 package postgresql
 
 import (
+	"context"
 	"gorm.io/gorm"
 )
 
-// Postgresql contains default DB structure
-type Postgresql struct {
-	*gorm.DB
+type PSQL struct {
+	database *gorm.DB
+	dbName   string
+	context  context.Context
 }
 
 // New creates a database connexion
-func New(database *gorm.DB) *Postgresql {
-	return &Postgresql{database}
+func New(context context.Context, database *gorm.DB, dbName string) *PSQL {
+	return &PSQL{database, dbName, context}
 }

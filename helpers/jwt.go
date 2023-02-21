@@ -4,8 +4,8 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"errors"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-lumen/lumen-api/utils"
-	"github.com/golang-jwt/jwt"
 	"time"
 )
 

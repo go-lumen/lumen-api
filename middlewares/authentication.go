@@ -8,6 +8,7 @@ import (
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/utils"
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"strings"
 )
@@ -31,10 +32,10 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 		}
 
 		ctx := store.AuthContext(c)
-		user, _ := models.GetUser(ctx, utils.ParamID(claims["sub"].(string)))
+		user, _ := models.GetUser(ctx, bson.M{"id": claims["sub"].(string)})
 		//logrus.Infoln("looking for: " + claims["sub"].(string) + " Got user: " + fmt.Sprint(user))
 		c.Set(store.CurrentUserKey, user)
-		group, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
+		group, err := models.GetGroup(ctx, bson.M{"id": user.GroupID})
 		if err != nil {
 			utils.Log(c, "error", "Group not found")
 		}

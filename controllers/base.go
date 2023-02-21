@@ -6,7 +6,6 @@ import (
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
@@ -78,7 +77,7 @@ func (bc BaseController) LoggedUser(c *gin.Context) (store.User, store.Group, bo
 
 // ParamID is a shortcut for `bson.M{"_id": c.Param("id")}`
 func (bc BaseController) ParamID(c *gin.Context) bson.M {
-	return utils.ParamID(c.Param("id"))
+	return bson.M{"_id": c.Param("id")}
 }
 
 // ShouldBeLogged is an helper method to check if the IsLogged flag and send an http error code accordingly
@@ -118,14 +117,14 @@ func (cc CRUDController) GetModel(c *gin.Context) {
 		return
 	}
 
-	if user, group, ok := cc.LoggedUser(c); ok {
+	/*if user, group, ok := cc.LoggedUser(c); ok {
 		if model.CanBeRead(user, group) {
 			c.JSON(http.StatusOK, model)
 			return
 		}
 
 		cc.AbortWithError(c, helpers.ErrorUserUnauthorized)
-	}
+	}*/
 }
 
 func (cc CRUDController) makeSlice() reflect.Value {
@@ -148,15 +147,15 @@ func (cc CRUDController) fetchModels(c *gin.Context) ([]store.Model, error) {
 	if cc.Error(c, ctx.Store.FindAll(ctx, filters, results.Addr().Interface()), helpers.ErrorResourceNotFound) {
 		return nil, errors.New("not found")
 	}
-	resTyped := sliceToBaseModelSlice(results.Interface())
+	//resTyped := sliceToBaseModelSlice(results.Interface())
 	readableModels := make([]store.Model, 0)
-	if user, group, ok := cc.LoggedUser(c); ok {
+	/*if user, group, ok := cc.LoggedUser(c); ok {
 		for _, m := range resTyped {
 			if m.CanBeRead(user, group) {
 				readableModels = append(readableModels, m)
 			}
 		}
-	}
+	}*/
 	return readableModels, nil
 }
 
@@ -181,14 +180,14 @@ func (cc CRUDController) CreateModel(c *gin.Context) {
 		return
 	}
 
-	if user, group, ok := cc.LoggedUser(c); ok && model.CanBeCreated(user, group) {
+	/*if user, group, ok := cc.LoggedUser(c); ok && model.CanBeCreated(user, group) {
 		if cc.ErrorInternal(c, ctx.Store.Create(ctx, model)) {
 			return
 		}
 		c.JSON(http.StatusCreated, model)
 	} else {
 		cc.AbortWithError(c, helpers.ErrorUserUnauthorized)
-	}
+	}*/
 }
 
 // DeleteModel implements generic delete one by ID
@@ -203,7 +202,7 @@ func (cc CRUDController) DeleteModel(c *gin.Context) {
 		return
 	}
 
-	if user, group, ok := cc.LoggedUser(c); ok {
+	/*if user, group, ok := cc.LoggedUser(c); ok {
 		if model.CanBeDeleted(user, group) {
 			if cc.ErrorInternal(c, ctx.Store.Delete(ctx, c.Param("id"), model)) {
 				return
@@ -213,7 +212,7 @@ func (cc CRUDController) DeleteModel(c *gin.Context) {
 		}
 
 		cc.AbortWithError(c, helpers.ErrorUserUnauthorized)
-	}
+	}*/
 }
 
 // UpdateModel implements generic update one
@@ -233,7 +232,7 @@ func (cc CRUDController) UpdateModel(c *gin.Context) {
 		return
 	}
 
-	if user, group, ok := cc.LoggedUser(c); ok {
+	/*if user, group, ok := cc.LoggedUser(c); ok {
 		if model.CanBeUpdated(user, group) {
 			if cc.ErrorInternal(c, ctx.Store.Update(ctx, store.ID(c.Param("id")), newModel)) {
 				return
@@ -243,5 +242,5 @@ func (cc CRUDController) UpdateModel(c *gin.Context) {
 		}
 
 		cc.AbortWithError(c, helpers.ErrorUserUnauthorized)
-	}
+	}*/
 }

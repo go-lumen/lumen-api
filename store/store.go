@@ -1,7 +1,6 @@
 package store
 
 import (
-	"github.com/go-lumen/lumen-api/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -106,12 +105,12 @@ func GetUpdateOptions(opts ...UpdateOption) UpdateOptions {
 
 // ID is a shortcut for creating an id filter
 func ID(id string) bson.M {
-	return utils.ParamID(id)
+	return bson.M{"id": id}
 }
 
 // Store interface
 type Store interface {
-	Create(*Context, Model) error
+	Create(*Context, string, Model) error
 	Find(*Context, bson.M, Model, ...FindOption) error
 	FindAll(*Context, bson.M, interface{}, ...FindOption) error
 	Update(*Context, bson.M, Model, ...UpdateOption) error

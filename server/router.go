@@ -2,8 +2,6 @@ package server
 
 import (
 	"github.com/go-lumen/lumen-api/config"
-	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"time"
 
@@ -19,7 +17,7 @@ func Index(c *gin.Context) {
 }
 
 // SetupRouter is the main routing point
-func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
+func (a *API) SetupRouter() {
 	router := a.Router
 
 	router.Use(middlewares.ErrorMiddleware())
@@ -40,8 +38,8 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 	switch dbType {
 	case "mongo":
 		router.Use(middlewares.StoreMongoMiddleware(a.MongoDatabase))
-		/*case "postgresql":
-		router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))*/
+	case "postgresql":
+		router.Use(middlewares.StorePostgreMiddleware(a.PostgreDatabase))
 	}
 
 	router.Use(middlewares.EmailMiddleware(a.EmailSender))
@@ -62,6 +60,7 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 			authentication.POST("/renew", authController.TokenRenewal)
 			authentication.Use(authenticationMiddleware)
 			authentication.GET("/", userController.GetUserMe)
+			authentication.GET("/details", userController.GetUserDetails)
 			//https://skarlso.github.io/2016/06/12/google-signin-with-go/
 			//https://github.com/zalando/gin-oauth2/blob/master/google/google.go
 		}
@@ -83,10 +82,8 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 		{
 			organizationController := controllers.NewOrganizationController()
 			organizations.GET("/token/:id", organizationController.GetOrganizationByAppKey)
-			//organizations.GET("/token/:id/trackers", organizationController.ListOrgDevices)
 			organizations.Use(authenticationMiddleware)
 			organizations.POST("/", organizationController.CreateOrganization)
-			organizations.GET("/index", organizationController.GetOrganizationsIndex)
 			organizations.GET("/", organizationController.GetOrganizations)
 			organizations.GET("/me", organizationController.GetUserOrganization)
 			organizations.GET("/:id", organizationController.GetOrganization)
@@ -98,12 +95,10 @@ func (a *API) SetupRouter() (mongoDB *mongo.Database, config *viper.Viper) {
 			groupController := controllers.NewGroupController()
 			groups.Use(authenticationMiddleware)
 			groups.POST("/", groupController.CreateGroup)
-			groups.GET("/index", groupController.GetGroupsIndex)
 			groups.GET("/", groupController.GetGroups)
 			groups.GET("/:id", groupController.GetGroup)
 			groups.GET("/me", groupController.GetUserGroup)
 		}
-
 	}
-	return a.MongoDatabase, a.Config
+	return
 }

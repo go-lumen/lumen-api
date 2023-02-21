@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/config"
 	"github.com/go-lumen/lumen-api/helpers"
@@ -8,10 +9,8 @@ import (
 	"github.com/go-lumen/lumen-api/services"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/utils"
-	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -41,27 +40,19 @@ func (uc UserController) GetUser(c *gin.Context) {
 		switch loggedGroup.GetRole() {
 		case store.RoleGod:
 			user, err := models.GetUser(ctx, uc.ParamID(c))
-			utils.CheckErrAndAbort(c, err)
-			userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
-			utils.CheckErrAndAbort(c, err)
-			userOrga, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID.Hex()))
-			utils.CheckErrAndAbort(c, err)
-			userSanitized := user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name)
 
-			c.JSON(http.StatusOK, userSanitized)
+			if err != nil {
+				uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
+				return
+			}
+			c.JSON(http.StatusOK, user)
 		case store.RoleAdmin, store.RoleUser:
 			user, err := models.GetUser(ctx, uc.ParamID(c))
-			utils.CheckErrAndAbort(c, err)
-			if user.GroupID.Hex() == loggedUser.GetGroupID() {
-				userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
-				utils.CheckErrAndAbort(c, err)
-				userOrga, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID.Hex()))
-				utils.CheckErrAndAbort(c, err)
-				userSanitized := user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name)
-
-				c.JSON(http.StatusOK, userSanitized)
+			if user.GroupID == loggedUser.GetGroupID() {
+				c.JSON(http.StatusOK, user)
+				return
 			}
-			uc.AbortWithError(ctx.C, helpers.ErrorUserUnauthorized)
+			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 			return
 
 		case store.RoleCustomer:
@@ -75,18 +66,18 @@ func (uc UserController) GetUser(c *gin.Context) {
 func (uc UserController) GetUserMe(c *gin.Context) {
 	ctx := store.AuthContext(c)
 	if user, group, ok := uc.LoggedUser(c); ok {
-		organization, err := models.GetOrganization(ctx, utils.ParamID(group.GetOrgID()))
+		organization, err := models.GetOrganization(ctx, bson.M{"_id": group.GetOrgID()})
 		if err != nil {
 			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 			return
 		}
 
-		var dbUser models.User
-		if uc.ErrorInternal(c, ctx.Store.Find(ctx, store.ID(user.GetID()), &dbUser)) {
+		var dbUSer models.User
+		if uc.ErrorInternal(c, ctx.Store.Find(ctx, store.ID(user.GetID()), &dbUSer)) {
 			return
 		}
 
-		c.JSON(http.StatusOK, dbUser.Sanitize(ctx.Role, ctx.Group.GetName(), organization.ID.Hex(), organization.Name))
+		c.JSON(http.StatusOK, dbUSer.Sanitize(group.GetRole(), organization.ID, organization.Name))
 	} else {
 		uc.AbortWithError(c, helpers.ErrorUserUnauthorized)
 	}
@@ -100,12 +91,12 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 	}
 	desiredGroupID := c.Param("groupID")
 
-	userOrganization, err := models.GetOrganization(ctx, utils.ParamID(ctx.Group.GetOrgID()))
+	userOrganization, err := models.GetOrganization(ctx, bson.M{"_id": ctx.Group.GetOrgID()})
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 		return
 	}
-	desiredGroup, err := models.GetGroup(ctx, utils.ParamID(desiredGroupID))
+	desiredGroup, err := models.GetGroup(ctx, bson.M{"_id": desiredGroupID})
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 		return
@@ -118,9 +109,8 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 
 	switch ctx.Role {
 	case store.RoleGod:
-		objID, _ := primitive.ObjectIDFromHex(desiredGroupID)
-		dbUser.GroupID = objID
-		err := models.UpdateUser(ctx, dbUser.ID.Hex(), &dbUser)
+		dbUser.GroupID = desiredGroupID
+		err := models.UpdateUser(ctx, dbUser.ID, &dbUser)
 		if err != nil {
 			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 			return
@@ -128,9 +118,8 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 		c.JSON(http.StatusOK, dbUser)
 	case store.RoleAdmin, store.RoleUser:
 		if desiredGroup.OrganizationID == userOrganization.ID {
-			objID, _ := primitive.ObjectIDFromHex(desiredGroupID)
-			dbUser.GroupID = objID
-			err := models.UpdateUser(ctx, dbUser.ID.Hex(), &dbUser)
+			dbUser.GroupID = desiredGroupID
+			err := models.UpdateUser(ctx, dbUser.ID, &dbUser)
 			if err != nil {
 				uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 				return
@@ -144,6 +133,27 @@ func (uc UserController) ChangeUserGroup(c *gin.Context) {
 	}
 }
 
+// GetUserDetails from id (in request)
+func (uc UserController) GetUserDetails(c *gin.Context) {
+	ctx := store.AuthContext(c)
+	if !uc.ShouldBeLogged(ctx) {
+		return
+	}
+
+	organization, err := models.GetOrganization(ctx, bson.M{"_id": ctx.Group.GetOrgID()})
+	if err != nil {
+		uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
+		return
+	}
+
+	var dbUser models.User
+	if uc.ErrorInternal(c, ctx.Store.Find(ctx, store.ID(ctx.User.GetID()), &dbUser)) {
+		return
+	}
+
+	c.JSON(http.StatusOK, dbUser.Detail(ctx.Role, organization.Name))
+}
+
 // CreateUser to create a new user
 func (uc UserController) CreateUser(c *gin.Context) {
 	ctx := store.AuthContext(c)
@@ -154,13 +164,13 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	userGroup, err := models.GetGroup(ctx, utils.ParamID(user.GroupID.Hex()))
+	userGroup, err := models.GetGroup(ctx, bson.M{"_id": user.GroupID})
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorInvalidInput(err))
 		return
 	}
 
-	organization, err := models.GetOrganization(ctx, utils.ParamID(userGroup.OrganizationID.Hex()))
+	organization, err := models.GetOrganization(ctx, bson.M{"_id": userGroup.OrganizationID})
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorInvalidInput(err))
 		return
@@ -204,7 +214,7 @@ func (uc UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, user.Sanitize(userGroup.Role, userGroup.Name, organization.ID.Hex(), organization.Name))
+	c.JSON(http.StatusCreated, user.Sanitize(userGroup.Role, organization.ID, organization.Name))
 }
 
 // DeleteUser to delete an existing user
@@ -229,33 +239,34 @@ func (uc UserController) GetUsers(c *gin.Context) {
 
 	dbGroups, err := models.GetGroups(ctx, bson.M{})
 	utils.CheckErr(err)
-	dbOrgas, err := models.GetOrganizations(ctx, bson.M{})
-	utils.CheckErr(err)
 
-	var retUsers []models.SanitizedUser
 	switch ctx.Role {
 	case store.RoleGod:
 		users, err := models.GetUsers(ctx, bson.M{})
-		utils.CheckErrAndAbort(c, err)
 		for _, user := range users {
-			userGroup, err := models.FindGroup(dbGroups, user.GroupID.Hex())
-			utils.CheckErrAndAbort(c, err)
-			userOrga, err := models.FindOrganization(dbOrgas, userGroup.OrganizationID.Hex())
-			utils.CheckErrAndAbort(c, err)
-			retUsers = append(retUsers, user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name))
+			group, err := models.FindGroup(dbGroups, user.GroupID)
+			if err == nil {
+				user.GroupID = group.Name
+			}
 		}
-		c.JSON(http.StatusOK, retUsers)
+		if err != nil {
+			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
+			return
+		}
+		c.JSON(http.StatusOK, users)
 	case store.RoleAdmin, store.RoleUser:
 		users, err := models.GetUsers(ctx, bson.M{"group_id": ctx.User.GetGroupID()})
-		utils.CheckErrAndAbort(c, err)
 		for _, user := range users {
-			userGroup, err := models.FindGroup(dbGroups, user.GroupID.Hex())
-			utils.CheckErrAndAbort(c, err)
-			userOrga, err := models.FindOrganization(dbOrgas, userGroup.OrganizationID.Hex())
-			utils.CheckErrAndAbort(c, err)
-			retUsers = append(retUsers, user.Sanitize(userGroup.Role, userGroup.Name, userOrga.ID.Hex(), userOrga.Name))
+			group, err := models.FindGroup(dbGroups, user.GroupID)
+			if err == nil {
+				user.GroupID = group.Name
+			}
 		}
-		c.JSON(http.StatusOK, retUsers)
+		if err != nil {
+			uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
+			return
+		}
+		c.JSON(http.StatusOK, users)
 	case store.RoleCustomer:
 		uc.AbortWithError(c, helpers.ErrorUserUnauthorized)
 	}
@@ -316,7 +327,7 @@ func (uc UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	dbUser, err := models.GetUser(ctx, utils.ParamID(userInput.ID))
+	dbUser, err := models.GetUser(ctx, bson.M{"_id": userInput.ID})
 	if err != nil {
 		uc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
 		return
@@ -350,7 +361,7 @@ func (uc UserController) UpdateUser(c *gin.Context) {
 	}
 
 	dbUser.LastModification = time.Now().Unix()
-	err = models.UpdateUser(ctx, dbUser.ID.Hex(), dbUser)
+	err = models.UpdateUser(ctx, dbUser.ID, dbUser)
 	utils.CheckErr(err)
 
 	c.JSON(http.StatusOK, "User well modified")

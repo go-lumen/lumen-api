@@ -3,6 +3,9 @@ package server
 import (
 	"context"
 	"github.com/go-lumen/lumen-api/utils"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"time"
 )
 
@@ -22,53 +25,18 @@ func (a *API) SetupMongoIndexes() error {
 	defer cancel()
 	db := a.MongoDatabase
 
-	//TODO: remove log &/|| setup required indexes
-	utils.Log(nil, "info", ctx, db)
-	/*
-		indexOpts := options.CreateIndexes().SetMaxTime(time.Second * 10)
-		// Index to location 2dsphere type.
-		pointIndexModel := mongo.IndexModel{
-			Options: options.Index().SetBackground(true),
-			Keys:    bsonx.MDoc{"location": bsonx.String("2dsphere")},
-		}
-		poiIndexes := db.Collection("pois").Indexes()
-		deviceMessagesNames, err := poiIndexes.CreateOne(ctx, pointIndexModel, indexOpts)
-		if err != nil {
-			return err
-		}
-		utils.Log(nil, "info", "Index successfully created for:", deviceMessagesNames)*/
-	/*
-		deviceMessagesIndexes := db.Collection(models.DeviceMessagesCollection).Indexes()
-		deviceIdIndexModel := mongo.IndexModel{
-			Keys:    bson.D{{Key: "device_id", Value: 1}},
-			Options: options.Index().SetName("deviceID"),
-		}
-		deviceIdIndex, err := deviceMessagesIndexes.CreateOne(ctx, deviceIdIndexModel, indexOpts)
-		if err != nil {
-			return err
-		}
-		utils.Log(nil, "info", "Index successfully created for:", deviceIdIndex)
-
-		sigfoxIdIndexModel := mongo.IndexModel{
-			Keys:    bson.D{{Key: "sigfox_id", Value: 1}},
-			Options: options.Index().SetName("sigfoxID"),
-		}
-		sigfoxIdIndex, err := deviceMessagesIndexes.CreateOne(ctx, sigfoxIdIndexModel, indexOpts)
-		if err != nil {
-			return err
-		}
-		utils.Log(nil, "info", "Index successfully created for:", sigfoxIdIndex)
-
-		sigfoxIdTimestampIndexModel := mongo.IndexModel{
-			Keys:    bson.D{{Key: "sigfox_id", Value: 1}, {"timestamp", 1}},
-			Options: options.Index().SetName("sigfoxIdTimestamp"),
-		}
-		sigfoxIdTimestampIndex, err := deviceMessagesIndexes.CreateOne(ctx, sigfoxIdTimestampIndexModel, indexOpts)
-		if err != nil {
-			return err
-		}
-		utils.Log(nil, "info", "Index successfully created for:", sigfoxIdTimestampIndex)
-	*/
+	indexOpts := options.CreateIndexes().SetMaxTime(time.Second * 10)
+	// Index to location 2dsphere type.
+	pointIndexModel := mongo.IndexModel{
+		Options: options.Index().SetBackground(true),
+		Keys:    bsonx.MDoc{"location": bsonx.String("2dsphere")},
+	}
+	poiIndexes := db.Collection("pois").Indexes()
+	deviceMessagesNames, err := poiIndexes.CreateOne(ctx, pointIndexModel, indexOpts)
+	if err != nil {
+		return err
+	}
+	utils.Log(nil, "info", "Index successfully created for:", deviceMessagesNames)
 	/*
 
 		// Creates a list of indexes to ensure

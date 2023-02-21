@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/go-gormigrate/gormigrate/v2"
+	"gopkg.in/gormigrate.v1"
 	"gorm.io/gorm"
 )
 
@@ -25,10 +25,10 @@ func init() {
 				LastModification   int64  `json:"last_access"`
 				LastPasswordUpdate int64  `json:"last_password_update"`
 			}
-			return tx.AutoMigrate(&User{})
+			return tx.AutoMigrate(&User{}).Error
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Migrator().DropTable("users")
+			return tx.DropTable("users").Error
 		},
 	})
 }

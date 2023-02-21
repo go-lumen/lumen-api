@@ -1,23 +1,78 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/server"
+	"github.com/go-lumen/lumen-api/services"
+	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
-	"os"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	api := server.NewAPI()
-	err := api.Setup()
+	api := &server.API{Router: gin.Default(), Config: viper.New()}
 
-	if err != nil {
-		logrus.WithError(err).Errorln("cannot setup api")
-		os.Exit(1)
+	// Configuration setup
+	err := api.SetupViper()
+	utils.CheckErr(err)
+
+	// Email sender setup
+	api.EmailSender = services.NewEmailSender(api.Config)
+	api.TextSender = services.NewTextSender(api.Config)
+
+	// Database setup
+	dbType := api.Config.GetString("db_type")
+	switch dbType {
+	case "mongo":
+		_, err := api.SetupMongoDatabase()
+		if err == nil {
+			utils.Log(nil, "info", "SetupMongoDatabase OK")
+		} else {
+			utils.Log(nil, "error", "SetupMongoDatabase KO:", err)
+		}
+		utils.CheckErr(err)
+		//defer session.Close()
+
+		err = api.SetupMongoIndexes()
+		if err == nil {
+			utils.Log(nil, "info", "SetupMongoIndexes OK")
+		} else {
+			utils.Log(nil, "error", "SetupMongoIndexes KO:", err)
+		}
+		utils.CheckErr(err)
+
+		// Seeds setup
+		err = api.SetupMongoSeeds()
+		utils.CheckErr(err)
+		if err == nil {
+			utils.Log(nil, "info", "SetupMongoSeeds OK")
+		} else {
+			utils.Log(nil, "error", "SetupMongoSeeds KO:", err)
+		}
+		utils.CheckErr(err)
+
+	case "postgresql":
+		db, err := api.SetupPostgreDatabase()
+		utils.CheckErr(err)
+
+		db.AutoMigrate(&models.Organization{})
+		db.AutoMigrate(&models.Group{})
+		db.AutoMigrate(&models.User{})
+		db.AutoMigrate(&models.Invoice{})
+		db.AutoMigrate(&models.Transaction{})
+
+		err = api.SetupPostgreSeeds()
+		utils.CheckErr(err)
 	}
 
-	err = api.Run()
+	// Router setup
+	api.SetupRouter()
+
+	logrus.Infoln("SetupRouter OK")
+	err = api.Router.Run(api.Config.GetString("host_address"))
 	if err != nil {
-		logrus.WithError(err).Errorln("cannot run api")
-		os.Exit(1)
+		logrus.Infoln("api.Router.Run OK")
 	}
+	utils.CheckErr(err)
 }

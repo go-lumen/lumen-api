@@ -13,7 +13,7 @@ var user *models.User
 var authToken string
 
 func TestMain(m *testing.M) {
-	api = SetupAPI()
+	api = SetupApi()
 	user, authToken = CreateUserAndGenerateToken()
 	retCode := m.Run()
 	//api.Database.Session.Close()

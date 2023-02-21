@@ -4,7 +4,9 @@ import (
 	"github.com/go-lumen/lumen-api/config"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/go-lumen/lumen-api/store/mongodb"
+	"github.com/go-lumen/lumen-api/store/postgresql"
 	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,9 +23,9 @@ func StoreMongoMiddleware(db *mongo.Database) gin.HandlerFunc {
 }
 
 // StorePostgreMiddleware allows to setup SQL database
-/*func StorePostgreMiddleware(db *gorm.DB) gin.HandlerFunc {
+func StorePostgreMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		store.ToContext(c, postgresql.New(db))
+		store.ToContext(c, postgresql.New(c, db, config.GetString(c, "postgres_db_name")))
 		c.Next()
 	}
-}*/
+}

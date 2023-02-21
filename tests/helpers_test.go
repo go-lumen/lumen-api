@@ -70,8 +70,7 @@ func ResetDatabase() {
 	user, authToken = CreateUserAndGenerateToken()
 }
 
-// SetupAPI allows to setup the api
-func SetupAPI() *server.API {
+func SetupApi() *server.API {
 	api := &server.API{Router: gin.Default(), Config: viper.New()}
 
 	err := api.SetupViper()

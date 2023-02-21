@@ -1,6 +1,6 @@
 FROM golang:latest
 
-ENV LUMEN_ENV prod
+ENV SAM_ENV prod
 ENV GIN_MODE release
 ENV GO111MODULE on
 
@@ -8,7 +8,7 @@ RUN mkdir -p /var/www/uploads
 
 WORKDIR /app
 COPY go.mod .
-COPY go.sum .
+COPY go.sum .é
 RUN go mod download
 COPY . .
 

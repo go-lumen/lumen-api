@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-// SetupMongoDatabase  establishes the connexion with the Mongo database
+type dbLogger struct{}
+
 func (a *API) SetupMongoDatabase() (*mongo.Database, error) {
 	uri := a.Config.GetString("mongo_db_prefix")
 
@@ -37,7 +39,7 @@ func (a *API) SetupMongoDatabase() (*mongo.Database, error) {
 // SetupPostgreDatabase establishes the connexion with the PostgreSQL database
 func (a *API) SetupPostgreDatabase() (*gorm.DB, error) {
 	connectionURI := fmt.Sprintf(
-		"sslmode=disable dbname=%s host=%s port=%s user=%s password=%s",
+		"dbname=%s host=%s port=%s user=%s password=%s sslmode=disable",
 		a.Config.GetString("postgres_db_name"),
 		a.Config.GetString("postgres_db_addr"),
 		a.Config.GetString("postgres_db_port"),
@@ -49,14 +51,6 @@ func (a *API) SetupPostgreDatabase() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Debug database logs
-	/*debugDatabase := a.Config.GetBool("debug_database")
-	db.LogMode(debugDatabase)
-
-	db.DB().SetConnMaxLifetime(time.Minute * 5)
-	db.DB().SetMaxIdleConns(5)
-	db.DB().SetMaxOpenConns(5)*/
 
 	a.PostgreDatabase = db
 	return db, nil

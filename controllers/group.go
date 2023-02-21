@@ -5,9 +5,7 @@ import (
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/go-lumen/lumen-api/utils"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"sort"
 )
@@ -53,37 +51,6 @@ func (gc GroupController) CreateGroup(c *gin.Context) {
 	}
 }
 
-// GetGroupsIndex to get groups index
-func (gc GroupController) GetGroupsIndex(c *gin.Context) {
-	ctx := store.AuthContext(c)
-	dbGroups, err := models.GetGroups(ctx, bson.M{})
-	if err != nil {
-		gc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
-	}
-
-	groupIndex := int64(0)
-	for _, group := range dbGroups {
-		if group.Index > groupIndex {
-			groupIndex = group.Index
-		}
-	}
-
-	if _, group, ok := gc.LoggedUser(c); ok {
-		userGroup, err := models.GetGroup(ctx, utils.ParamID(group.GetID()))
-		if err != nil {
-			gc.AbortWithError(c, helpers.ErrorResourceNotFound(err))
-			return
-		}
-
-		switch userGroup.Role {
-		case store.RoleGod, store.RoleAdmin:
-			c.JSON(http.StatusOK, groupIndex)
-		case store.RoleUser, store.RoleCustomer:
-			gc.AbortWithError(c, helpers.ErrorUserUnauthorized)
-		}
-	}
-}
-
 // GetGroups to get all groups
 func (gc GroupController) GetGroups(c *gin.Context) {
 	ctx := store.AuthContext(c)
@@ -101,10 +68,9 @@ func (gc GroupController) GetGroups(c *gin.Context) {
 		switch userGroup.GetRole() {
 		case store.RoleGod: // Get all
 			for _, group := range dbGroups {
-				orga, err := models.FindOrganization(dbOrgas, group.OrganizationID.Hex())
+				orga, err := models.FindOrganization(dbOrgas, group.OrganizationID)
 				if err == nil {
-					objID, _ := primitive.ObjectIDFromHex(orga.Name)
-					group.OrganizationID = objID
+					group.OrganizationID = orga.Name
 				}
 			}
 			sort.Slice(dbGroups, func(i, j int) bool { return dbGroups[i].Name < dbGroups[j].Name })
@@ -112,11 +78,10 @@ func (gc GroupController) GetGroups(c *gin.Context) {
 		case store.RoleAdmin, store.RoleUser: // Get all from devices with same group ID (and group for admin)
 			var retGroups []*models.Group
 			for _, group := range dbGroups {
-				if group.OrganizationID.Hex() == userGroup.GetOrgID() {
-					orga, err := models.FindOrganization(dbOrgas, group.OrganizationID.Hex())
+				if group.OrganizationID == userGroup.GetOrgID() {
+					orga, err := models.FindOrganization(dbOrgas, group.OrganizationID)
 					if err == nil {
-						objID, _ := primitive.ObjectIDFromHex(orga.Name)
-						group.OrganizationID = objID
+						group.OrganizationID = orga.Name
 					}
 					retGroups = append(retGroups, group)
 				}
@@ -149,7 +114,7 @@ func (gc GroupController) GetGroup(c *gin.Context) {
 		case store.RoleGod:
 			c.JSON(http.StatusOK, group)
 		case store.RoleAdmin, store.RoleUser:
-			if group.OrganizationID.Hex() == userGroup.GetOrgID() {
+			if group.OrganizationID == userGroup.GetOrgID() {
 				c.JSON(http.StatusOK, group)
 				return
 			}

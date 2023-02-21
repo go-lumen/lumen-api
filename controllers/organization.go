@@ -5,7 +5,6 @@ import (
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/go-lumen/lumen-api/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 )
@@ -42,31 +41,6 @@ func (oc OrganizationController) CreateOrganization(c *gin.Context) {
 	}
 }
 
-// GetOrganizationsIndex to get organizations index
-func (oc OrganizationController) GetOrganizationsIndex(c *gin.Context) {
-	ctx := store.AuthContext(c)
-	dbOrganizations, err := models.GetOrganizations(ctx, bson.M{})
-	if oc.Error(c, err, helpers.ErrorResourceNotFound) {
-		return
-	}
-
-	organizationsIndex := int64(0)
-	for _, organization := range dbOrganizations {
-		if organization.Index > organizationsIndex {
-			organizationsIndex = organization.Index
-		}
-	}
-
-	if _, group, ok := oc.LoggedUser(c); ok {
-		switch group.GetRole() {
-		case store.RoleGod, store.RoleAdmin:
-			c.JSON(http.StatusOK, organizationsIndex)
-		case store.RoleUser, store.RoleCustomer:
-			oc.AbortWithError(c, helpers.ErrorUserUnauthorized)
-		}
-	}
-}
-
 // GetOrganizations to get all organizations
 func (oc OrganizationController) GetOrganizations(c *gin.Context) {
 	ctx := store.AuthContext(c)
@@ -80,7 +54,7 @@ func (oc OrganizationController) GetOrganizations(c *gin.Context) {
 		case store.RoleGod: // Get all
 			c.JSON(http.StatusOK, dbOrganizations)
 		case store.RoleAdmin, store.RoleUser: // Get all from devices with same group ID (and organization for admin)
-			userOrganization, err := models.GetOrganization(ctx, utils.ParamID(group.GetOrgID()))
+			userOrganization, err := models.GetOrganization(ctx, bson.M{"_id": group.GetOrgID()})
 			if oc.Error(c, err, helpers.ErrorResourceNotFound) {
 				return
 			}
@@ -104,7 +78,7 @@ func (oc OrganizationController) GetOrganization(c *gin.Context) {
 		case store.RoleGod:
 			c.JSON(http.StatusOK, organization)
 		case store.RoleAdmin, store.RoleUser:
-			if organization.ID.Hex() == group.GetOrgID() {
+			if organization.ID == group.GetOrgID() {
 				c.JSON(http.StatusOK, organization)
 				return
 			}
@@ -133,7 +107,7 @@ func (oc OrganizationController) GetOrganizationGroups(c *gin.Context) {
 		case store.RoleGod:
 			c.JSON(http.StatusOK, groups)
 		case store.RoleAdmin, store.RoleUser:
-			if organization.ID.Hex() == group.GetOrgID() {
+			if organization.ID == group.GetOrgID() {
 				c.JSON(http.StatusOK, groups)
 				return
 			}
@@ -148,7 +122,7 @@ func (oc OrganizationController) GetOrganizationGroups(c *gin.Context) {
 func (oc OrganizationController) GetUserOrganization(c *gin.Context) {
 	ctx := store.AuthContext(c)
 	if _, group, ok := oc.LoggedUser(c); ok {
-		userOrganization, err := models.GetOrganization(ctx, utils.ParamID(group.GetOrgID()))
+		userOrganization, err := models.GetOrganization(ctx, bson.M{"_id": group.GetOrgID()})
 		if oc.Error(c, err, helpers.ErrorResourceNotFound) {
 			return
 		}
@@ -174,37 +148,3 @@ func (oc OrganizationController) GetOrganizationByAppKey(c *gin.Context) {
 
 	c.JSON(http.StatusOK, org)
 }
-
-/*
-// ListOrgDevices allows to get organization available devices
-func (oc OrganizationController) ListOrgDevices(c *gin.Context) {
-	ctx := store.AuthContext(c)
-	var org models.Organization
-	if oc.Error(c, ctx.Store.Find(ctx, models.OrgByAppKey(c.Param("id")), &org), helpers.ErrorResourceNotFound) {
-		return
-	}
-
-	var sigfoxIDs []string
-	/var dbFleets []*models.Fleet
-	if oc.ErrorInternal(c, ctx.Store.FindAll(ctx, models.All(), &dbFleets)) {
-		return
-	}
-
-	for _, fleet := range dbFleets {
-		var dbFleetGroup models.Group
-		err := ctx.Store.Find(ctx, models.ByID(fleet.GroupID), &dbFleetGroup)
-
-		if err == nil && dbFleetGroup.OrganizationID == org.ID {
-			fleetDevices, _ := models.GetFleetDevices(ctx, fleet.ID)
-			for _, device := range fleetDevices {
-				if _, err := models.GetThing(ctx, bson.M{"tracker_ids.0": device.ID}); err == nil {
-					sigfoxIDs = append(sigfoxIDs, device.SigfoxID)
-				}
-			}
-		}
-
-		c.JSON(http.StatusOK, sigfoxIDs)
-		return
-	}
-}
-*/

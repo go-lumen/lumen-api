@@ -61,7 +61,7 @@ var (
 	// ErrorResourceNotFound occurs
 	ErrorResourceNotFound = declare("resource_not_found", http.StatusNotFound, "Resource does not exist")
 
-	// ErrorUserUnauthorized occurs when user doesn't have enough permissions to access a resource
+	// ErrorUserUnauthorized occurs when user doesn't have enough permissions to access au resource
 	ErrorUserUnauthorized = Error{Code: "user_unauthorized", HTTPCode: http.StatusUnauthorized, Message: "Insufficient permissions to access this resource"}
 	// ErrorUserUpdate occurs when user failed to be updated
 	ErrorUserUpdate = declare("update_user_failed", http.StatusInternalServerError, "Could not update the user")
@@ -79,4 +79,7 @@ var (
 	ErrorFileOpening = declare("file_opening_error", http.StatusNotAcceptable, "File opening error")
 	// ErrorFileParsing occurs when file parsing fails
 	ErrorFileParsing = declare("file_parsing_error", http.StatusNotAcceptable, "File parsing error")
+
+	//ErrorUnprocessableEntity occurs when an internal rule fails to process entity
+	ErrorUnprocessableEntity = declare("unprocessable_entity", http.StatusUnprocessableEntity, "Fail to process entity")
 )

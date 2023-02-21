@@ -3,28 +3,27 @@ package models
 import (
 	"errors"
 	"github.com/asaskevich/govalidator"
+	mgobson "github.com/globalsign/mgo/bson"
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/store"
 	"github.com/sahilm/fuzzy"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
 // Group type holds all required informations
 type Group struct {
-	store.DefaultRoles `bson:"-,omitempty"`
-	ID                 primitive.ObjectID `json:"id" bson:"_id,omitempty" valid:"-"`
-	Index              int64              `json:"index" bson:"index" valid:"-"`
-	Name               string             `json:"name" bson:"name" valid:"-"`
-	Role               string             `json:"role" bson:"role" valid:"-"`
-	OrganizationID     primitive.ObjectID `json:"organization_id" bson:"organization_id" valid:"-"`
+	//store.DefaultRoles `bson:"-,omitempty"`
+	ID             string `json:"id" bson:"_id,omitempty" valid:"-"`
+	Name           string `json:"name" bson:"name" valid:"-"`
+	Role           string `json:"role" bson:"role" valid:"-"`
+	OrganizationID string `json:"organization_id" bson:"organization_id" valid:"-"`
 }
 
 // GetID returns ID
 func (group *Group) GetID() string {
-	return group.ID.Hex()
+	return group.ID
 }
 
 // GetRole returns role
@@ -32,14 +31,9 @@ func (group *Group) GetRole() store.UserRole {
 	return group.Role
 }
 
-// GetName returns name
-func (group *Group) GetName() string {
-	return group.Name
-}
-
 // GetOrgID returns organization ID
-func (group *Group) GetOrgID() string {
-	return group.OrganizationID.Hex()
+func (group *Group) GetOrgID() store.UserRole {
+	return group.OrganizationID
 }
 
 // GetCollection returns mongodb collection
@@ -49,7 +43,7 @@ func (group *Group) GetCollection() string {
 
 // BeforeCreate validates object struct
 func (group *Group) BeforeCreate() error {
-	//group.ID = mgobson.NewObjectId().Hex()
+	group.ID = mgobson.NewObjectId().Hex()
 
 	_, err := govalidator.ValidateStruct(group)
 	if err != nil {
@@ -61,7 +55,7 @@ func (group *Group) BeforeCreate() error {
 // FindGroup is used to find a group in a groups list (for performance purposes, only 1 db request)
 func FindGroup(dbGroups []*Group, groupID string) (ret *Group, err error) {
 	for _, group := range dbGroups {
-		if group.ID.Hex() == groupID {
+		if group.ID == groupID {
 			return group, nil
 		}
 	}
@@ -105,7 +99,7 @@ func CreateGroup(c *store.Context, group *Group) error {
 		return helpers.NewError(http.StatusConflict, "group_already_exists", "Group already exists", err)
 	}
 
-	err = c.Store.Create(c, group)
+	err = c.Store.Create(c, "groups", group)
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "group_creation_failed", "Failed to insert the group in the database", err)
 	}
@@ -137,8 +131,9 @@ func GetGroups(c *store.Context, filter bson.M) ([]*Group, error) {
 
 // ChangeGroupOrganization allows to change the organization of a group by its id
 func ChangeGroupOrganization(c *store.Context, groupID string, organizationID string) error {
-	obID, err := primitive.ObjectIDFromHex(organizationID)
-	err = c.Store.Update(c, store.ID(groupID), &Group{OrganizationID: obID}, store.OnlyFields([]string{"organization_id"}), store.CreateIfNotExists(true))
+	err := c.Store.Update(c, store.ID(groupID), &Group{OrganizationID: organizationID},
+		store.OnlyFields([]string{"organization_id"}),
+		store.CreateIfNotExists(true))
 
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "group_group_change_failed", "Couldn't find the group to change group", err)

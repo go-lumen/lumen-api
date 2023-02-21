@@ -13,30 +13,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
-	"strings"
 )
 
 const idName = "ID"
 
-// ensureMongoModel ensures that a model implement MongoModel interface
-func ensureMongoModel(model store.Model) store.MongoModel {
-	mongoModel, ok := model.(store.MongoModel)
-	if !ok {
-		panic("when using Mongo driver, you should implement MongoModel interface on your model")
-	}
-	return mongoModel
-}
-
 func setID(model store.Model, id string) {
 	v := reflect.ValueOf(model).Elem().FieldByName(idName)
 	if v.IsValid() && v.CanSet() {
-		if strings.Contains(v.String(), "Object") {
-			objID, _ := primitive.ObjectIDFromHex(id)
-			v.Set(reflect.ValueOf(objID))
-		} else {
-			v.SetString(id)
-		}
+		v.SetString(id)
 	}
+}
+
+func orderToMongoOrder(order store.SortOrder) int {
+	if order == store.SortAscending {
+		return 1
+	}
+	return -1
 }
 
 // getCacheKey returns an unique cache key
@@ -49,24 +41,17 @@ func getCacheKey(filter bson.M, input interface{}) (string, error) {
 	return cacheKey, nil
 }
 
-func orderToMongoOrder(order store.SortOrder) int {
-	if order == store.SortAscending {
-		return 1
-	}
-	return -1
-}
-
 // GetCollection returns mongo collection
 func (db *Mngo) GetCollection(c *store.Context, model store.Model) *mongo.Collection {
 	utils.EnsurePointer(model)
-	mongoModel := ensureMongoModel(model)
+	mongoModel := store.EnsureGenericModel(model)
 	return db.database.Collection(mongoModel.GetCollection())
 }
 
 // Create a generic model
-func (db *Mngo) Create(c *store.Context, model store.Model) error {
+func (db *Mngo) Create(c *store.Context, collectionName string, model store.Model) error {
 	utils.EnsurePointer(model)
-	mongoModel := ensureMongoModel(model)
+	mongoModel := store.EnsureGenericModel(model)
 	collection := db.database.Collection(mongoModel.GetCollection())
 
 	if creator, ok := model.(store.BeforeCreator); ok {
@@ -85,6 +70,7 @@ func (db *Mngo) Create(c *store.Context, model store.Model) error {
 		logrus.WithError(err).Errorln("cannot insert model")
 		return errors.Wrap(err, "cannot insert model")
 	}
+
 	// update with inserted id
 	if id, ok := res.InsertedID.(primitive.ObjectID); ok {
 		setID(model, id.Hex())
@@ -100,7 +86,7 @@ func (db *Mngo) Create(c *store.Context, model store.Model) error {
 func (db *Mngo) Find(c *store.Context, filter bson.M, model store.Model, opts ...store.FindOption) error {
 	optValues := store.GetFindOptions(opts...)
 	utils.EnsurePointer(model)
-	mongoModel := ensureMongoModel(model)
+	mongoModel := store.EnsureGenericModel(model)
 	collection := db.database.Collection(mongoModel.GetCollection())
 
 	cacheKey, err := getCacheKey(filter, model)
@@ -140,7 +126,7 @@ func (db *Mngo) FindAll(c *store.Context, filter bson.M, results interface{}, op
 	modelType := reflect.TypeOf(results).Elem().Elem().Elem()
 	newModel := reflect.New(modelType)
 	sliceItem := newModel.Interface().(store.Model)
-	mongoModel := ensureMongoModel(sliceItem)
+	mongoModel := store.EnsureGenericModel(sliceItem)
 	collection := db.database.Collection(mongoModel.GetCollection())
 
 	cacheKey, err := getCacheKey(filter, results)
@@ -194,7 +180,7 @@ func (db *Mngo) FindAll(c *store.Context, filter bson.M, results interface{}, op
 func (db *Mngo) Update(c *store.Context, filter bson.M, model store.Model, opts ...store.UpdateOption) error {
 	optValues := store.GetUpdateOptions(opts...)
 	utils.EnsurePointer(model)
-	mongoModel := ensureMongoModel(model)
+	mongoModel := store.EnsureGenericModel(model)
 	collection := db.database.Collection(mongoModel.GetCollection())
 
 	// flatten field to update for mongodb driver
@@ -236,10 +222,10 @@ func (db *Mngo) Update(c *store.Context, filter bson.M, model store.Model, opts 
 // Delete a generic model
 func (db *Mngo) Delete(c *store.Context, id string, model store.Model) error {
 	utils.EnsurePointer(model)
-	mongoModel := ensureMongoModel(model)
+	mongoModel := store.EnsureGenericModel(model)
 	collection := db.database.Collection(mongoModel.GetCollection())
 
-	_, err := collection.DeleteOne(db.context, utils.ParamID(id))
+	_, err := collection.DeleteOne(db.context, bson.M{"_id": id})
 	if err != nil {
 		logrus.WithError(err).Errorln("cannot delete model")
 		return errors.Wrap(err, "cannot delete model")
@@ -251,7 +237,7 @@ func (db *Mngo) Delete(c *store.Context, id string, model store.Model) error {
 // DeleteAll a generic model
 func (db *Mngo) DeleteAll(c *store.Context, filter bson.M, model store.Model) (int64, error) {
 	utils.EnsurePointer(model)
-	mongoModel := ensureMongoModel(model)
+	mongoModel := store.EnsureGenericModel(model)
 	collection := db.database.Collection(mongoModel.GetCollection())
 
 	res, err := collection.DeleteOne(db.context, filter)

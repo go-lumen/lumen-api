@@ -11,8 +11,8 @@ import (
 // SetupViper according to env var that selects related conf file
 func (a *API) SetupViper() error {
 	filename := ".env"
-	logrus.Infoln("Using env:" + os.Getenv("LUMEN_ENV"))
-	switch os.Getenv("LUMEN_ENV") {
+	logrus.Infoln("Using env:" + os.Getenv("SAM_ENV"))
+	switch os.Getenv("SAM_ENV") {
 	case "testing":
 		filename = "../.env.testing"
 	case "prod":
@@ -26,7 +26,7 @@ func (a *API) SetupViper() error {
 		logrus.Infoln("Godotenv OK")
 	}
 
-	a.Config.SetEnvPrefix("lumen")
+	a.Config.SetEnvPrefix("SAM")
 	a.Config.AutomaticEnv()
 
 	return nil

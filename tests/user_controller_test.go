@@ -67,7 +67,7 @@ func TestCreateAccount(t *testing.T) {
 	assert.Equal(t, user.Active, true)*/
 
 	//Activation key isn't right
-	resp = SendRequest(nil, "GET", "/v1/users/"+user.ID.Hex()+"/activate/fakeKey")
+	resp = SendRequest(nil, "GET", "/v1/users/"+user.ID+"/activate/fakeKey")
 	assert.Equal(t, http.StatusInternalServerError, resp.Code)
 
 	//Unknown user

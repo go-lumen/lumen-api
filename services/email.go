@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"github.com/go-lumen/lumen-api/models"
 	"github.com/go-lumen/lumen-api/utils"
 	"github.com/matcornic/hermes/v2"
@@ -131,7 +130,7 @@ func (s *EmailSenderParams) SendEmail(content string, data *models.EmailData) er
 
 // SendActivationEmail allows to send an email to user to activate his account
 func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiURL string, appName string, frontURL string) error {
-	currentYear := fmt.Sprint(time.Now().Year())
+	currentYear := string(time.Now().Year())
 
 	h := hermes.Hermes{
 		Theme: new(hermes.Flat),
@@ -185,7 +184,7 @@ func (s *EmailSenderParams) SendActivationEmail(user *models.User, apiURL string
 
 // SendResetEmail allows to send an email to user to reset his password
 func (s *EmailSenderParams) SendResetEmail(user *models.User, apiURL string, appName string, frontURL string) error {
-	currentYear := fmt.Sprint(time.Now().Year())
+	currentYear := string(time.Now().Year())
 
 	h := hermes.Hermes{
 		Theme: new(hermes.Flat),

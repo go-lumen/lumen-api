@@ -3,13 +3,13 @@ package models
 import (
 	"errors"
 	"github.com/asaskevich/govalidator"
+	mgobson "github.com/globalsign/mgo/bson"
 	"github.com/go-lumen/lumen-api/helpers"
 	"github.com/go-lumen/lumen-api/store"
-	"github.com/go-lumen/lumen-api/utils"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"net/http"
 	"strings"
 	"time"
@@ -24,29 +24,29 @@ type UserAuth struct {
 // User type holds all required information
 type User struct {
 	store.DefaultRoles `bson:"-,omitempty"`
-	ID                 primitive.ObjectID `json:"id" bson:"_id,omitempty" valid:"-"`
-	FirstName          string             `json:"first_name" bson:"first_name" valid:"-"`
-	LastName           string             `json:"last_name" bson:"last_name" valid:"-"`
-	Password           string             `json:"password" bson:"password" valid:"required"`
-	Email              string             `json:"email" bson:"email" valid:"email,required"`
-	Address            string             `json:"address,omitempty" bson:"address,omitempty" valid:"-"`
-	Status             string             `json:"status" bson:"status" valid:"-"`
-	Phone              string             `json:"phone" bson:"phone" valid:"-"`
-	Language           string             `json:"language,omitempty" bson:"language,omitempty" valid:"-"`
-	Key                string             `json:"key" bson:"key" valid:"-"`
-	LastLogin          int64              `json:"last_login" bson:"last_login" valid:"-"`
-	LastModification   int64              `json:"last_modification" bson:"last_modification" valid:"-"`
-	GroupID            primitive.ObjectID `json:"group_id" bson:"group_id" valid:"-"`
+	ID                 string `json:"id" bson:"id,omitempty" valid:"-"`
+	FirstName          string `json:"first_name" bson:"first_name" valid:"-"`
+	LastName           string `json:"last_name" bson:"last_name" valid:"-"`
+	Password           string `json:"password" bson:"password" valid:"required"`
+	Email              string `json:"email" bson:"email" valid:"email,required"`
+	Address            string `json:"address,omitempty" bson:"address,omitempty" valid:"-"`
+	Status             string `json:"status" bson:"status" valid:"-"`
+	Phone              string `json:"phone,omitempty" bson:"phone,omitempty" valid:"-"`
+	Language           string `json:"language,omitempty" bson:"language,omitempty" valid:"-"`
+	Key                string `json:"key,omitempty" bson:"key,omitempty" valid:"-"`
+	LastLogin          int64  `json:"last_login,omitempty" bson:"last_login,omitempty" valid:"-"`
+	LastModification   int64  `json:"last_modification,omitempty" bson:"last_modification,omitempty" valid:"-"`
+	GroupID            string `json:"group_id" bson:"group_id" valid:"-"`
 }
 
 // GetID returns ID
 func (user *User) GetID() string {
-	return user.ID.Hex()
+	return user.ID
 }
 
 // GetGroupID returns organization ID
 func (user *User) GetGroupID() string {
-	return user.GroupID.Hex()
+	return user.GroupID
 }
 
 // GetCollection returns mongodb collection
@@ -54,57 +54,78 @@ func (user *User) GetCollection() string {
 	return UsersCollection
 }
 
-// SanitizedUser type holds user with details
+// UserDetails type holds user with details
+type UserDetails struct {
+	ID           string `json:"id" bson:"_id,omitempty" valid:"-"`
+	FirstName    string `json:"first_name" bson:"first_name" valid:"-"`
+	LastName     string `json:"last_name" bson:"last_name" valid:"-"`
+	Email        string `json:"email" bson:"email" valid:"email,required"`
+	Address      string `json:"address" bson:"address" valid:"-"`
+	Status       string `json:"status" bson:"status" valid:"-"`
+	Phone        string `json:"phone" bson:"phone" valid:"-"`
+	Language     string `json:"language" bson:"language" valid:"-"`
+	GroupID      string `json:"group_id" bson:"group_id" valid:"-"`
+	Role         string `json:"role" bson:"role" valid:"-"`
+	Organization string `json:"organization" bson:"organization" valid:"-"`
+}
+
+// SanitizedUser allows to expose only few characteristics
 type SanitizedUser struct {
-	ID               primitive.ObjectID `json:"id" bson:"_id,omitempty" valid:"-"`
-	FirstName        string             `json:"first_name" bson:"first_name" valid:"-"`
-	LastName         string             `json:"last_name" bson:"last_name" valid:"-"`
-	Email            string             `json:"email" bson:"email" valid:"email,required"`
-	Address          string             `json:"address" bson:"address" valid:"-"`
-	Status           string             `json:"status" bson:"status" valid:"-"`
-	Phone            string             `json:"phone" bson:"phone" valid:"-"`
-	Language         string             `json:"language" bson:"language" valid:"-"`
-	LastLogin        int64              `json:"last_login" bson:"last_login" valid:"-"`
-	LastModification int64              `json:"last_modification" bson:"last_modification" valid:"-"`
-	GroupID          primitive.ObjectID `json:"group_id" bson:"group_id" valid:"-"`
-	Group            string             `json:"group" bson:"group" valid:"-"`
-	Role             string             `json:"role" bson:"role" valid:"-"`
-	OrganizationID   primitive.ObjectID `json:"organization_id" bson:"organization_id" valid:"-"`
-	OrganizationName string             `json:"organization" bson:"organization" valid:"-"`
+	ID               string `json:"id" bson:"_id,omitempty" valid:"-"`
+	FirstName        string `json:"first_name" bson:"first_name" valid:"-"`
+	LastName         string `json:"last_name" bson:"last_name" valid:"-"`
+	Email            string `json:"email" bson:"email" valid:"-"`
+	Status           string `json:"status" bson:"status" valid:"-"`
+	GroupID          string `json:"group_id" bson:"group_id" valid:"-"`
+	Role             string `json:"role" bson:"role" valid:"-"`
+	OrganizationID   string `json:"organization_id" bson:"organization_id" valid:"-"`
+	OrganizationName string `json:"organization_name" bson:"organization_name" valid:"-"`
 }
 
 // Sanitize allows to create a lightweight user
-func (user *User) Sanitize(role string, groupName string, organizationID string, organizationName string) SanitizedUser {
-	obID, _ := primitive.ObjectIDFromHex(organizationID)
-	return SanitizedUser{user.ID, user.FirstName, user.LastName, user.Email, user.Address, user.Status, user.Phone, user.Language, user.LastLogin, user.LastModification, user.GroupID, groupName, role, obID, organizationName}
+func (user *User) Sanitize(role string, organizationID string, organizationName string) SanitizedUser {
+	return SanitizedUser{user.ID, user.FirstName, user.LastName, user.Email, user.Status, user.GroupID, role, organizationID, organizationName}
+}
+
+// Detail to detail a user
+func (user *User) Detail(role string, organization string) UserDetails {
+	return UserDetails{user.ID, user.FirstName, user.LastName, user.Email, user.Address, user.Status, user.Phone, user.Language, user.GroupID, role, organization}
 }
 
 // FindUser is used to find a user in a users list (for performance purposes, only 1 db request)
 func FindUser(dbUsers []*User, userID string) (ret *User, err error) {
 	for _, user := range dbUsers {
-		if userID == user.ID.Hex() {
+		if userID == user.ID {
 			return user, nil
 		}
 	}
-	return nil, errors.New("user not found")
+	return nil, errors.New("User not found")
 }
 
 // BeforeCreate validates object struct
-func (user *User) BeforeCreate() error {
-	//TODO: Check if we can remove this old dependency
-	//user.ID = mgobson.NewObjectId().Hex()
-	user.Key = helpers.RandomString(40)
+func (user *User) BeforeCreate(tx *gorm.DB, keepId, keepKey, keepPassword bool) error {
+	if !keepId {
+		user.ID = mgobson.NewObjectId().Hex()
+	}
+	if !keepKey {
+		user.Key = helpers.RandomString(40)
+	}
 	user.Email = strings.ToLower(user.Email)
 	user.LastModification = time.Now().Unix()
-	user.Status = "created"
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return helpers.NewError(http.StatusInternalServerError, "encryption_failed", "Failed to generate the encrypted password", err)
+	if user.Status == "" {
+		user.Status = "created"
 	}
-	user.Password = string(hashedPassword)
 
-	if _, err = govalidator.ValidateStruct(user); err != nil {
+	if !keepPassword {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return helpers.NewError(http.StatusInternalServerError, "encryption_failed", "Failed to generate the crypted password", err)
+		}
+		user.Password = string(hashedPassword) //user.Password
+	}
+
+	_, err := govalidator.ValidateStruct(user)
+	if err != nil {
 		return helpers.NewError(http.StatusBadRequest, "input_not_valid", err.Error(), err)
 	}
 	return nil
@@ -115,32 +136,6 @@ const UsersCollection = "users"
 
 // UsersTableName represents a SQL table
 const UsersTableName = "users_user"
-
-// GetOrCreateUser allows getting or create user
-func GetOrCreateUser(c *store.Context, user *User) (*User, error) {
-	err := user.BeforeCreate()
-	utils.CheckErr(err)
-
-	var existingUsers []*User
-	if err := c.Store.FindAll(c, bson.M{"$or": []interface{}{bson.M{"_id": user.ID}, bson.M{"email": user.Email}}}, &existingUsers); err != nil {
-		return nil, err
-	}
-
-	if len(existingUsers) > 0 {
-		//utils.Log(nil, "info", existingUsers[0], existingUsers[0].ID)
-		err = c.Store.Update(c, bson.M{"_id": existingUsers[0].ID}, user)
-		if err != nil {
-			return user, helpers.NewError(http.StatusInternalServerError, "thing_update_failed", "Failed to update the user in the database", err)
-		}
-	} else {
-		err = c.Store.Create(c, user)
-		if err != nil {
-			return user, helpers.NewError(http.StatusInternalServerError, "thing_creation_failed", "Failed to insert the user in the database", err)
-		}
-	}
-
-	return user, nil
-}
 
 // CreateUser checks if user already exists, and if not, creates it
 func CreateUser(c *store.Context, user *User) error {
@@ -153,7 +148,7 @@ func CreateUser(c *store.Context, user *User) error {
 		return helpers.NewError(http.StatusConflict, "user_already_exists", "User already exists", nil)
 	}
 
-	err := c.Store.Create(c, user)
+	err := c.Store.Create(c, "users", user)
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_creation_failed", "Failed to insert the user in the database", err)
 	}
@@ -207,7 +202,9 @@ func UpdateUser(c *store.Context, userID string, newUser *User) error {
 
 // ActivateUser allows to activate a user by its id
 func ActivateUser(c *store.Context, activationKey string, id string) error {
-	err := c.Store.Update(c, bson.M{"$and": []bson.M{utils.ParamID(id), {"key": activationKey}}}, &User{Status: "activated"}, store.OnlyFields([]string{"status"}))
+	err := c.Store.Update(c, bson.M{"id": id, "key": activationKey}, &User{Status: "activated"}, store.OnlyFields([]string{"status"}))
+	//mongo: err := c.Store.Update(c, bson.M{"$and": []bson.M{{"id": id}, {"key": activationKey}}}, &User{Status: "activated"}, store.OnlyFields([]string{"status"}))
+	//psql arr: err := c.Store.Update(c, bson.A{bson.M{"id": id}, bson.M{"key": activationKey}}, &User{Status: "activated"}, store.OnlyFields([]string{"status"}))
 
 	if err != nil {
 		return helpers.NewError(http.StatusInternalServerError, "user_activation_failed", "Couldn't find the user to activate", err)

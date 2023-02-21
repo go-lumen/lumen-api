@@ -4,9 +4,9 @@ base.rsa
 base.rsa.pub
 .env
 .env.prod
-.env.prod.*
+.env.local
 .env.testing
-.env.*
+.env.server.*
 
 *.rsa
 

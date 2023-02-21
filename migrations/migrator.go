@@ -1,28 +1,26 @@
 package migrations
 
 import (
-	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/go-lumen/lumen-api/server"
+	"gopkg.in/gormigrate.v1"
 )
 
 var (
 	migrations []*gormigrate.Migration
 )
 
-// Migrator contains api server
-type Migrator struct {
+type migrator struct {
 	api *server.API
 }
 
-// New initiates Migrator struct
-func New(api *server.API) *Migrator {
-	return &Migrator{
+func New(api *server.API) *migrator {
+	return &migrator{
 		api: api,
 	}
 }
 
-// Migrate runs migrations
-func (m *Migrator) Migrate() error {
+// Run migration
+func (m *migrator) Migrate() error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 
 	if err := gm.Migrate(); err != nil {
@@ -33,7 +31,7 @@ func (m *Migrator) Migrate() error {
 
 // MigrateTo executes all migrations that did not run yet up to
 // the migration that matches `migrationID`.
-func (m *Migrator) MigrateTo(migrationID string) error {
+func (m *migrator) MigrateTo(migrationID string) error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 
 	if err := gm.MigrateTo(migrationID); err != nil {
@@ -43,7 +41,7 @@ func (m *Migrator) MigrateTo(migrationID string) error {
 }
 
 // RollbackLast undo the last migration
-func (m *Migrator) RollbackLast() error {
+func (m *migrator) RollbackLast() error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 	if err := gm.RollbackLast(); err != nil {
 		return err
@@ -53,7 +51,7 @@ func (m *Migrator) RollbackLast() error {
 
 // RollbackTo undoes migrations up to the given migration that matches the `migrationID`.
 // Migration with the matching `migrationID` is not rolled back.
-func (m *Migrator) RollbackTo(migrationID string) error {
+func (m *migrator) RollbackTo(migrationID string) error {
 	gm := gormigrate.New(m.api.PostgreDatabase, gormigrate.DefaultOptions, migrations)
 	if err := gm.RollbackTo(migrationID); err != nil {
 		return err

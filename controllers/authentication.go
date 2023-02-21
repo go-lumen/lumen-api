@@ -27,13 +27,13 @@ func NewAuthController() AuthController {
 func (ac AuthController) returnToken(c *gin.Context, encodedKey []byte, dbUser *models.User) {
 	ctx := store.AuthContext(c)
 
-	accessToken, err := helpers.GenerateToken(encodedKey, dbUser.ID.Hex(), "access", 4320) //3d in min
+	accessToken, err := helpers.GenerateToken(encodedKey, dbUser.ID, "access", 4320) //3d in min
 	if err != nil {
 		utils.CheckErr(err)
 		ac.AbortWithError(c, helpers.ErrorTokenGenAccess(err))
 		return
 	}
-	refreshToken, err := helpers.GenerateToken(encodedKey, dbUser.ID.Hex(), "refresh", 10080) //7d in min
+	refreshToken, err := helpers.GenerateToken(encodedKey, dbUser.ID, "refresh", 10080) //7d in min
 	if err != nil {
 		utils.CheckErr(err)
 		ac.AbortWithError(c, helpers.ErrorTokenGenRefresh(err))
@@ -43,20 +43,19 @@ func (ac AuthController) returnToken(c *gin.Context, encodedKey []byte, dbUser *
 	// Get group : orga & role
 	var group models.Group
 	var organization models.Organization
-	if ac.Error(c, ctx.Store.Find(ctx, utils.ParamID(dbUser.GroupID.Hex()), &group), helpers.ErrorResourceNotFound) {
+	if ac.Error(c, ctx.Store.Find(ctx, bson.M{"_id": dbUser.GroupID}, &group), helpers.ErrorResourceNotFound) {
 		return
 	}
-	if ac.Error(c, ctx.Store.Find(ctx, utils.ParamID(group.OrganizationID.Hex()), &organization), helpers.ErrorResourceNotFound) {
+	if ac.Error(c, ctx.Store.Find(ctx, bson.M{"_id": group.OrganizationID}, &organization), helpers.ErrorResourceNotFound) {
 		return
 	}
 
-	err = ctx.Store.Update(ctx, store.ID(dbUser.ID.Hex()), &models.User{LastLogin: time.Now().Unix()},
-		store.OnlyFields([]string{"last_login"}))
+	err = ctx.Store.Update(ctx, store.ID(dbUser.ID), &models.User{LastLogin: time.Now().Unix()}, store.OnlyFields([]string{"last_login"}))
 	if ac.ErrorInternal(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": accessToken, "refresh_token": refreshToken, store.RoleUser: dbUser.Sanitize(group.Role, group.Name, organization.ID.Hex(), organization.Name)})
+	c.JSON(http.StatusOK, gin.H{"token": accessToken, "refresh_token": refreshToken, store.RoleUser: dbUser.Sanitize(group.Role, organization.ID, organization.Name)})
 }
 
 // TokensGeneration to authenticate the user and generate a new token
@@ -86,6 +85,10 @@ func (ac AuthController) TokensGeneration(c *gin.Context) {
 		utils.Log(c, "info", "CompareHashAndPassword err:", err)
 		return
 	}
+	/*if dbUser.Password != userInput.Password {
+		utils.Log(c, "info", "CompareHashAndPassword er")
+		return
+	}*/
 
 	if dbUser.Status == "created" {
 		ac.AbortWithError(c, helpers.ErrorUserNotActivated(nil))
@@ -117,7 +120,7 @@ func (ac AuthController) TokenRenewal(c *gin.Context) {
 	}
 
 	var dbUser models.User
-	if ac.Error(c, ctx.Store.Find(ctx, utils.ParamID(fmt.Sprintf("%v", refreshTokenClaims["sub"])), &dbUser), helpers.ErrorUserNotExist) {
+	if ac.Error(c, ctx.Store.Find(ctx, bson.M{"_id": fmt.Sprintf("%v", refreshTokenClaims["sub"])}, &dbUser), helpers.ErrorUserNotExist) {
 		return
 	}
 

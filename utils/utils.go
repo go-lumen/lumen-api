@@ -2,14 +2,9 @@ package utils
 
 import (
 	"context"
-	"github.com/getsentry/sentry-go"
-	"github.com/gin-gonic/gin"
 	"github.com/go-lumen/lumen-api/config"
 	"github.com/sirupsen/logrus"
 	"github.com/snwfdhmp/errlog"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
 	"reflect"
 	"strconv"
 	"time"
@@ -18,20 +13,10 @@ import (
 // CheckErr checks error and print it if it exists
 func CheckErr(e error) bool {
 	if e != nil {
-		sentry.CaptureException(e)
 		errlog.Debug(e)
 		return true
 	}
 	return false
-}
-
-// CheckErrAndAbort checks error and returns a gin one
-func CheckErrAndAbort(c *gin.Context, e error) {
-	if e != nil {
-		_ = c.AbortWithError(http.StatusNotFound, e)
-		logrus.WithError(e).WithField("path", c.FullPath()).Debugln("request aborted")
-		CheckErr(e)
-	}
 }
 
 // Log logs if debug env var is set at true
@@ -48,12 +33,6 @@ func Log(ctxt context.Context, level string, msg ...interface{}) {
 			logrus.Infoln(msg...)
 		}
 	}
-}
-
-// ParamID allows to generate an ID query
-func ParamID(id string) bson.M {
-	objID, _ := primitive.ObjectIDFromHex(id)
-	return bson.M{"_id": objID}
 }
 
 // RemoveStringFromSlice allows to remove a string in a slice

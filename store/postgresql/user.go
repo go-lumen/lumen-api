@@ -60,7 +60,6 @@ func (db *PSQL) GetOrCreateUser(user *models.User) (*models.User, error) {
 			dbUser.Password = user.Password
 			dbUser.Email = user.Email
 			dbUser.Phone = user.Phone
-			dbUser.Balance = user.Balance
 			if err := db.ActivateUser(dbUser.Key /*strconv.Itoa(dbUser.ID)*/, dbUser.Email); err != nil {
 				utils.Log(nil, "warn", `Error when activating user`, err)
 			}

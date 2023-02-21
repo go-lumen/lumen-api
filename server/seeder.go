@@ -54,7 +54,6 @@ func (a *API) SetupMongoSeeds() error {
 		Email:     a.Config.GetString("admin_email"),
 		Phone:     a.Config.GetString("admin_phone"),
 		GroupID:   group.ID,
-		Balance:   123.45,
 	}
 
 	userExists, user, err := models.UserExists(ctx, user.Email)
@@ -108,7 +107,6 @@ func (a *API) SetupPostgreSeeds() error {
 		Phone:     a.Config.GetString("admin_phone"),
 		Status:    "activated",
 		GroupID:   adminGroup.ID,
-		Balance:   123.45,
 	}
 	s.GetOrCreateUser(adminUser)
 	/*err := models.ActivateUser(ctx, adminUser.Key, adminUser.ID)

@@ -59,8 +59,6 @@ func main() {
 		db.AutoMigrate(&models.Organization{})
 		db.AutoMigrate(&models.Group{})
 		db.AutoMigrate(&models.User{})
-		db.AutoMigrate(&models.Invoice{})
-		db.AutoMigrate(&models.Transaction{})
 
 		err = api.SetupPostgreSeeds()
 		utils.CheckErr(err)

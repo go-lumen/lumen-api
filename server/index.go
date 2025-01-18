@@ -2,11 +2,12 @@ package server
 
 import (
 	"context"
+	"time"
+
 	"github.com/go-lumen/lumen-api/utils"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
-	"time"
 )
 
 // SetupMongoIndexes allows to setup MongoDB index
@@ -29,7 +30,7 @@ func (a *API) SetupMongoIndexes() error {
 	// Index to location 2dsphere type.
 	pointIndexModel := mongo.IndexModel{
 		Options: options.Index().SetBackground(true),
-		Keys:    bsonx.MDoc{"location": bsonx.String("2dsphere")},
+		Keys:    bson.D{{Key: "location", Value: "2dsphere"}},
 	}
 	poiIndexes := db.Collection("pois").Indexes()
 	deviceMessagesNames, err := poiIndexes.CreateOne(ctx, pointIndexModel, indexOpts)
